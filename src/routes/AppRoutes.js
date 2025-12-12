@@ -1,0 +1,72 @@
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ROUTES } from "./RouterConstant";
+
+import MainLayout from "../components/layout/MainLayout";
+
+import Dashboard from "../components/home/dashboard/Dashboard";
+import ContentLibrary from "../components/home/contentLibrary/ContentLibrary";
+import Upload from "../components/home/upload/Upload";
+import Users from "../components/home/users/Users";
+import Settings from "../components/home/settings/Settings";
+import ReviewQueue from "../components/home/reviewQueue/ReviewQueue";
+import NotFound from "../components/common/NotFound";
+
+import PublicRoutes from "./scopeRoute/PublicRoute";
+import ProtectedRoutes from "./scopeRoute/ProtectedRoutes";
+import AuthLayout from "../components/authentication/AuthLayout";
+
+const AppRouter = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to={ROUTES.LOGIN} replace />} />
+
+        <Route
+          path={ROUTES.LOGIN}
+          element={
+            <PublicRoutes>
+              <AuthLayout />
+            </PublicRoutes>
+          }
+        />
+
+         <Route
+          path={ROUTES.FORGET_PASSWORD}
+          element={
+            <PublicRoutes>
+              <AuthLayout />
+            </PublicRoutes>
+          }
+        />
+
+        <Route
+          path={ROUTES.RESET_PASSWORD}
+          element={
+            <PublicRoutes>
+              <AuthLayout />
+            </PublicRoutes>
+          }
+        />
+
+        <Route
+          element={
+            <ProtectedRoutes>
+              <MainLayout />
+            </ProtectedRoutes>
+          }
+        >
+          <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
+          <Route path={ROUTES.CONTENT_LIBRARY} element={<ContentLibrary />} />
+          <Route path={ROUTES.REVIEW_QUEUE} element={<ReviewQueue />} />
+          <Route path={ROUTES.UPLOAD} element={<Upload />} />
+          <Route path={ROUTES.USERS} element={<Users />} />
+          <Route path={ROUTES.SETTINGS} element={<Settings />} />
+        </Route>
+
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default AppRouter;
