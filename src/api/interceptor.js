@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "https://practo-cms-backend-8.onrender.com";
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL || "https://practo-cms-backend-8.onrender.com";
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -17,7 +18,7 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
+
     console.log("Request:", config.method?.toUpperCase(), config.url);
     return config;
   },
@@ -31,15 +32,30 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error("Error:", error.response?.status, error.response?.config?.url);
-    
+    console.error(
+      "Error:",
+      error.response?.status,
+      error.response?.config?.url
+    );
+
     if (error.response?.status === 401) {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("permissions");
-      window.location.href = "/login";
+      const requestUrl = error.config?.url || "";
+      const isAuthRequest =
+        requestUrl.includes("/api/auth/login") ||
+        requestUrl.includes("/api/auth/oauth/google") ||
+        requestUrl.includes("/api/auth/refresh");
+
+      if (!isAuthRequest) {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("permissions");
+
+        if (window.location.pathname !== "/login") {
+          window.location.replace("/login");
+        }
+      }
     }
-    
+
     return Promise.reject(error);
   }
 );
