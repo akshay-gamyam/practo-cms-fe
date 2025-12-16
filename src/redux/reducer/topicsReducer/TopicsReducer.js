@@ -1,0 +1,119 @@
+import { createSlice } from "@reduxjs/toolkit";
+import { revertAll } from "../revertStateReducer/RevertStateReducer";
+
+const initialState = {
+  topics: [],
+  doctors: [],
+  selectedTopics: null,
+  topicStatistics: null,
+  isTopicsListLoading: false,
+  isTopicsViewLoading: false,
+  isTopicsCreateLoading: false,
+  isTopicStatsLoading: false,
+  error: null,
+};
+
+const topicsSlice = createSlice({
+  name: "topics",
+  initialState,
+  extraReducers: (builder) => builder.addCase(revertAll, () => initialState),
+  reducers: {
+    // .................. fetch topics listing ....................
+    fetchTopicsStart(state) {
+      state.isTopicsListLoading = true;
+    },
+    fetchTopicsSuccess(state, action) {
+      state.isTopicsListLoading = false;
+      state.topics = action.payload.topics || [];
+      state.error = null;
+    },
+    fetchTopicsFailure(state, action) {
+      state.isTopicsListLoading = false;
+      state.error = action.payload;
+    },
+
+    // .................. fetch doctors list ....................
+    fetchDoctorsStart(state) {
+      state.isTopicsListLoading = true;
+    },
+    fetchDoctorsSuccess(state, action) {
+      state.isTopicsListLoading = false;
+      state.doctors = action.payload.doctors || [];
+      state.error = null;
+    },
+    fetchDoctorsFailure(state, action) {
+      state.isTopicsListLoading = false;
+      state.error = action.payload;
+    },
+
+    // ................. create new topic ........................
+    createTopicsStart(state) {
+      state.isCreateLoading = true;
+    },
+    createTopicsSuccess(state, action) {
+      state.isCreateLoading = false;
+      state.topics.unshift(action.payload.topics);
+      state.error = null;
+    },
+    createTopicsFailure(state, action) {
+      state.isCreateLoading = false;
+      state.error = action.payload;
+    },
+
+    // ................. fetch single topic ........................
+    fetchViewTopicsStart(state) {
+      state.isTopicsViewLoading = true;
+    },
+    fetchViewTopicsSuccess(state, action) {
+      state.isTopicsViewLoading = false;
+      state.selectedTopics = action.payload.topic;
+      state.error = null;
+    },
+    fetchViewTopicsFailure(state, action) {
+      state.isTopicsViewLoading = false;
+      state.error = action.payload;
+    },
+
+    // ................. fetch topic statistics ........................
+    fetchTopicStatisticsStart(state) {
+      state.isTopicStatsLoading = true;
+    },
+
+    fetchTopicStatisticsSuccess(state, action) {
+      state.isTopicStatsLoading = false;
+      state.topicStatistics = action.payload.stats;
+      state.error = null;
+    },
+
+    fetchTopicStatisticsFailure(state, action) {
+      state.isTopicStatsLoading = false;
+      state.error = action.payload;
+    },
+
+    // ................. clear selected topic ........................
+    clearSelectedTopics(state) {
+      state.selectedTopics = null;
+    },
+  },
+});
+
+export const {
+  fetchTopicsStart,
+  fetchTopicsSuccess,
+  fetchTopicsFailure,
+  fetchDoctorsStart,
+  fetchDoctorsSuccess,
+  fetchDoctorsFailure,
+  createTopicsStart,
+  createTopicsSuccess,
+  createTopicsFailure,
+  fetchViewTopicsStart,
+  fetchViewTopicsSuccess,
+  fetchViewTopicsFailure,
+  fetchTopicStatisticsStart,
+  fetchTopicStatisticsSuccess,
+  fetchTopicStatisticsFailure,
+  clearSelectedTopics,
+} = topicsSlice.actions;
+
+export default topicsSlice.reducer;

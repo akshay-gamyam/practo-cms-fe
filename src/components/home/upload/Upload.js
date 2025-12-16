@@ -1,8 +1,9 @@
 import React from 'react'
+import CreateTopics from './Topics/CreateTopics'
 
 const Upload = () => {
   return (
-    <div>Upload</div>
+    <div><CreateTopics /></div>
   )
 }
 

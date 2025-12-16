@@ -6,14 +6,15 @@ import MainLayout from "../components/layout/MainLayout";
 import Dashboard from "../components/home/dashboard/Dashboard";
 import ContentLibrary from "../components/home/contentLibrary/ContentLibrary";
 import Upload from "../components/home/upload/Upload";
-import Users from "../components/home/users/Users";
 import Settings from "../components/home/settings/Settings";
 import ReviewQueue from "../components/home/reviewQueue/ReviewQueue";
 import NotFound from "../components/common/NotFound";
+import UserManagement from "../components/home/userManagement/UsersManagement";
 
 import PublicRoutes from "./scopeRoute/PublicRoute";
 import ProtectedRoutes from "./scopeRoute/ProtectedRoutes";
 import AuthLayout from "../components/authentication/AuthLayout";
+
 
 const AppRouter = () => {
   return (
@@ -59,7 +60,7 @@ const AppRouter = () => {
           <Route path={ROUTES.CONTENT_LIBRARY} element={<ContentLibrary />} />
           <Route path={ROUTES.REVIEW_QUEUE} element={<ReviewQueue />} />
           <Route path={ROUTES.UPLOAD} element={<Upload />} />
-          <Route path={ROUTES.USERS} element={<Users />} />
+          <Route path={ROUTES.USERS} element={<UserManagement />} />
           <Route path={ROUTES.SETTINGS} element={<Settings />} />
         </Route>
 

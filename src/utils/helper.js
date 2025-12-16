@@ -1,7 +1,7 @@
 import { IoDocumentTextOutline, IoHome } from "react-icons/io5";
 import { ROUTES } from "../routes/RouterConstant";
 import { FiUpload } from "react-icons/fi";
-import { FaRegChartBar } from "react-icons/fa";
+import { FaClipboardList, FaRegChartBar, FaSpinner, FaUserMd } from "react-icons/fa";
 import { PiUsers } from "react-icons/pi";
 import { CiSettings } from "react-icons/ci";
 
@@ -128,3 +128,53 @@ export const getUserInitials = () => {
 
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 };
+
+// ................type of role based list .................
+export const rolesList = [
+  { label: "Super Admin", value: "SUPER_ADMIN" },
+  { label: "Medical Reviewer", value: "MEDICAL_REVIEWER" },
+  { label: "Brand Reviewer", value: "BRAND_REVIEWER" },
+  { label: "Doctor Creator", value: "DOCTOR_CREATOR" },
+  { label: "Agency POC", value: "AGENCY_POC" },
+  { label: "Content Approver", value: "CONTENT_APPROVER" },
+  { label: "Publisher", value: "PUBLISHER" },
+  { label: "Viewer", value: "VIEWER" },
+];
+
+
+// ..................... change color according to status ......................
+
+export const statusList = [
+  { label: "Active", value: "ACTIVE", color: "green" },
+  { label: "Inactive", value: "INACTIVE", color: "gray" },
+  { label: "Suspended", value: "SUSPENDED", color: "red" },
+];
+
+
+// ......................... topics status style ...................
+export const statusStyles = {
+  ASSIGNED: "bg-blue-100 text-blue-700",
+  PENDING_REVIEW: "bg-yellow-100 text-yellow-700",
+  FINAL_REVIEW: "bg-purple-100 text-purple-700",
+  PUBLISHED: "bg-green-100 text-green-700",
+  REJECTED: "bg-red-100 text-red-700",
+};
+
+
+export const buildStats = (stats) => [
+  {
+    title: "Total Topics",
+    value: stats?.total ?? 0,
+    icon: FaClipboardList,
+  },
+  {
+    title: "Assigned Topics",
+    value: stats?.byStatus?.ASSIGNED ?? 0,
+    icon: FaUserMd,
+  },
+  {
+    title: "In Progress",
+    value: stats?.byStatus?.IN_PROGRESS ?? 0,
+    icon: FaSpinner,
+  }
+];

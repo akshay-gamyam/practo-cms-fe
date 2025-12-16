@@ -54,13 +54,6 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.error = action.payload;
     },
-    
-    // setSocialLoginPending(state, action) {
-    //   state.socialLoginPending = action.payload;
-    // },
-
-    // ........... logout state ...............
-    
   },
 });
 
