@@ -1,4 +1,5 @@
 import {
+  DOCTOR_ASSIGNMENT_LIST,
   GET_DOCTOR_LIST,
   GET_TOPIC_STATISTICS,
   GET_TOPICS_LIST,
@@ -20,10 +21,13 @@ import {
   fetchTopicStatisticsStart,
   fetchTopicStatisticsSuccess,
   fetchTopicStatisticsFailure,
-  clearSelectedTopics,
+  fetchDoctorAssignmentStart,
+  fetchDoctorAssignmentSuccess,
+  fetchDoctorAssignmentFailure,
 } from "../../reducer/topicsReducer/TopicsReducer";
 
 let isFetchingTopics = false;
+let isFetchingDoctorAssignment = false;
 let isCreatingTopic = false;
 let isViewFetchingTopic = false;
 let isFetchingDoctors = false;
@@ -50,6 +54,30 @@ export const fetchUplodedTopcsList = () => async (dispatch) => {
     throw error;
   } finally {
     isFetchingTopics = false;
+  }
+};
+
+// .................... get Doctor Assignment list ......................
+
+export const fetchDoctorAssignmentList = () => async (dispatch) => {
+  if (isFetchingDoctorAssignment) return;
+  isFetchingDoctorAssignment = true;
+  dispatch(fetchDoctorAssignmentStart());
+
+  try {
+    const response = await api.get(`${DOCTOR_ASSIGNMENT_LIST}`);
+    console.log("response", response)
+    const { topics } = response.data;
+    dispatch(fetchDoctorAssignmentSuccess({ topics }));
+
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || error.message || "Failed to fetch users";
+    dispatch(fetchDoctorAssignmentFailure(errorMessage));
+    throw error;
+  } finally {
+    isFetchingDoctorAssignment = false;
   }
 };
 
@@ -110,10 +138,10 @@ export const fetchDetailedTopicById = (topicId) => async (dispatch) => {
 
   try {
     const response = await api.get(`${GET_TOPICS_LIST}/${topicId}`);
-console.log("response", response)
+    console.log("response", response);
     const { topic } = response.data;
 
-    console.log("topic", topic)
+    console.log("topic", topic);
     dispatch(fetchViewTopicsSuccess({ topic }));
 
     return response.data;
@@ -130,7 +158,6 @@ console.log("response", response)
 };
 
 // .................... get topic statistics ......................
-
 
 export const fetchTopicStatistics = () => async (dispatch) => {
   if (isFetchingTopicStat) return;

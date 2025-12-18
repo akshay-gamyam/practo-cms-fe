@@ -4,12 +4,14 @@ import { revertAll } from "../revertStateReducer/RevertStateReducer";
 const initialState = {
   topics: [],
   doctors: [],
+  doctorAssignments: [],
   selectedTopics: null,
   topicStatistics: null,
   isTopicsListLoading: false,
   isTopicsViewLoading: false,
   isTopicsCreateLoading: false,
   isTopicStatsLoading: false,
+  isDoctorAssignmentLoading: false,
   error: null,
 };
 
@@ -29,6 +31,20 @@ const topicsSlice = createSlice({
     },
     fetchTopicsFailure(state, action) {
       state.isTopicsListLoading = false;
+      state.error = action.payload;
+    },
+
+    // .................. fetch doctor Assignments listing ....................
+    fetchDoctorAssignmentStart(state) {
+      state.isDoctorAssignmentLoading = true;
+    },
+    fetchDoctorAssignmentSuccess(state, action) {
+      state.isDoctorAssignmentLoading = false;
+      state.doctorAssignments = action.payload.topics || [];
+      state.error = null;
+    },
+    fetchDoctorAssignmentFailure(state, action) {
+      state.isDoctorAssignmentLoading = false;
       state.error = action.payload;
     },
 
@@ -113,6 +129,9 @@ export const {
   fetchTopicStatisticsStart,
   fetchTopicStatisticsSuccess,
   fetchTopicStatisticsFailure,
+  fetchDoctorAssignmentStart,
+  fetchDoctorAssignmentSuccess,
+  fetchDoctorAssignmentFailure,
   clearSelectedTopics,
 } = topicsSlice.actions;
 

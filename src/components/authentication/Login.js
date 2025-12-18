@@ -4,15 +4,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "react-toastify";
 import { ROUTES } from "../../routes/RouterConstant";
-import { loginUser, loginWithGoogle } from "../../redux/action/authAction/AuthAction";
+import {
+  loginUser,
+  loginWithGoogle,
+} from "../../redux/action/authAction/AuthAction";
 import { FaRegEye } from "react-icons/fa";
 import { IoEyeOffOutline } from "react-icons/io5";
+import { ROLE_VARIABLES_MAP } from "../../utils/helper";
 
 const Login = ({ setScreen }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const isLoading = useSelector((state) => state.auth.isLoading);
+  const user = useSelector((state) => state.auth.user);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -74,9 +79,26 @@ const Login = ({ setScreen }) => {
         toastId: "login-success",
       });
 
-      navigate(ROUTES.DASHBOARD);
+      if (user?.role === ROLE_VARIABLES_MAP?.MEDICAL_REVIEWER) {
+        return navigate(ROUTES.MEDICAL_TOPICS);
+      } else if (user?.role === ROLE_VARIABLES_MAP?.BRAND_REVIEWER) {
+        return navigate(ROUTES.REVIEW_QUEUE);
+      } else if (user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR) {
+        return navigate(ROUTES.MY_TOPICS);
+      } else if (user?.role ===  ROLE_VARIABLES_MAP?.AGENCY_POC) {
+        return navigate(ROUTES.UPLOAD);
+      } else if (user?.role === ROLE_VARIABLES_MAP?.CONTENT_APPROVER) {
+        return navigate(ROUTES.REVIEW_QUEUE);
+      } else if (user?.role === ROLE_VARIABLES_MAP?.PUBLISHER) {
+        return navigate(ROUTES.REVIEW_QUEUE);
+      } else if (user?.role === ROLE_VARIABLES_MAP?.SUPER_ADMIN) {
+        return navigate(ROUTES.DASHBOARD);
+      }
+
+      // navigate(ROUTES.DASHBOARD);
     } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || "Login failed";
+      const errorMessage =
+        error.response?.data?.message || error.message || "Login failed";
 
       toast.error(errorMessage, {
         toastId: "login-error",
@@ -92,11 +114,28 @@ const Login = ({ setScreen }) => {
         loginWithGoogle(credentialResponse.credential)
       );
 
-      toast.success(`Welcome back, ${response.user.name}!`, {toastId: "google-success" });
+      toast.success(`Welcome back, ${response.user.name}!`, {
+        toastId: "google-success",
+      });
 
-      navigate(ROUTES.DASHBOARD);
+        if (user?.role === ROLE_VARIABLES_MAP?.MEDICAL_REVIEWER) {
+        return navigate(ROUTES.MEDICAL_TOPICS);
+      } else if (user?.role === ROLE_VARIABLES_MAP?.BRAND_REVIEWER) {
+        return navigate(ROUTES.REVIEW_QUEUE);
+      } else if (user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR) {
+        return navigate(ROUTES.MY_TOPICS);
+      } else if (user?.role ===  ROLE_VARIABLES_MAP?.AGENCY_POC) {
+        return navigate(ROUTES.UPLOAD);
+      } else if (user?.role === ROLE_VARIABLES_MAP?.CONTENT_APPROVER) {
+        return navigate(ROUTES.REVIEW_QUEUE);
+      } else if (user?.role === ROLE_VARIABLES_MAP?.PUBLISHER) {
+        return navigate(ROUTES.REVIEW_QUEUE);
+      } else if (user?.role === ROLE_VARIABLES_MAP?.SUPER_ADMIN) {
+        return navigate(ROUTES.DASHBOARD);
+      }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || "Google login failed";
+      const errorMessage =
+        error.response?.data?.message || error.message || "Google login failed";
 
       toast.error(errorMessage, {
         toastId: "google-error",
@@ -107,7 +146,9 @@ const Login = ({ setScreen }) => {
   };
 
   const handleGoogleError = () => {
-    toast.error("Google login failed. Please try again.", {toastId: "google-error-btn",});
+    toast.error("Google login failed. Please try again.", {
+      toastId: "google-error-btn",
+    });
   };
 
   return (

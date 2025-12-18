@@ -14,7 +14,10 @@ import UserManagement from "../components/home/userManagement/UsersManagement";
 import PublicRoutes from "./scopeRoute/PublicRoute";
 import ProtectedRoutes from "./scopeRoute/ProtectedRoutes";
 import AuthLayout from "../components/authentication/AuthLayout";
-
+import MyTopics from "../components/home/myTopics/MyTopics";
+import UserProfile from "../components/home/userProfile/UserProfile";
+import Notifications from "../components/home/notifications/Notifications";
+import MedicalTopics from "../components/home/medicalTopics/MedicalTopics";
 
 const AppRouter = () => {
   return (
@@ -31,7 +34,7 @@ const AppRouter = () => {
           }
         />
 
-         <Route
+        <Route
           path={ROUTES.FORGET_PASSWORD}
           element={
             <PublicRoutes>
@@ -60,8 +63,13 @@ const AppRouter = () => {
           <Route path={ROUTES.CONTENT_LIBRARY} element={<ContentLibrary />} />
           <Route path={ROUTES.REVIEW_QUEUE} element={<ReviewQueue />} />
           <Route path={ROUTES.UPLOAD} element={<Upload />} />
+          <Route path={ROUTES.UPLOAD_WITH_ID} element={<Upload />} />
+          <Route path={ROUTES.MY_TOPICS} element={<MyTopics />} />
+          <Route path={ROUTES.MEDICAL_TOPICS} element={<MedicalTopics />} />
           <Route path={ROUTES.USERS} element={<UserManagement />} />
           <Route path={ROUTES.SETTINGS} element={<Settings />} />
+          <Route path={ROUTES.USER_PROFILE} element={<UserProfile />} />
+          <Route path={ROUTES.NOCIFICATIONS} element={<Notifications />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

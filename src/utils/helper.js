@@ -4,6 +4,8 @@ import { FiUpload } from "react-icons/fi";
 import { FaClipboardList, FaRegChartBar, FaSpinner, FaUserMd } from "react-icons/fa";
 import { PiUsers } from "react-icons/pi";
 import { CiSettings } from "react-icons/ci";
+import { MdOutlineMedicalInformation, MdOutlineTopic } from "react-icons/md";
+import { IoIosNotifications } from "react-icons/io";
 
 // Google OAuth Client ID
 export const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -16,6 +18,8 @@ export const MENU_ITEMS = [
     path: ROUTES.CONTENT_LIBRARY,
   },
   { label: "Upload", icon: <FiUpload size={20} />, path: ROUTES.UPLOAD },
+  { label: "My Topics", icon: <MdOutlineTopic size={20} />, path: ROUTES.MY_TOPICS },
+  { label: "Medical Topics", icon: <MdOutlineMedicalInformation size={20} />, path: ROUTES.MEDICAL_TOPICS },
   {
     label: "Review Queue",
     icon: <FaRegChartBar size={20} />,
@@ -23,6 +27,7 @@ export const MENU_ITEMS = [
   },
   { label: "Users", icon: <PiUsers size={20} />, path: ROUTES.USERS },
   { label: "Settings", icon: <CiSettings size={20} />, path: ROUTES.SETTINGS },
+  { label: "Notifications", icon: <IoIosNotifications size={20} />, path: ROUTES.NOCIFICATIONS },
 ];
 
 
@@ -178,3 +183,36 @@ export const buildStats = (stats) => [
     icon: FaSpinner,
   }
 ];
+
+
+export  const passwordFields = [
+    {
+      field: "current",
+      label: "Current Password",
+      name: "currentpassword",
+      placeholder: "Enter current password"
+    },
+    {
+      field: "new",
+      label: "New Password",
+      name: "newPassword",
+      placeholder: "Enter new password"
+    },
+    {
+      field: "confirm",
+      label: "Confirm New Password",
+      name: "confirmPassword",
+      placeholder: "Confirm new password"
+    }
+  ];
+
+
+export const ROLE_VARIABLES_MAP = {
+  MEDICAL_REVIEWER: "MEDICAL_REVIEWER",
+  BRAND_REVIEWER: "BRAND_REVIEWER",
+  CONTENT_APPROVER: "CONTENT_APPROVER",
+  PUBLISHER: "PUBLISHER",
+  DOCTOR_CREATOR: "DOCTOR_CREATOR",
+  AGENCY_POC: "AGENCY_POC",
+  SUPER_ADMIN: "SUPER_ADMIN",
+};

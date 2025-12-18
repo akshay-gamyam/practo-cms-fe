@@ -5,7 +5,12 @@ export const ROUTES = {
   DASHBOARD: "/dashboard",
   CONTENT_LIBRARY: "/content-library",
   UPLOAD: "/upload",
+  UPLOAD_WITH_ID: "/upload/:id",
+  MY_TOPICS: "/my-topics",
   REVIEW_QUEUE: "/review-queue",
   USERS: "/users",
   SETTINGS: "/settings",
+  USER_PROFILE: "/profile",
+  NOCIFICATIONS: "/notifications",
+  MEDICAL_TOPICS : "/medical-topics",
 };

@@ -1,12 +1,26 @@
 import React, { useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { MENU_ITEMS } from "../../utils/helper";
+import { MENU_ITEMS, ROLE_VARIABLES_MAP } from "../../utils/helper";
+import { revertAll } from "../../redux/reducer/revertStateReducer/RevertStateReducer";
+import { persistor } from "../../redux/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { BiLogOut } from "react-icons/bi";
+import { ROUTES } from "../../routes/RouterConstant";
+import { ROLE_ACCESS } from "../../utils/roleAccess";
 
 const Sidebar = () => {
   const [open, setOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
+
+  const allowedRoutes = ROLE_ACCESS[user?.role] || [];
+
+  const filteredMenuItems = MENU_ITEMS.filter((item) =>
+    allowedRoutes.includes(item.path)
+  );
 
   const handleNavigate = useCallback(
     (path) => {
@@ -19,6 +33,43 @@ const Sidebar = () => {
     (path) => location.pathname === path,
     [location.pathname]
   );
+
+  const getInitials = () => {
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName.charAt(0)}${user.lastName.charAt(
+        0
+      )}`.toUpperCase();
+    }
+    return "A";
+  };
+
+  const getUserName = () => {
+    if (user?.name) return user.name;
+    if (user?.firstName && user?.lastName)
+      return `${user.firstName} ${user.lastName}`;
+    return "Admin User";
+  };
+
+  const getUserRole = () => {
+    if (user?.role) {
+      return user.role
+        .split("_")
+        .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
+        .join(" ");
+    }
+    return "Super Admin";
+  };
+
+  const handleLogout = async () => {
+    try {
+      dispatch(revertAll());
+      await persistor.purge();
+      localStorage.clear();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <aside
@@ -45,7 +96,7 @@ const Sidebar = () => {
       </div>
 
       <nav className="mt-6 flex flex-col gap-2 px-3 flex-1 overflow-y-auto">
-        {MENU_ITEMS.map((item) => {
+        {filteredMenuItems.map((item) => {
           const active = isRouteActive(item.path);
 
           return (
@@ -72,24 +123,54 @@ const Sidebar = () => {
                     : "opacity-0 -translate-x-3 w-0 overflow-hidden"
                 }`}
               >
-                {item.label}
+                {user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR && item.label === "My Topics"
+                  ? "Doctor Notes"
+                  : item.label}
+                {/* {item.label} */}
               </span>
             </button>
           );
         })}
       </nav>
 
-      <div className="mt-auto px-5 py-5 border-t border-gray-800 flex items-center gap-3">
-        <div className="h-12 w-12 rounded-full bg-teal-400 flex items-center justify-center text-white font-bold flex-shrink-0">
-          A
-        </div>
-
-        {open && (
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-white truncate">Admin User</p>
-            <p className="text-sm text-gray-400 truncate">Medical Reviewer</p>
+      <div className="px-3 mb-3">
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 text-gray-300 hover:bg-red-900/20 hover:text-red-400 border border-transparent hover:border-red-800"
+        >
+          <div className="min-w-[24px] flex justify-center">
+            <BiLogOut size={24} />
           </div>
-        )}
+
+          <span
+            className={`text-[15px] font-medium whitespace-nowrap transition-all duration-200 
+            ${
+              open
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 -translate-x-3 w-0 overflow-hidden"
+            }`}
+          >
+            Logout
+          </span>
+        </button>
+      </div>
+
+      <div className="mt-auto px-5 py-5 border-t border-gray-800">
+        <button
+          onClick={() => handleNavigate(ROUTES.USER_PROFILE)}
+          className="flex items-center gap-3 w-full hover:bg-[#1f2937] p-2 rounded-lg transition-all"
+        >
+          <div className="h-12 w-12 rounded-full bg-teal-400 flex items-center justify-center text-white font-bold flex-shrink-0">
+            {getInitials()}
+          </div>
+
+          {open && (
+            <div className="flex-1 min-w-0 text-left">
+              <p className="font-medium text-white truncate">{getUserName()}</p>
+              <p className="text-sm text-gray-400 truncate">{getUserRole()}</p>
+            </div>
+          )}
+        </button>
       </div>
     </aside>
   );

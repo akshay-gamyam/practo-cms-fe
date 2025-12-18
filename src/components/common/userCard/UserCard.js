@@ -1,4 +1,5 @@
 import React from "react";
+import { ROLE_VARIABLES_MAP } from "../../../utils/helper";
 
 const UserCard = ({ user, onViewProfile, onEditUser }) => {
 
@@ -21,7 +22,7 @@ const UserCard = ({ user, onViewProfile, onEditUser }) => {
             <span className="px-4 py-1 rounded-full text-xs  bg-blue-100 text-blue-700 border border-blue-200">
               {user.role}
             </span>
-            {user?.role === "DOCTOR_CREATOR" ? <span className="px-4 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            {user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR ? <span className="px-4 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
               {user.specialty || "---"}
             </span> :"" }
           </div>
