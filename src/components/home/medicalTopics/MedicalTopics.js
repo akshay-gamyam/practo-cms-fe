@@ -15,9 +15,9 @@ const MedicalTopics = () => {
   );
   console.log("topics", topics);
 
-  const handleCardClick = (topicId) => {
-    navigate(`${ROUTES.UPLOAD}/${topicId}`);
-  };
+  // const handleCardClick = (topicId) => {
+  //   navigate(`${ROUTES.UPLOAD}/${topicId}`);
+  // };
 
   useEffect(() => {
     dispatch(fetchUplodedTopcsList());
@@ -77,7 +77,7 @@ const MedicalTopics = () => {
                 return (
                   <div
                     key={topic?.id}
-                    onClick={() => handleCardClick(topic?.id)}
+                    // onClick={() => handleCardClick(topic?.id)}
                     className="group relative bg-white border rounded-xl p-5 transition hover:shadow-md hover:border-gray-300"
                   >
                     <span

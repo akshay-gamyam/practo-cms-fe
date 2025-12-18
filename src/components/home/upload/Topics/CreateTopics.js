@@ -24,8 +24,8 @@ const CreateTopics = () => {
 
   const selectedTopic = topics?.find((topic) => topic?.id === topicId);
 
-  const doctorFirstName = selectedTopic?.assignedDoctor?.firstName;
-  const doctorLastName = selectedTopic?.assignedDoctor?.lastName;
+  // const doctorFirstName = selectedTopic?.assignedDoctor?.firstName;
+  // const doctorLastName = selectedTopic?.assignedDoctor?.lastName;
   const selectedDoctorId = selectedTopic?.assignedDoctor?.id;
 
   const isDoctorCreator = user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR;
@@ -149,14 +149,14 @@ const CreateTopics = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Doctor Name *
                     </label>
-                    {isMedicalReviewerCreator ? (
+                    {/* {isMedicalReviewerCreator ? (
                       <input
                         type="text"
                         value={`${doctorFirstName} ${doctorLastName}`}
                         disabled
                         className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed"
                       />
-                    ) : (
+                    ) : ( */}
                       <select
                         name="doctorId"
                         value={formData.doctorId}
@@ -171,7 +171,7 @@ const CreateTopics = () => {
                           </option>
                         ))}
                       </select>
-                    )}
+                    {/* )} */}
                   </div>
                 </div>
               )}
