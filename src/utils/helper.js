@@ -19,6 +19,7 @@ export const MENU_ITEMS = [
   },
   { label: "Upload", icon: <FiUpload size={20} />, path: ROUTES.UPLOAD },
   { label: "My Topics", icon: <MdOutlineTopic size={20} />, path: ROUTES.MY_TOPICS },
+  { label: "My Doctor Notes", icon: <MdOutlineMedicalInformation size={20} />, path: ROUTES.MY_DOCTOR_NOTES },
   { label: "Medical Topics", icon: <MdOutlineMedicalInformation size={20} />, path: ROUTES.MEDICAL_TOPICS },
   {
     label: "Review Queue",

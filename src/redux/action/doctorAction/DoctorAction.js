@@ -10,33 +10,37 @@ import {
   fetchViewDoctorPointerStart,
   fetchViewDoctorPointerSuccess,
   fetchViewDoctorPointerFailure,
+  fetchDoctorPointersStart,
+  fetchDoctorPointersSuccess,
+  fetchDoctorPointersFailure,
 } from "../../reducer/doctorReducer/DoctorReducer";
 
 let isCreatingDoctorPointer = false;
 let isFetchDoctorPointerById = false;
+let isFetchDoctorPointers = false;
 
 // ..................... create Doctor pointers .......................
 
-export const createDoctorPointers = (doctorPointerData) => async (dispatch, getState) => {
-  const { isDoctorPointerCreateLoading } = getState().doctor_pointers;
-  if (isDoctorPointerCreateLoading) return;
-  
-  dispatch(createDoctorPointerStart());
-  try {
-    const response = await api.post(CREATE_DOCTOR_POINTER, doctorPointerData);
-    const { doctorPointer } = response.data;
-    dispatch(createDoctorPointerSuccess(doctorPointer));
-    return response.data;
-  } catch (error) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "Failed to create doctor pointer";
-    dispatch(createDoctorPointerFailure(errorMessage));
-    throw error;
-  }
-};
+export const createDoctorPointers =
+  (doctorPointerData) => async (dispatch, getState) => {
+    const { isDoctorPointerCreateLoading } = getState().doctor_pointers;
+    if (isDoctorPointerCreateLoading) return;
 
+    dispatch(createDoctorPointerStart());
+    try {
+      const response = await api.post(CREATE_DOCTOR_POINTER, doctorPointerData);
+      const { doctorPointer } = response.data;
+      dispatch(createDoctorPointerSuccess(doctorPointer));
+      return response.data;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to create doctor pointer";
+      dispatch(createDoctorPointerFailure(errorMessage));
+      throw error;
+    }
+  };
 
 // ........................ get detailed pointer by ID .........................
 
@@ -65,3 +69,39 @@ export const fetchDoctorPointersById = (topicId) => async (dispatch) => {
     isFetchDoctorPointerById = false;
   }
 };
+
+// .............. doctor pointer listing ...................
+
+
+export const fetchDoctorPointers =
+  ({ page = 1, limit = 10, search = "", topicId } = {}) =>
+  async (dispatch) => {
+    if (isFetchDoctorPointers) return;
+    isFetchDoctorPointers = true;
+    dispatch(fetchDoctorPointersStart());
+
+    try {
+      const response = await api.get(CREATE_DOCTOR_POINTER, {
+        params: { page,limit,search,...(topicId && { topicId }),},
+      });
+
+      dispatch(
+        fetchDoctorPointersSuccess({
+          pointers: response.data.pointers,
+          pagination: {
+            page: response.data.page,
+            totalPages: response.data.totalPages,
+            totalCount: response.data.totalCount,
+          },
+        })
+      );
+    } catch (error) {
+      dispatch(
+        fetchDoctorPointersFailure(
+          error.response?.data?.message || "Failed to load Medical Notes"
+        )
+      );
+    } finally {
+      isFetchDoctorPointers = false;
+    }
+  };

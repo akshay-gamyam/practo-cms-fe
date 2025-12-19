@@ -13,4 +13,5 @@ export const ROUTES = {
   USER_PROFILE: "/profile",
   NOCIFICATIONS: "/notifications",
   MEDICAL_TOPICS : "/medical-topics",
+  MY_DOCTOR_NOTES : "/doctor-notes",
 };

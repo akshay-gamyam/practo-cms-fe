@@ -18,6 +18,7 @@ import MyTopics from "../components/home/myTopics/MyTopics";
 import UserProfile from "../components/home/userProfile/UserProfile";
 import Notifications from "../components/home/notifications/Notifications";
 import MedicalTopics from "../components/home/medicalTopics/MedicalTopics";
+import MyDoctorNotes from "../components/home/myDoctorNotes/MyDoctorNotes";
 
 const AppRouter = () => {
   return (
@@ -64,6 +65,7 @@ const AppRouter = () => {
           <Route path={ROUTES.REVIEW_QUEUE} element={<ReviewQueue />} />
           <Route path={ROUTES.UPLOAD} element={<Upload />} />
           <Route path={ROUTES.UPLOAD_WITH_ID} element={<Upload />} />
+          <Route path={ROUTES.MY_DOCTOR_NOTES} element={<MyDoctorNotes />} />
           <Route path={ROUTES.MY_TOPICS} element={<MyTopics />} />
           <Route path={ROUTES.MEDICAL_TOPICS} element={<MedicalTopics />} />
           <Route path={ROUTES.USERS} element={<UserManagement />} />
