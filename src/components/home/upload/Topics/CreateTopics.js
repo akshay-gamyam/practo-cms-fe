@@ -10,6 +10,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "../../../../routes/RouterConstant";
 import { createDoctorPointers } from "../../../../redux/action/doctorAction/DoctorAction";
 import { ROLE_VARIABLES_MAP } from "../../../../utils/helper";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import TextAlign from "@tiptap/extension-text-align";
+import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
+import TipTopRichTextEditor from "../../../common/richTextEditor/TipTopRichTextEditor";
 
 const CreateTopics = () => {
   const dispatch = useDispatch();
@@ -23,14 +30,40 @@ const CreateTopics = () => {
   });
 
   const { user } = useSelector((state) => state.auth);
-  const { doctors, topics, isCreateLoading } = useSelector((state) => state.topics);
+  const { doctors, topics, isCreateLoading } = useSelector(
+    (state) => state.topics
+  );
 
   const isDoctorCreator = user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR;
-  const isMedicalReviewerCreator = user?.role === ROLE_VARIABLES_MAP?.MEDICAL_REVIEWER;
+  const isMedicalReviewerCreator =
+    user?.role === ROLE_VARIABLES_MAP?.MEDICAL_REVIEWER;
 
   const selectedTopic = useMemo(() => {
-    return topics?.find((topic) => topic.id === topicId);
+    return topics?.find((topic) => topic?.id === topicId);
   }, [topics, topicId]);
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      Link.configure({
+        openOnClick: false,
+      }),
+      Placeholder.configure({
+        placeholder: isDoctorCreator
+          ? "Write doctor notes..."
+          : "Write detailed medical content...",
+      }),
+    ],
+    content: formData.description,
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      setFormData((prev) => ({ ...prev, description: html }));
+    },
+  });
 
   useEffect(() => {
     dispatch(fetchUplodedTopcsList());
@@ -75,6 +108,9 @@ const CreateTopics = () => {
       doctorId: "",
       description: "",
     });
+    if (editor) {
+      editor.commands.setContent("");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -205,11 +241,11 @@ const CreateTopics = () => {
                 </div>
               )}
 
-              <div>
+              <div className="mt-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {isDoctorCreator ? "Doctor Notes *" : "Description *"}
                 </label>
-                <textarea
+                {/* <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
@@ -221,7 +257,14 @@ const CreateTopics = () => {
                   }
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
-                />
+                /> */}
+                <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
+                  <TipTopRichTextEditor editor={editor} />
+                  <EditorContent
+                    editor={editor}
+                    className="prose max-w-none p-4 min-h-[200px] focus:outline-none"
+                  />
+                </div>
               </div>
             </div>
 
