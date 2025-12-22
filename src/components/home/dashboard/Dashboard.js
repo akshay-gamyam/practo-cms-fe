@@ -155,7 +155,7 @@ const Dashboard = () => {
                     })}
                   </p>
 
-                  <div className="flex flex-wrap gap-3 mt-4">
+                  {/* <div className="flex flex-wrap gap-3 mt-4">
                     <span className="px-3 py-1 rounded-lg bg-gray-100 text-xs text-gray-700">
                       📄 Scripts:{" "}
                       <span className="font-semibold">
@@ -174,7 +174,7 @@ const Dashboard = () => {
                         {topic._count?.doctorPointers}
                       </span>
                     </span>
-                  </div>
+                  </div> */}
                 </div>
               ))}
             </div>

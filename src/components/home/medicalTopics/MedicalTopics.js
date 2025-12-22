@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchUplodedTopcsList } from "../../../redux/action/topicAction/TopicAction";
 import { statusStyles } from "../../../utils/helper";
 import SkeletonBlock from "../../common/skeletonBlock/SkeletonBlock";
-import { ROUTES } from "../../../routes/RouterConstant";
-import { useNavigate } from "react-router-dom";
+// import { ROUTES } from "../../../routes/RouterConstant";
+// import { useNavigate } from "react-router-dom";
 
 const MedicalTopics = () => {
   const dispatch = useDispatch();
@@ -115,7 +115,7 @@ const MedicalTopics = () => {
                       })}
                     </p>
 
-                    <div className="flex flex-wrap gap-3 mt-4">
+                    {/* <div className="flex flex-wrap gap-3 mt-4">
                       <span className="px-3 py-1 rounded-lg bg-gray-100 text-xs text-gray-700">
                         📄 Scripts:{" "}
                         <span className="font-semibold">
@@ -134,7 +134,7 @@ const MedicalTopics = () => {
                           {topic._count?.doctorPointers}
                         </span>
                       </span>
-                    </div>
+                    </div> */}
                   </div>
                 );
               })}

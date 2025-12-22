@@ -78,7 +78,7 @@ const DetailedCard = ({
         </p>
       )}
 
-      {counts && (
+      {/* {counts && (
         <div className="flex flex-wrap gap-2 sm:gap-3">
           {counts?.scripts != null && (
             <span className="px-3 py-1 rounded-lg bg-gray-100 text-xs text-gray-700 whitespace-nowrap">
@@ -99,7 +99,7 @@ const DetailedCard = ({
             </span>
           )}
         </div>
-      )}
+      )} */}
     </div>
   );
 };

@@ -4,11 +4,12 @@ import { statusStyles } from "../../../utils/helper";
 import {
   HiOutlineUser,
   HiOutlineCalendar,
-  HiOutlineDocumentText,
-  HiOutlineVideoCamera,
-  HiOutlineUserGroup,
+  // HiOutlineDocumentText,
+  // HiOutlineVideoCamera,
+  // HiOutlineUserGroup,
 } from "react-icons/hi";
 import SkeletonBlock from "../../common/skeletonBlock/SkeletonBlock";
+import "../../common/richTextEditor/viewRichTextEditor.css"
 
 const TopicDetailsModal = ({ isOpen, onClose, topic, isLoading }) => {
   return (
@@ -33,9 +34,13 @@ const TopicDetailsModal = ({ isOpen, onClose, topic, isLoading }) => {
             <p className="text-sm font-medium text-gray-800 mb-2">
               Overview
             </p>
-            <p className="text-sm text-gray-600 leading-relaxed">
+            {/* <p className="text-sm text-gray-600 leading-relaxed">
               {topic.description}
-            </p>
+            </p> */}
+             <div 
+              className="text-sm text-gray-600 leading-relaxed richtext-content"
+              dangerouslySetInnerHTML={{ __html: topic.description }}
+            />
           </div>
 
           <div className="border rounded-xl p-5 bg-white shadow-sm">
@@ -101,7 +106,7 @@ const TopicDetailsModal = ({ isOpen, onClose, topic, isLoading }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <StatCard
               icon={<HiOutlineDocumentText size={20} />}
               label="Scripts"
@@ -117,7 +122,7 @@ const TopicDetailsModal = ({ isOpen, onClose, topic, isLoading }) => {
               label="Doctors"
               value={topic._count?.doctorPointers ?? 0}
             />
-          </div>
+          </div> */}
         </div>
       )}
 
@@ -130,17 +135,17 @@ const TopicDetailsModal = ({ isOpen, onClose, topic, isLoading }) => {
   );
 };
 
-const StatCard = ({ icon, label, value }) => (
-  <div className="flex items-center gap-4 border rounded-xl p-4 bg-gray-50">
-    <div className="p-3 rounded-lg bg-blue-50 text-blue-600">
-      {icon}
-    </div>
-    <div>
-      <p className="text-xs text-gray-500">{label}</p>
-      <p className="text-xl font-semibold text-gray-900">{value}</p>
-    </div>
-  </div>
-);
+// const StatCard = ({ icon, label, value }) => (
+//   <div className="flex items-center gap-4 border rounded-xl p-4 bg-gray-50">
+//     <div className="p-3 rounded-lg bg-blue-50 text-blue-600">
+//       {icon}
+//     </div>
+//     <div>
+//       <p className="text-xs text-gray-500">{label}</p>
+//       <p className="text-xl font-semibold text-gray-900">{value}</p>
+//     </div>
+//   </div>
+// );
 
 export default TopicDetailsModal;
 

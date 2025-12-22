@@ -85,7 +85,7 @@ const Login = ({ setScreen }) => {
         return navigate(ROUTES.REVIEW_QUEUE);
       } else if (user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR) {
         return navigate(ROUTES.MY_TOPICS);
-      } else if (user?.role ===  ROLE_VARIABLES_MAP?.AGENCY_POC) {
+      } else if (user?.role === ROLE_VARIABLES_MAP?.AGENCY_POC) {
         return navigate(ROUTES.UPLOAD);
       } else if (user?.role === ROLE_VARIABLES_MAP?.CONTENT_APPROVER) {
         return navigate(ROUTES.REVIEW_QUEUE);
@@ -118,13 +118,13 @@ const Login = ({ setScreen }) => {
         toastId: "google-success",
       });
 
-        if (user?.role === ROLE_VARIABLES_MAP?.MEDICAL_REVIEWER) {
+      if (user?.role === ROLE_VARIABLES_MAP?.MEDICAL_REVIEWER) {
         return navigate(ROUTES.MEDICAL_TOPICS);
       } else if (user?.role === ROLE_VARIABLES_MAP?.BRAND_REVIEWER) {
         return navigate(ROUTES.REVIEW_QUEUE);
       } else if (user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR) {
         return navigate(ROUTES.MY_TOPICS);
-      } else if (user?.role ===  ROLE_VARIABLES_MAP?.AGENCY_POC) {
+      } else if (user?.role === ROLE_VARIABLES_MAP?.AGENCY_POC) {
         return navigate(ROUTES.UPLOAD);
       } else if (user?.role === ROLE_VARIABLES_MAP?.CONTENT_APPROVER) {
         return navigate(ROUTES.REVIEW_QUEUE);

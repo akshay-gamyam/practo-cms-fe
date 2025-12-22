@@ -1,0 +1,57 @@
+.richtext-content h1 {
+  font-size: 2em;
+  font-weight: 700;
+  margin: 0.67em 0;
+  line-height: 1.2;
+  color: #1f2937;
+}
+.richtext-content h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+  margin: 0.75em 0;
+  line-height: 1.3;
+  color: #1f2937;
+}
+.richtext-content h3 {
+  font-size: 1.25em;
+  font-weight: 600;
+  margin: 0.83em 0;
+  line-height: 1.4;
+  color: #1f2937;
+}
+.richtext-content p {
+  margin: 0.5em 0;
+}
+.richtext-content ul,
+.richtext-content ol {
+  padding-left: 1.5rem;
+  margin: 0.5em 0;
+}
+.richtext-content li {
+  margin: 0.25em 0;
+}
+.richtext-content strong {
+  font-weight: 600;
+}
+.richtext-content em {
+  font-style: italic;
+}
+.richtext-content u {
+  text-decoration: underline;
+}
+.richtext-content a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+.richtext-content a:hover {
+  color: #1d4ed8;
+}
+.richtext-content[style*="text-align: center"] {
+  text-align: center;
+}
+.richtext-content[style*="text-align: right"] {
+  text-align: right;
+}
+.richtext-content[style*="text-align: justify"] {
+  text-align: justify;
+}
