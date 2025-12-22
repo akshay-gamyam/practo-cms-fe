@@ -154,27 +154,6 @@ const Dashboard = () => {
                       year: "numeric",
                     })}
                   </p>
-
-                  {/* <div className="flex flex-wrap gap-3 mt-4">
-                    <span className="px-3 py-1 rounded-lg bg-gray-100 text-xs text-gray-700">
-                      📄 Scripts:{" "}
-                      <span className="font-semibold">
-                        {topic._count?.scripts}
-                      </span>
-                    </span>
-                    <span className="px-3 py-1 rounded-lg bg-gray-100 text-xs text-gray-700">
-                      🎥 Videos:{" "}
-                      <span className="font-semibold">
-                        {topic._count?.videos}
-                      </span>
-                    </span>
-                    <span className="px-3 py-1 rounded-lg bg-gray-100 text-xs text-gray-700">
-                      👨‍⚕️ Doctors:{" "}
-                      <span className="font-semibold">
-                        {topic._count?.doctorPointers}
-                      </span>
-                    </span>
-                  </div> */}
                 </div>
               ))}
             </div>

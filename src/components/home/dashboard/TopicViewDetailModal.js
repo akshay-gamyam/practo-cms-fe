@@ -4,9 +4,6 @@ import { statusStyles } from "../../../utils/helper";
 import {
   HiOutlineUser,
   HiOutlineCalendar,
-  // HiOutlineDocumentText,
-  // HiOutlineVideoCamera,
-  // HiOutlineUserGroup,
 } from "react-icons/hi";
 import SkeletonBlock from "../../common/skeletonBlock/SkeletonBlock";
 import "../../common/richTextEditor/viewRichTextEditor.css"
@@ -105,24 +102,6 @@ const TopicDetailsModal = ({ isOpen, onClose, topic, isLoading }) => {
               </div>
             </div>
           </div>
-
-          {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <StatCard
-              icon={<HiOutlineDocumentText size={20} />}
-              label="Scripts"
-              value={topic._count?.scripts ?? 0}
-            />
-            <StatCard
-              icon={<HiOutlineVideoCamera size={20} />}
-              label="Videos"
-              value={topic._count?.videos ?? 0}
-            />
-            <StatCard
-              icon={<HiOutlineUserGroup size={20} />}
-              label="Doctors"
-              value={topic._count?.doctorPointers ?? 0}
-            />
-          </div> */}
         </div>
       )}
 
@@ -134,18 +113,4 @@ const TopicDetailsModal = ({ isOpen, onClose, topic, isLoading }) => {
     </CustomModal>
   );
 };
-
-// const StatCard = ({ icon, label, value }) => (
-//   <div className="flex items-center gap-4 border rounded-xl p-4 bg-gray-50">
-//     <div className="p-3 rounded-lg bg-blue-50 text-blue-600">
-//       {icon}
-//     </div>
-//     <div>
-//       <p className="text-xs text-gray-500">{label}</p>
-//       <p className="text-xl font-semibold text-gray-900">{value}</p>
-//     </div>
-//   </div>
-// );
-
 export default TopicDetailsModal;
-
