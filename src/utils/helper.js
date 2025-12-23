@@ -144,7 +144,7 @@ export const rolesList = [
   { label: "Super Admin", value: "SUPER_ADMIN" },
   { label: "Medical affairs", value: "MEDICAL_REVIEWER" },
   { label: "Brand Reviewer", value: "BRAND_REVIEWER" },
-  { label: "Doctor", value: "DOCTOR_CREATOR" },
+  { label: "Doctor", value: "DOCTOR" },
   { label: "Agency POC", value: "AGENCY_POC" },
   { label: "Content Approver", value: "CONTENT_APPROVER" },
   // { label: "Publisher", value: "PUBLISHER" },
@@ -217,7 +217,7 @@ export const ROLE_VARIABLES_MAP = {
   BRAND_REVIEWER: "BRAND_REVIEWER",
   CONTENT_APPROVER: "CONTENT_APPROVER",
   PUBLISHER: "PUBLISHER",
-  DOCTOR_CREATOR: "DOCTOR_CREATOR",
+  DOCTOR_CREATOR: "DOCTOR",
   AGENCY_POC: "AGENCY_POC",
   SUPER_ADMIN: "SUPER_ADMIN",
 };
