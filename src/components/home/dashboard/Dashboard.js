@@ -38,7 +38,7 @@ const Dashboard = () => {
   }, [isDetailedTopicModalOpen, selectedTopicId, dispatch]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">dfvsdgdhdrhydr
+    <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         <div>
           <h1 className="text-3xl font-semibold text-gray-900">Dashboard</h1>
