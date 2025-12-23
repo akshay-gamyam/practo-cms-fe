@@ -93,9 +93,14 @@ const MyDoctorNotes = ({ topicId }) => {
                   key={item?.id}
                   className="border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-md transition overflow-hidden"
                 >
-                  <div className="px-5 py-4 bg-gray-50 border-b">
+                  <div className="px-5 py-4 bg-gray-50 border-b flex justify-between">
                     <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
                       {item?.topic?.title || "Medical Topic"}
+                    </h3>
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+                      {item?.doctor
+                        ? `${item.doctor.firstName} ${item.doctor.lastName}`
+                        : "Doctor"}
                     </h3>
                   </div>
 

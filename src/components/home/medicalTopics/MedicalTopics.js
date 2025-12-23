@@ -1,8 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUplodedTopcsList } from "../../../redux/action/topicAction/TopicAction";
 import { statusStyles } from "../../../utils/helper";
 import SkeletonBlock from "../../common/skeletonBlock/SkeletonBlock";
+import { FiUserPlus } from "react-icons/fi";
+import AddMedicalTopicModal from "./AddmedicalTopicModal";
 // import { ROUTES } from "../../../routes/RouterConstant";
 // import { useNavigate } from "react-router-dom";
 
@@ -13,7 +15,7 @@ const MedicalTopics = () => {
   const { topics, isTopicsListLoading, error } = useSelector(
     (state) => state.topics
   );
-  console.log("topics", topics);
+  const [openMedicalTopicModal, setOpenMedicalTopicModal] = useState(false);
 
   // const handleCardClick = (topicId) => {
   //   navigate(`${ROUTES.UPLOAD}/${topicId}`);
@@ -34,13 +36,25 @@ const MedicalTopics = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        <div>
-          <h1 className="text-3xl font-semibold text-gray-900">
-            Medical Topics
-          </h1>
-          <p className="text-gray-500 mt-1">
-            Overview of content management system
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+              My Topics
+            </h1>
+            <p className="text-gray-600 text-base sm:text-lg">
+              Overview of Consultant Doctors
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              console.log("OPEN MODAL");
+              setOpenMedicalTopicModal(true);
+            }}
+            className="flex items-center gap-4 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-400 text-white font-medium shadow-md hover:opacity-90 transition-all duration-200"
+          >
+            <FiUserPlus size={20} />
+            Add Topics
+          </button>
         </div>
 
         <div className="bg-white rounded-2xl border shadow-sm p-6">
@@ -121,6 +135,11 @@ const MedicalTopics = () => {
           )}
         </div>
       </div>
+
+      <AddMedicalTopicModal
+        open={openMedicalTopicModal}
+        onClose={() => setOpenMedicalTopicModal(false)}
+      />
     </div>
   );
 };

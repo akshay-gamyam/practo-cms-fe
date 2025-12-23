@@ -12,6 +12,7 @@ const MyTopics = () => {
   const navigate = useNavigate();
 
   const { doctorAssignments = [], isDoctorAssignmentLoading, error } = useSelector((state) => state.topics);
+  console.log("doctorAssignments", doctorAssignments)
   const user = useSelector((state) => state.auth.user);
   const redirecttoUploadById = user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR;
 
@@ -43,7 +44,7 @@ const MyTopics = () => {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         <div>
-          <h1 className="text-3xl font-semibold text-gray-900">My Topics</h1>
+          <h1 className="text-3xl font-semibold text-gray-900">Assigned Topics</h1>
           <p className="text-gray-500 mt-1">Overview of Consultant Doctors</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
@@ -57,7 +58,7 @@ const MyTopics = () => {
               createdAt={topic.createdAt}
               counts={topic._count}
               onClick={() => {
-                if (redirecttoUploadById) {
+                if (redirecttoUploadById && doctorAssignments?.status === "DOCTOR_INPUT_RECEIVED") {
                   navigate(`${ROUTES.UPLOAD}/${topic?.id}`);
                 } else {
                   console.log("Clicked:", topic.id);
