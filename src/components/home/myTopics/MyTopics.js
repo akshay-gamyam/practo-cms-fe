@@ -58,7 +58,7 @@ const MyTopics = () => {
               createdAt={topic.createdAt}
               counts={topic._count}
               onClick={() => {
-                if (redirecttoUploadById && doctorAssignments?.status === "DOCTOR_INPUT_RECEIVED") {
+                if (redirecttoUploadById && doctorAssignments?.status !== "DOCTOR_INPUT_RECEIVED") {
                   navigate(`${ROUTES.UPLOAD}/${topic?.id}`);
                 } else {
                   console.log("Clicked:", topic.id);

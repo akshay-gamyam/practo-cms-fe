@@ -45,10 +45,8 @@ const DetailedCard = ({
       )}
 
       {description && (
-        <Tooltip content={description} position="bottom" maxWidth="max-w-sm">
-          <p className="mt-1 text-sm text-gray-500 line-clamp-2 break-words cursor-help">
-            {description}
-          </p>
+        <Tooltip content={ <div dangerouslySetInnerHTML={{ __html: description }} /> } position="bottom" maxWidth="max-w-sm">
+          <p  dangerouslySetInnerHTML={{ __html: description }} className="mt-1 text-sm text-gray-500 line-clamp-2 break-words cursor-help leading-relaxed richtext-content" />             
         </Tooltip>
       )}
 
