@@ -38,7 +38,7 @@ const doctorPointersSlice = createSlice({
 
     // ................. fetch single Doctor Pointer ........................
     fetchViewDoctorPointerStart(state) {
-      state.isTopicsViewLoading = true;
+      state.isDoctorPointerViewLoading = true;
     },
     fetchViewDoctorPointerSuccess(state, action) {
       state.isTopicsViewLoading = false;

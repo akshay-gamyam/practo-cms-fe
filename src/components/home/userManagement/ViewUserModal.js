@@ -18,7 +18,7 @@ const ViewUserModal = ({ isOpen, onClose }) => {
           lineWidths={["w-full", "w-5/6"]}
         />
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-6 space-x-2">
           <div className="flex items-center gap-4 pb-6 border-b">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-white font-semibold text-2xl">
               {`${selectedUser?.firstName?.[0] || ""}${

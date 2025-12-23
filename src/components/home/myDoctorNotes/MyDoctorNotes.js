@@ -4,6 +4,7 @@ import { CiSearch } from "react-icons/ci";
 import SkeletonBlock from "../../common/skeletonBlock/SkeletonBlock";
 import Pagination from "../../common/pagination/Pagination";
 import { fetchDoctorPointers } from "../../../redux/action/doctorAction/DoctorAction";
+import "../../common/richTextEditor/viewRichTextEditor.css"
 
 const MyDoctorNotes = ({ topicId }) => {
   const dispatch = useDispatch();
@@ -107,9 +108,7 @@ const MyDoctorNotes = ({ topicId }) => {
                   <div className="px-5 py-5 space-y-4">
                     {item?.topic?.description && (
                       <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                        <p className="text-sm text-blue-900 leading-relaxed">
-                          {item.topic.description}
-                        </p>
+                        <p dangerouslySetInnerHTML={{__html: item.topic.description}} className="text-sm text-blue-900 leading-relaxed richtext-content" />
                       </div>
                     )}
 
@@ -120,9 +119,7 @@ const MyDoctorNotes = ({ topicId }) => {
                         </h4>
 
                         <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-                          <p className="list-disc list-inside space-y-2 text-sm text-gray-700 leading-relaxed">
-                            {item.notes}
-                          </p>
+                          <p  dangerouslySetInnerHTML={{__html: item.notes}} className="list-disc list-inside space-y-2 text-sm text-gray-700 leading-relaxed richtext-content" />
                         </div>
                       </div>
                     )}

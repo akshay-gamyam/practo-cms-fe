@@ -15,9 +15,7 @@ import {
   fetchDoctorPointersFailure,
 } from "../../reducer/doctorReducer/DoctorReducer";
 
-let isCreatingDoctorPointer = false;
 let isFetchDoctorPointerById = false;
-let isFetchDoctorPointers = false;
 
 // ..................... create Doctor pointers .......................
 
@@ -72,17 +70,17 @@ export const fetchDoctorPointersById = (topicId) => async (dispatch) => {
 
 // .............. doctor pointer listing ...................
 
-
 export const fetchDoctorPointers =
   ({ page = 1, limit = 10, search = "", topicId } = {}) =>
-  async (dispatch) => {
-    if (isFetchDoctorPointers) return;
-    isFetchDoctorPointers = true;
+  async (dispatch, getState) => {
+    const { isDoctorPointerListLoading } = getState().doctor_pointers;
+
+    if (isDoctorPointerListLoading) return;
     dispatch(fetchDoctorPointersStart());
 
     try {
       const response = await api.get(CREATE_DOCTOR_POINTER, {
-        params: { page,limit,search,...(topicId && { topicId }),},
+        params: { page, limit, search, ...(topicId && { topicId }) },
       });
 
       dispatch(
@@ -101,7 +99,5 @@ export const fetchDoctorPointers =
           error.response?.data?.message || "Failed to load Medical Notes"
         )
       );
-    } finally {
-      isFetchDoctorPointers = false;
     }
   };

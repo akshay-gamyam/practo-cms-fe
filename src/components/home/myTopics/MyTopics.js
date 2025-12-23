@@ -50,6 +50,11 @@ const MyTopics = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
           {doctorAssignments.map((topic) => (
             <DetailedCard
+              className={
+                topic.status === "DOCTOR_INPUT_RECEIVED"
+                  ? ""
+                  : "cursor-pointer"
+              }
               key={topic?.id}
               title={topic.title}
               description={topic.description}
@@ -58,10 +63,12 @@ const MyTopics = () => {
               createdAt={topic.createdAt}
               counts={topic._count}
               onClick={() => {
-                if (redirecttoUploadById && doctorAssignments?.status !== "DOCTOR_INPUT_RECEIVED") {
-                  navigate(`${ROUTES.UPLOAD}/${topic?.id}`);
-                } else {
-                  console.log("Clicked:", topic.id);
+                if (topic.status === "DOCTOR_INPUT_RECEIVED") {
+                  return;
+                }
+
+                if (redirecttoUploadById) {
+                  navigate(`${ROUTES.UPLOAD}/${topic.id}`);
                 }
               }}
             />

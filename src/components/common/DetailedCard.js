@@ -25,7 +25,6 @@ const DetailedCard = ({
       onClick={onClick}
       className={`relative bg-white rounded-2xl border border-gray-200 shadow-sm
         p-4 sm:p-5 md:p-6 transition-shadow hover:shadow-md
-        ${onClick ? "cursor-pointer" : ""}
         ${className}`}
     >
       {status && (

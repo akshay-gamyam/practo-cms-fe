@@ -31,9 +31,6 @@ const TopicDetailsModal = ({ isOpen, onClose, topic, isLoading }) => {
             <p className="text-sm font-medium text-gray-800 mb-2">
               Overview
             </p>
-            {/* <p className="text-sm text-gray-600 leading-relaxed">
-              {topic.description}
-            </p> */}
              <div 
               className="text-sm text-gray-600 leading-relaxed richtext-content"
               dangerouslySetInnerHTML={{ __html: topic.description }}
