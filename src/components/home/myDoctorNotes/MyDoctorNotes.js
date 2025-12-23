@@ -54,7 +54,7 @@ const MyDoctorNotes = ({ topicId }) => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900">
-              My Doctor Notes
+              Doctor Notes
             </h1>
             <p className="text-gray-500 mt-1 text-sm max-w-xl">
               Clinical notes and medical guidance provided by consultants
@@ -97,7 +97,7 @@ const MyDoctorNotes = ({ topicId }) => {
                     <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
                       {item?.topic?.title || "Medical Topic"}
                     </h3>
-                    <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+                    <h3 className="text-lg sm:text-md font-semibold text-gray-900">
                       {item?.doctor
                         ? `${item.doctor.firstName} ${item.doctor.lastName}`
                         : "Doctor"}
