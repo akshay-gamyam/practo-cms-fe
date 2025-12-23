@@ -43,44 +43,44 @@ const Sidebar = () => {
     return "A";
   };
 
-  // const getUserName = () => {
-  //   if (user?.name) return user.name;
-  //   if (user?.firstName && user?.lastName)
-  //     return `${user.firstName} ${user.lastName}`;
-  //   return "Admin User";
-  // };
-
   const getUserName = () => {
-    if (user?.role && ROLE_DISPLAY_NAME[user.role]) {
-      return ROLE_DISPLAY_NAME[user.role];
-    }
     if (user?.name) return user.name;
-    if (user?.firstName && user?.lastName) {
+    if (user?.firstName && user?.lastName)
       return `${user.firstName} ${user.lastName}`;
-    }
     return "Admin User";
   };
 
-  // const getUserRole = () => {
-  //   if (user?.role) {
-  //     return user.role
-  //       .split("_")
-  //       .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
-  //       .join(" ");
+  // const getUserName = () => {
+  //   if (user?.role && ROLE_DISPLAY_NAME[user.role]) {
+  //     return ROLE_DISPLAY_NAME[user.role];
   //   }
-  //   return "Super Admin";
+  //   if (user?.name) return user.name;
+  //   if (user?.firstName && user?.lastName) {
+  //     return `${user.firstName} ${user.lastName}`;
+  //   }
+  //   return "Admin User";
   // };
 
   const getUserRole = () => {
-  if (!user?.role) return "Super Admin";
-  if (ROLE_DISPLAY_NAME[user.role]) {
-    return ROLE_DISPLAY_NAME[user.role];
-  }
-  return user.role
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-};
+    if (user?.role) {
+      return user.role
+        .split("_")
+        .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
+        .join(" ");
+    }
+    return "Super Admin";
+  };
+
+//   const getUserRole = () => {
+//   if (!user?.role) return "Super Admin";
+//   if (ROLE_DISPLAY_NAME[user.role]) {
+//     return ROLE_DISPLAY_NAME[user.role];
+//   }
+//   return user.role
+//     .split("_")
+//     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+//     .join(" ");
+// };
 
   const handleLogout = async () => {
     try {

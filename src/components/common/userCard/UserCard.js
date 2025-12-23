@@ -32,9 +32,9 @@ const UserCard = ({ user, onViewProfile, onEditUser }) => {
           <div className="grid grid-cols-2 gap-6">
             <div className="flex flex-col justify-between">
               <div>
-                <p className="text-gray-500 text-sm mb-1">Content</p>
-                <p className="text-xl font-semibold text-gray-900">
-                  {user.contentCount || "---"}
+                <p className="text-gray-500 text-sm">CreatedAt</p>
+                <p className="text-sm font-semibold text-gray-600">
+                  {new Date(user?.createdAt).toLocaleDateString("en-IN", {day: "2-digit",month: "short",year: "numeric"})}
                 </p>
               </div>
 
