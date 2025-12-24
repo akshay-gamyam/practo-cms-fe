@@ -142,7 +142,7 @@ export const getUserInitials = () => {
 // ................type of role based list .................
 export const rolesList = [
   { label: "Super Admin", value: "SUPER_ADMIN" },
-  { label: "Medical affairs", value: "MEDICAL_REVIEWER" },
+  { label: "Medical affairs", value: "MEDICAL_AFFAIRS" },
   { label: "Brand Reviewer", value: "BRAND_REVIEWER" },
   { label: "Doctor", value: "DOCTOR" },
   { label: "Agency POC", value: "AGENCY_POC" },
