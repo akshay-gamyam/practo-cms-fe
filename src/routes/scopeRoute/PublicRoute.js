@@ -9,7 +9,7 @@ const PublicRoutes = ({ children }) => {
   const token = getToken();
 
   if (isAuthenticated && token) {
-    if (user?.role === ROLE_VARIABLES_MAP?.MEDICAL_REVIEWER) {
+    if (user?.role === ROLE_VARIABLES_MAP?.MEDICAL_AFFAIRS) {
       return <Navigate to={ROUTES.MEDICAL_TOPICS} replace />;
     } else if (user?.role === ROLE_VARIABLES_MAP?.BRAND_REVIEWER) {
       return <Navigate to={ROUTES.REVIEW_QUEUE} replace />;

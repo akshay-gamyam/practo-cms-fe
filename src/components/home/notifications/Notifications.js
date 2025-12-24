@@ -22,7 +22,7 @@ const Notifications = () => {
 
     const interval = setInterval(() => {
       dispatch(fetchNotificationUnreadCount());
-    }, 30000);
+    }, 30000000);
 
     return () => clearInterval(interval);
   }, [dispatch]);

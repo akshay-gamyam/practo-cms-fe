@@ -12,6 +12,7 @@ export const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
 export const MENU_ITEMS = [
   { label: "Dashboard", icon: <IoHome size={20} />, path: ROUTES.DASHBOARD },
+   { label: "Users", icon: <PiUsers size={20} />, path: ROUTES.USERS },
   {
     label: "Content Library",
     icon: <IoDocumentTextOutline size={20} />,
@@ -26,13 +27,13 @@ export const MENU_ITEMS = [
     icon: <FaRegChartBar size={20} />,
     path: ROUTES.REVIEW_QUEUE,
   },
-  { label: "Users", icon: <PiUsers size={20} />, path: ROUTES.USERS },
+ 
   { label: "Settings", icon: <CiSettings size={20} />, path: ROUTES.SETTINGS },
   { label: "Notifications", icon: <IoIosNotifications size={20} />, path: ROUTES.NOCIFICATIONS },
 ];
 
 export const ROLE_DISPLAY_NAME = {
-    MEDICAL_REVIEWER: "Medical Affairs",
+    MEDICAL_AFFAIRS: "Medical Affairs",
   };
 
 
@@ -213,7 +214,7 @@ export  const passwordFields = [
 
 
 export const ROLE_VARIABLES_MAP = {
-  MEDICAL_REVIEWER: "MEDICAL_AFFAIRS",
+  MEDICAL_AFFAIRS: "MEDICAL_AFFAIRS",
   BRAND_REVIEWER: "BRAND_REVIEWER",
   CONTENT_APPROVER: "CONTENT_APPROVER",
   PUBLISHER: "PUBLISHER",

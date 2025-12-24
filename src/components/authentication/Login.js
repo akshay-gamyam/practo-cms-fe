@@ -79,7 +79,7 @@ const Login = ({ setScreen }) => {
         toastId: "login-success",
       });
 
-      if (user?.role === ROLE_VARIABLES_MAP?.MEDICAL_REVIEWER) {
+      if (user?.role === ROLE_VARIABLES_MAP?.MEDICAL_AFFAIRS) {
         return navigate(ROUTES.MEDICAL_TOPICS);
       } else if (user?.role === ROLE_VARIABLES_MAP?.BRAND_REVIEWER) {
         return navigate(ROUTES.REVIEW_QUEUE);
@@ -118,7 +118,7 @@ const Login = ({ setScreen }) => {
         toastId: "google-success",
       });
 
-      if (user?.role === ROLE_VARIABLES_MAP?.MEDICAL_REVIEWER) {
+      if (user?.role === ROLE_VARIABLES_MAP?.MEDICAL_AFFAIRS) {
         return navigate(ROUTES.MEDICAL_TOPICS);
       } else if (user?.role === ROLE_VARIABLES_MAP?.BRAND_REVIEWER) {
         return navigate(ROUTES.REVIEW_QUEUE);

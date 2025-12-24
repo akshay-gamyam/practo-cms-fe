@@ -36,26 +36,26 @@ let isFetchingTopicStat = false;
 // .................... get Topics list ......................
 
 export const fetchUplodedTopcsList = (page = 1, limit = 10, offset) => async (dispatch) => {
-  if (isFetchingTopics) return;
-  isFetchingTopics = true;
-  dispatch(fetchTopicsStart());
+    if (isFetchingTopics) return;
+    isFetchingTopics = true;
+    dispatch(fetchTopicsStart());
 
-  try {
-    const response = await api.get(`${GET_TOPICS_LIST}?page=${page}&limit=${limit}`);
+    try {
+      const response = await api.get(`${GET_TOPICS_LIST}?page=${page}&limit=${limit}`);
 
     const { topics, page: currentPage, totalPages, totalCount } = response.data;
-    dispatch(fetchTopicsSuccess({ topics,  page: currentPage, totalPages, totalCount, }));
+      dispatch(fetchTopicsSuccess({ topics,  page: currentPage, totalPages, totalCount, }));
 
-    return response.data;
-  } catch (error) {
-    const errorMessage =
-      error.response?.data?.message || error.message || "Failed to fetch users";
-    dispatch(fetchTopicsFailure(errorMessage));
-    throw error;
-  } finally {
-    isFetchingTopics = false;
-  }
-};
+      return response.data;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || error.message || "Failed to fetch users";
+      dispatch(fetchTopicsFailure(errorMessage));
+      throw error;
+    } finally {
+      isFetchingTopics = false;
+    }
+  };
 
 // .................... get Doctor Assignment list ......................
 
@@ -63,10 +63,18 @@ export const fetchDoctorAssignmentList = () => async (dispatch) => {
   if (isFetchingDoctorAssignment) return;
   isFetchingDoctorAssignment = true;
   dispatch(fetchDoctorAssignmentStart());
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  console.log("user", user);
 
   try {
-    const response = await api.get(`${DOCTOR_ASSIGNMENT_LIST}`);
-    console.log("response", response)
+    let response;
+
+    if (user?.role === "SUPER_ADMIN") {
+      response = await api.get(GET_TOPICS_LIST);
+    } else {
+      response = await api.get(DOCTOR_ASSIGNMENT_LIST);
+    }
     const { topics } = response.data;
     dispatch(fetchDoctorAssignmentSuccess({ topics }));
 

@@ -25,7 +25,7 @@ const CreateTopics = () => {
 
   const { user } = useSelector((state) => state.auth);
   const { topics, isCreateLoading } = useSelector((state) => state.topics);
-  const isDoctorCreator = user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR;
+  const isDoctorCreator = user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR || ROLE_VARIABLES_MAP?.SUPER_ADMIN ;
 
   const [formData, setFormData] = useState({
     title: "",

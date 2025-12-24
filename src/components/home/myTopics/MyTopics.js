@@ -14,7 +14,7 @@ const MyTopics = () => {
   const { doctorAssignments = [], isDoctorAssignmentLoading, error } = useSelector((state) => state.topics);
   console.log("doctorAssignments", doctorAssignments)
   const user = useSelector((state) => state.auth.user);
-  const redirecttoUploadById = user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR;
+  const redirecttoUploadById = user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR || ROLE_VARIABLES_MAP?.SUPER_ADMIN;
 
   useEffect(() => {
     dispatch(fetchDoctorAssignmentList());
