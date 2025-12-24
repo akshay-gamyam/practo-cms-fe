@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { MENU_ITEMS, ROLE_DISPLAY_NAME, ROLE_VARIABLES_MAP } from "../../utils/helper";
+import { MENU_ITEMS, ROLE_VARIABLES_MAP } from "../../utils/helper";
 import { revertAll } from "../../redux/reducer/revertStateReducer/RevertStateReducer";
 import { persistor } from "../../redux/store/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -50,17 +50,6 @@ const Sidebar = () => {
     return "Admin User";
   };
 
-  // const getUserName = () => {
-  //   if (user?.role && ROLE_DISPLAY_NAME[user.role]) {
-  //     return ROLE_DISPLAY_NAME[user.role];
-  //   }
-  //   if (user?.name) return user.name;
-  //   if (user?.firstName && user?.lastName) {
-  //     return `${user.firstName} ${user.lastName}`;
-  //   }
-  //   return "Admin User";
-  // };
-
   const getUserRole = () => {
     if (user?.role) {
       return user.role
@@ -70,17 +59,6 @@ const Sidebar = () => {
     }
     return "Super Admin";
   };
-
-//   const getUserRole = () => {
-//   if (!user?.role) return "Super Admin";
-//   if (ROLE_DISPLAY_NAME[user.role]) {
-//     return ROLE_DISPLAY_NAME[user.role];
-//   }
-//   return user.role
-//     .split("_")
-//     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-//     .join(" ");
-// };
 
   const handleLogout = async () => {
     try {
@@ -126,11 +104,8 @@ const Sidebar = () => {
               key={item.path}
               onClick={() => handleNavigate(item.path)}
               className={`flex w-full items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200
-                ${
-                  active
-                    ? "bg-[#1f2937] text-white"
-                    : "text-gray-300 hover:bg-[#1f2937] hover:text-white"
-                }`}
+                ${ active ? "bg-[#1f2937] text-white" : "text-gray-300 hover:bg-[#1f2937] hover:text-white"}`
+              }
               aria-current={active ? "page" : undefined}
             >
               <div className="min-w-[24px] flex justify-center">
