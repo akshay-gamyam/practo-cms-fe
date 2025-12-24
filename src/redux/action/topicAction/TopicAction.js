@@ -35,16 +35,16 @@ let isFetchingTopicStat = false;
 
 // .................... get Topics list ......................
 
-export const fetchUplodedTopcsList = () => async (dispatch) => {
+export const fetchUplodedTopcsList = (page = 1, limit = 10, offset) => async (dispatch) => {
   if (isFetchingTopics) return;
   isFetchingTopics = true;
   dispatch(fetchTopicsStart());
 
   try {
-    const response = await api.get(`${GET_TOPICS_LIST}`);
+    const response = await api.get(`${GET_TOPICS_LIST}?page=${page}&limit=${limit}`);
 
-    const { topics } = response.data;
-    dispatch(fetchTopicsSuccess({ topics }));
+    const { topics, page: currentPage, totalPages, totalCount } = response.data;
+    dispatch(fetchTopicsSuccess({ topics,  page: currentPage, totalPages, totalCount, }));
 
     return response.data;
   } catch (error) {

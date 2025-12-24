@@ -15,3 +15,5 @@ export const PERMISSIONS = {
   // Dashboard
   VIEW_ANALYTICS: "view_analytics",
 };
+
+export const LIMIT = 10;

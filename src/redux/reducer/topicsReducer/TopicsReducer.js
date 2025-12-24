@@ -12,6 +12,9 @@ const initialState = {
   isTopicsCreateLoading: false,
   isTopicStatsLoading: false,
   isDoctorAssignmentLoading: false,
+  currentPage: 1,
+  totalPages: 1,
+  totalCount: 0,
   error: null,
 };
 
@@ -27,6 +30,9 @@ const topicsSlice = createSlice({
     fetchTopicsSuccess(state, action) {
       state.isTopicsListLoading = false;
       state.topics = action.payload.topics || [];
+      state.currentPage = action.payload.page || 1;
+      state.totalPages = action.payload.totalPages || 1;
+      state.totalCount = action.payload.totalCount || 0;
       state.error = null;
     },
     fetchTopicsFailure(state, action) {

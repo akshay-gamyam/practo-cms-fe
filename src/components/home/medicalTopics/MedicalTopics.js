@@ -5,6 +5,8 @@ import { statusStyles } from "../../../utils/helper";
 import SkeletonBlock from "../../common/skeletonBlock/SkeletonBlock";
 import { FiUserPlus } from "react-icons/fi";
 import AddMedicalTopicModal from "./AddmedicalTopicModal";
+import Pagination from "../../common/pagination/Pagination";
+import { LIMIT } from "../../../utils/constants";
 // import { ROUTES } from "../../../routes/RouterConstant";
 // import { useNavigate } from "react-router-dom";
 
@@ -12,18 +14,19 @@ const MedicalTopics = () => {
   const dispatch = useDispatch();
   // const navigate = useNavigate();
 
-  const { topics, isTopicsListLoading, error } = useSelector(
-    (state) => state.topics
-  );
+  const { topics, isTopicsListLoading, error, currentPage, totalPages } = useSelector((state) => state.topics);
   const [openMedicalTopicModal, setOpenMedicalTopicModal] = useState(false);
 
   // const handleCardClick = (topicId) => {
   //   navigate(`${ROUTES.UPLOAD}/${topicId}`);
   // };
-
   useEffect(() => {
     dispatch(fetchUplodedTopcsList());
   }, [dispatch]);
+
+  const handlePageChange = (page) => {
+    dispatch(fetchUplodedTopcsList(page, LIMIT));
+  };
 
   if (error) {
     return (
@@ -64,74 +67,80 @@ const MedicalTopics = () => {
             </h2>
           </div>
 
-          {!isTopicsListLoading && topics.length === 0 && (
-            <p className="text-sm text-gray-500">No Medical Topics found</p>
-          )}
-
-          {isTopicsListLoading ? (
+          {isTopicsListLoading && (
             <div className="space-y-4">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="relative bg-white border rounded-xl p-5"
-                >
+                <div key={i} className="border rounded-xl p-5">
                   <SkeletonBlock
                     title
                     lines={2}
-                    showCard={true}
+                    showCard
                     lineWidths={["w-3/4", "w-2/3"]}
                   />
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="space-y-4 cursor-pointer">
-              {topics?.map((topic) => {
-                if (!topic) return null;
-                return (
-                  <div
-                    key={topic?.id}
-                    // onClick={() => handleCardClick(topic?.id)}
-                    className="group relative bg-white border rounded-xl p-5 transition hover:shadow-md hover:border-gray-300"
-                  >
-                    <span
-                      className={`absolute top-5 right-5 px-3 py-1 rounded-full text-xs font-semibold
+          )}
+          {!isTopicsListLoading && topics.length === 0 && (
+            <p className="text-sm text-gray-500">No Medical Topics found</p>
+          )}
+          {!isTopicsListLoading && topics.length > 0 && (
+            <>
+              <div className="space-y-4 cursor-pointer">
+                {topics?.map((topic) => {
+                  if (!topic) return null;
+                  return (
+                    <>
+                      <div
+                        key={topic?.id}
+                        // onClick={() => handleCardClick(topic?.id)}
+                        className="group relative bg-white border rounded-xl p-5 transition hover:shadow-md hover:border-gray-300"
+                      >
+                        <span
+                          className={`absolute top-5 right-5 px-3 py-1 rounded-full text-xs font-semibold
             ${statusStyles[topic?.status] || ""}`}
-                    >
-                      {topic.status.replace("_", " ") || "---"}
-                    </span>
+                        >
+                          {topic.status.replace("_", " ") || "---"}
+                        </span>
 
-                    <h3 className="text-lg font-semibold text-gray-900 pr-28">
-                      {topic?.title}
-                    </h3>
+                        <h3 className="text-lg font-semibold text-gray-900 pr-28">
+                          {topic?.title}
+                        </h3>
 
-                    <div className="flex items-center gap-2 mt-1 text-sm text-gray-600">
-                      <span>
-                        {topic.assignedDoctor?.firstName}{" "}
-                        {topic.assignedDoctor?.lastName}
-                      </span>
+                        <div className="flex items-center gap-2 mt-1 text-sm text-gray-600">
+                          <span>
+                            {topic.assignedDoctor?.firstName}{" "}
+                            {topic.assignedDoctor?.lastName}
+                          </span>
 
-                      <span className="px-3 py-1 rounded-full text-xs bg-gray-100 border border-gray-300 text-gray-700">
-                        {topic.assignedDoctor?.specialty}
-                      </span>
-                    </div>
+                          <span className="px-3 py-1 rounded-full text-xs bg-gray-100 border border-gray-300 text-gray-700">
+                            {topic.assignedDoctor?.specialty}
+                          </span>
+                        </div>
 
-                    <p className="text-xs text-gray-500 mt-1">
-                      Created by{" "}
-                      <span className="font-medium text-gray-700">
+                        <p className="text-xs text-gray-500 mt-1">
+                          Created by{" "}
+                          <span className="font-medium text-gray-700">
                         {topic.createdBy?.firstName} {topic.createdBy?.lastName}
-                      </span>
-                      <span className="mx-1">•</span>
+                          </span>
+                          <span className="mx-1">•</span>
                       {new Date(topic.createdAt).toLocaleDateString("en-IN", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
                       })}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
+                        </p>
+                      </div>
+                    </>
+                  );
+                })}
+              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </>
           )}
         </div>
       </div>
