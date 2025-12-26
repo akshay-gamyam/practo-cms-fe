@@ -4,7 +4,7 @@ import { FiUpload } from "react-icons/fi";
 import { FaClipboardList, FaRegChartBar, FaSpinner, FaUserMd } from "react-icons/fa";
 import { PiUsers } from "react-icons/pi";
 import { CiSettings } from "react-icons/ci";
-import { MdOutlineMedicalInformation, MdOutlineTopic } from "react-icons/md";
+import { MdOutlineMediation, MdOutlineMedicalInformation, MdOutlineTopic } from "react-icons/md";
 import { IoIosNotifications } from "react-icons/io";
 
 // Google OAuth Client ID
@@ -12,22 +12,14 @@ export const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
 export const MENU_ITEMS = [
   { label: "Dashboard", icon: <IoHome size={20} />, path: ROUTES.DASHBOARD },
-   { label: "Users", icon: <PiUsers size={20} />, path: ROUTES.USERS },
-  {
-    label: "Content Library",
-    icon: <IoDocumentTextOutline size={20} />,
-    path: ROUTES.CONTENT_LIBRARY,
-  },
+  { label: "Users", icon: <PiUsers size={20} />, path: ROUTES.USERS },
+  { label: "Content Library", icon: <IoDocumentTextOutline size={20} />, path: ROUTES.CONTENT_LIBRARY },
   { label: "Upload", icon: <FiUpload size={20} />, path: ROUTES.UPLOAD },
   { label: "Assigned Topics", icon: <MdOutlineTopic size={20} />, path: ROUTES.MY_TOPICS },
   { label: "Doctor Notes", icon: <MdOutlineMedicalInformation size={20} />, path: ROUTES.MY_DOCTOR_NOTES },
   { label: "Medical Topics", icon: <MdOutlineMedicalInformation size={20} />, path: ROUTES.MEDICAL_TOPICS },
-  {
-    label: "Review Queue",
-    icon: <FaRegChartBar size={20} />,
-    path: ROUTES.REVIEW_QUEUE,
-  },
- 
+  { label: "Agency POC", icon: <MdOutlineMediation size={20} />, path: ROUTES.AGENCY_POC },
+  { label: "Review Queue", icon: <FaRegChartBar size={20} />, path: ROUTES.REVIEW_QUEUE },
   { label: "Settings", icon: <CiSettings size={20} />, path: ROUTES.SETTINGS },
   { label: "Notifications", icon: <IoIosNotifications size={20} />, path: ROUTES.NOCIFICATIONS },
 ];

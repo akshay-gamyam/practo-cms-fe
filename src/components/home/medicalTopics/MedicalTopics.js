@@ -14,7 +14,8 @@ const MedicalTopics = () => {
   const dispatch = useDispatch();
   // const navigate = useNavigate();
 
-  const { topics, isTopicsListLoading, error, currentPage, totalPages } = useSelector((state) => state.topics);
+  const { topics, isTopicsListLoading, error, currentPage, totalPages } =
+    useSelector((state) => state.topics);
   const [openMedicalTopicModal, setOpenMedicalTopicModal] = useState(false);
 
   // const handleCardClick = (topicId) => {
@@ -37,55 +38,55 @@ const MedicalTopics = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-              My Topics
-            </h1>
-            <p className="text-gray-600 text-base sm:text-lg">
-              Overview of Consultant Doctors
-            </p>
-          </div>
-          <button
-            onClick={() => {
-              console.log("OPEN MODAL");
-              setOpenMedicalTopicModal(true);
-            }}
-            className="flex items-center gap-4 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-400 text-white font-medium shadow-md hover:opacity-90 transition-all duration-200"
-          >
-            <FiUserPlus size={20} />
-            Add Topics
-          </button>
-        </div>
-
-        <div className="bg-white rounded-2xl border shadow-sm p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-gray-900">
-              Medical Topics
-            </h2>
-          </div>
-
-          {isTopicsListLoading && (
-            <div className="space-y-4">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="border rounded-xl p-5">
-                  <SkeletonBlock
-                    title
-                    lines={2}
-                    showCard
-                    lineWidths={["w-3/4", "w-2/3"]}
-                  />
-                </div>
-              ))}
+    <div className="h-screen bg-gray-100 flex flex-col">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto space-y-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                My Topics
+              </h1>
+              <p className="text-gray-600 text-base sm:text-lg">
+                Overview of Consultant Doctors
+              </p>
             </div>
-          )}
-          {!isTopicsListLoading && topics.length === 0 && (
-            <p className="text-sm text-gray-500">No Medical Topics found</p>
-          )}
-          {!isTopicsListLoading && topics.length > 0 && (
-            <>
+            <button
+              onClick={() => {
+                console.log("OPEN MODAL");
+                setOpenMedicalTopicModal(true);
+              }}
+              className="flex items-center gap-4 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-400 text-white font-medium shadow-md hover:opacity-90 transition-all duration-200"
+            >
+              <FiUserPlus size={20} />
+              Add Topics
+            </button>
+          </div>
+
+          <div className="bg-white rounded-2xl border shadow-sm p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-gray-900">
+                Medical Topics
+              </h2>
+            </div>
+
+            {isTopicsListLoading && (
+              <div className="space-y-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="border rounded-xl p-5">
+                    <SkeletonBlock
+                      title
+                      lines={2}
+                      showCard
+                      lineWidths={["w-3/4", "w-2/3"]}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+            {!isTopicsListLoading && topics.length === 0 && (
+              <p className="text-sm text-gray-500">No Medical Topics found</p>
+            )}
+            {!isTopicsListLoading && topics.length > 0 && (
               <div className="space-y-4 cursor-pointer">
                 {topics?.map((topic) => {
                   if (!topic) return null;
@@ -121,27 +122,26 @@ const MedicalTopics = () => {
                         <p className="text-xs text-gray-500 mt-1">
                           Created by{" "}
                           <span className="font-medium text-gray-700">
-                        {topic.createdBy?.firstName} {topic.createdBy?.lastName}
+                            {topic.createdBy?.firstName}{" "}
+                            {topic.createdBy?.lastName}
                           </span>
                           <span className="mx-1">•</span>
-                      {new Date(topic.createdAt).toLocaleDateString("en-IN", {
+                          {new Date(topic.createdAt).toLocaleDateString(
+                            "en-IN",
+                            {
                               day: "2-digit",
                               month: "short",
                               year: "numeric",
-                      })}
+                            }
+                          )}
                         </p>
                       </div>
                     </>
                   );
                 })}
               </div>
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            </>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
@@ -149,6 +149,13 @@ const MedicalTopics = () => {
         open={openMedicalTopicModal}
         onClose={() => setOpenMedicalTopicModal(false)}
       />
+      <div className=" sticky bottom-0 backdrop-blur-xl bg-white/30 border-t">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      </div>
     </div>
   );
 };

@@ -47,6 +47,9 @@ const topicsSlice = createSlice({
     fetchDoctorAssignmentSuccess(state, action) {
       state.isDoctorAssignmentLoading = false;
       state.doctorAssignments = action.payload.topics || [];
+      state.currentPage = action.payload.page || 1;
+      state.totalPages = action.payload.totalPages || 1;
+      state.totalCount = action.payload.totalCount || 0;
       state.error = null;
     },
     fetchDoctorAssignmentFailure(state, action) {

@@ -93,6 +93,8 @@ const Login = ({ setScreen }) => {
         return navigate(ROUTES.REVIEW_QUEUE);
       } else if (user?.role === ROLE_VARIABLES_MAP?.SUPER_ADMIN) {
         return navigate(ROUTES.DASHBOARD);
+      } else if (user?.role === ROLE_VARIABLES_MAP?.AGENCY_POC) {
+        return navigate(ROUTES.AGENCY_POC);
       }
 
       // navigate(ROUTES.DASHBOARD);
@@ -132,6 +134,8 @@ const Login = ({ setScreen }) => {
         return navigate(ROUTES.REVIEW_QUEUE);
       } else if (user?.role === ROLE_VARIABLES_MAP?.SUPER_ADMIN) {
         return navigate(ROUTES.DASHBOARD);
+      } else if (user?.role === ROLE_VARIABLES_MAP?.AGENCY_POC) {
+        return navigate(ROUTES.AGENCY_POC);
       }
     } catch (error) {
       const errorMessage =

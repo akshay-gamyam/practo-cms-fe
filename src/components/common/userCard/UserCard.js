@@ -1,7 +1,7 @@
 import React from "react";
 import { ROLE_VARIABLES_MAP } from "../../../utils/helper";
 
-const UserCard = ({ user, onViewProfile, onEditUser }) => {
+const UserCard = ({ user, onViewProfile, onEditUser, viewTextButton, editTextButton }) => {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 hover:shadow-md transition-shadow">
@@ -42,7 +42,7 @@ const UserCard = ({ user, onViewProfile, onEditUser }) => {
                 onClick={() => onViewProfile(user?.id)}
                 className="mt-4 w-full text-sm py-2 rounded-xl hover:text-white border border-gray-300 text-gray-900 font-medium hover:bg-teal-500 transition"
               >
-                View Profile
+                {viewTextButton}
               </button>
             </div>
 
@@ -63,7 +63,7 @@ const UserCard = ({ user, onViewProfile, onEditUser }) => {
               </div>
 
               <button onClick={() => onEditUser(user?.id)} className="mt-4 w-full text-sm py-2 rounded-xl border border-gray-300 text-gray-900 font-medium hover:text-white hover:bg-teal-500 transition">
-                Edit Role
+                {editTextButton}
               </button>
             </div>
           </div>

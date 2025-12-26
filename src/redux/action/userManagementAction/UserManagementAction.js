@@ -26,16 +26,22 @@ let isUpdatingStatus = false;
 
 // .................... Fetch All User Management listing ...........................
 
-export const fetchUserManagementList = () => async (dispatch) => {
+export const fetchUserManagementList = ({ page, size, search } = {}) => async (dispatch) => {
   if (isFetchingUsers) return;
   isFetchingUsers = true;
   dispatch(fetchUsersStart());
 
   try {
-    const response = await api.get(`${USER_MANAGEMENT_LIST}`);
+     const params = {};
 
-    const { users } = response.data;
-    dispatch(fetchUsersSuccess({ users }));
+      if (page) params.page = page;
+      if (size) params.size = size;
+      if (search) params.search = search;
+
+    const response = await api.get(USER_MANAGEMENT_LIST, { params });
+
+    const { users, page: currentPage, totalPages, total } = response.data;
+    dispatch(fetchUsersSuccess({ users, currentPage, totalPages, total }));
 
     return response.data;
   } catch (error) {

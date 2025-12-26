@@ -4,19 +4,17 @@ import { CiSearch } from "react-icons/ci";
 import { IoShieldOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchUserById,
+//   fetchUserById,
   fetchUserManagementList,
 } from "../../../redux/action/userManagementAction/UserManagementAction";
-import AddUserModal from "./AddUserModal";
-import { FiUserPlus } from "react-icons/fi";
-import { clearSelectedUser } from "../../../redux/reducer/userManagementReducer/UserManagementReducer";
-import ViewUserModal from "./ViewUserModal";
-import EditUserModal from "./EditUserModal";
+// import { clearSelectedUser } from "../../../redux/reducer/userManagementReducer/UserManagementReducer";
+// import ViewUserModal from "./ViewUserModal";
+// import EditUserModal from "./EditUserModal";
 import SkeletonBlock from "../../common/skeletonBlock/SkeletonBlock";
 import { LIMIT } from "../../../utils/constants";
 import Pagination from "../../common/pagination/Pagination";
 
-const UserManagement = () => {
+const AgencyPOC = () => {
   const dispatch = useDispatch();
 
   const { users, isListLoading, error, totalPages } = useSelector(
@@ -24,9 +22,8 @@ const UserManagement = () => {
   );
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-  const [showViewUserModal, setShowViewUserModal] = useState(false);
-  const [showEditUserModal, setShowEditUserModal] = useState(false);
+//   const [showViewUserModal, setShowViewUserModal] = useState(false);
+//   const [showEditUserModal, setShowEditUserModal] = useState(false);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -50,68 +47,49 @@ const UserManagement = () => {
       user.role?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAddUser = () => {
-    setIsAddUserOpen(true);
-  };
+//   const handleViewProfile = async (userId) => {
+//     try {
+//       setShowViewUserModal(true);
+//       await dispatch(fetchUserById(userId));
+//     } catch (error) {
+//       console.error("Failed to fetch user details:", error);
+//     }
+//   };
 
-  const handleCloseAddModal = useCallback(() => {
-    setIsAddUserOpen(false);
-    dispatch(fetchUserManagementList({ page, size: LIMIT }));
-  }, [dispatch, page]);
+//   const handleEditUser = async (userId) => {
+//     try {
+//       setShowEditUserModal(true);
+//       await dispatch(fetchUserById(userId));
+//     } catch (error) {
+//       console.error("Failed to fetch user details:", error);
+//     }
+//   };
 
-  const handleViewProfile = async (userId) => {
-    try {
-      setShowViewUserModal(true);
-      await dispatch(fetchUserById(userId));
-    } catch (error) {
-      console.error("Failed to fetch user details:", error);
-    }
-  };
+//   const handleCloseViewModal = useCallback(() => {
+//     setShowViewUserModal(false);
+//     dispatch(clearSelectedUser());
+//   }, [dispatch]);
 
-  const handleEditUser = async (userId) => {
-    try {
-      setShowEditUserModal(true);
-      await dispatch(fetchUserById(userId));
-    } catch (error) {
-      console.error("Failed to fetch user details:", error);
-    }
-  };
-
-  const handleCloseViewModal = useCallback(() => {
-    setShowViewUserModal(false);
-    dispatch(clearSelectedUser());
-  }, [dispatch]);
-
-  const handleCloseEditModal = useCallback(() => {
-    setShowEditUserModal(false);
-    dispatch(clearSelectedUser());
-    dispatch(fetchUserManagementList({ page, size: LIMIT }));
-  }, [dispatch, page]);
+//   const handleCloseEditModal = useCallback(() => {
+//     setShowEditUserModal(false);
+//     dispatch(clearSelectedUser());
+//     dispatch(fetchUserManagementList({ page, size: LIMIT }));
+//   }, [dispatch, page]);
 
   return (
     <div className="h-screen bg-gray-100 flex flex-col">
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-            <div>
+           <div>
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-                User Management
+                Agency POC
               </h1>
               <p className="text-gray-600 text-base sm:text-lg">
-                Manage team members and their roles
+                Topics assigned to you by doctors for script creation
               </p>
             </div>
-            <button
-              onClick={handleAddUser}
-              className="flex items-center gap-4 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-400 text-white font-medium shadow-md hover:opacity-90 transition-all duration-200"
-            >
-              {/* <LiaUserPlusSolid size={20} /> */}
-              <FiUserPlus size={20} />
-              Add User
-            </button>
-          </div>
 
-          <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+          <div className="bg-white rounded-lg shadow-md p-4 mb-6 mt-4">
             <div className="flex flex-col lg:flex-row gap-4">
               <div className="flex-1 relative">
                 <CiSearch
@@ -120,7 +98,7 @@ const UserManagement = () => {
                 />
                 <input
                   type="text"
-                  placeholder="Search users..."
+                  placeholder="Search topics..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -128,7 +106,7 @@ const UserManagement = () => {
               </div>
               <button className="flex items-center justify-center gap-2 px-4 py-2 hover:bg-teal-500 hover:text-white border border-gray-300 rounded-xl text-gray-700 font-medium transition-colors whitespace-nowrap">
                 <IoShieldOutline size={20} />
-                Role Permissions
+                Filter
               </button>
             </div>
           </div>
@@ -150,8 +128,8 @@ const UserManagement = () => {
                   user={user}
                   viewTextButton="View Profile"
                   editTextButton="Edit Role"
-                  onViewProfile={handleViewProfile}
-                  onEditUser={handleEditUser}
+                //   onViewProfile={handleViewProfile}
+                //   onEditUser={handleEditUser}
                 />
               ))}
             </div>
@@ -169,27 +147,15 @@ const UserManagement = () => {
         </div>
       </div>
 
-      {/* {!isListLoading && users.length > 0 && ( */}
-        <div className=" sticky bottom-0 backdrop-blur-xl bg-white/30 border-t">
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={(newPage) => setPage(newPage)}
-          />
-        </div>
-      {/* )} */}
-
-      <AddUserModal isOpen={isAddUserOpen} onClose={handleCloseAddModal} />
-      <ViewUserModal
-        isOpen={showViewUserModal}
-        onClose={handleCloseViewModal}
-      />
-      <EditUserModal
-        isOpen={showEditUserModal}
-        onClose={handleCloseEditModal}
-      />
+      <div className=" sticky bottom-0 backdrop-blur-xl bg-white/30 border-t">
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={(newPage) => setPage(newPage)}
+        />
+      </div>
     </div>
   );
 };
 
-export default UserManagement;
+export default AgencyPOC;

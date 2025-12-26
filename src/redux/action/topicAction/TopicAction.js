@@ -5,6 +5,7 @@ import {
   GET_TOPICS_LIST,
 } from "../../../api/apiEndPoints";
 import api from "../../../api/interceptor";
+import { LIMIT } from "../../../utils/constants";
 import {
   fetchTopicsStart,
   fetchTopicsSuccess,
@@ -35,7 +36,7 @@ let isFetchingTopicStat = false;
 
 // .................... get Topics list ......................
 
-export const fetchUplodedTopcsList = (page = 1, limit = 10, offset) => async (dispatch) => {
+export const fetchUplodedTopcsList = (page = 1, limit = LIMIT, offset) => async (dispatch) => {
     if (isFetchingTopics) return;
     isFetchingTopics = true;
     dispatch(fetchTopicsStart());
@@ -59,24 +60,23 @@ export const fetchUplodedTopcsList = (page = 1, limit = 10, offset) => async (di
 
 // .................... get Doctor Assignment list ......................
 
-export const fetchDoctorAssignmentList = () => async (dispatch) => {
+export const fetchDoctorAssignmentList = (page = 1, limit = LIMIT,) => async (dispatch) => {
   if (isFetchingDoctorAssignment) return;
   isFetchingDoctorAssignment = true;
   dispatch(fetchDoctorAssignmentStart());
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
-  console.log("user", user);
 
   try {
     let response;
 
     if (user?.role === "SUPER_ADMIN") {
-      response = await api.get(GET_TOPICS_LIST);
+      response = await api.get(`${GET_TOPICS_LIST}?page=${page}&limit=${limit}`);
     } else {
-      response = await api.get(DOCTOR_ASSIGNMENT_LIST);
+      response = await api.get(`${DOCTOR_ASSIGNMENT_LIST}?page=${page}&limit=${limit}`);
     }
-    const { topics } = response.data;
-    dispatch(fetchDoctorAssignmentSuccess({ topics }));
+    const { topics, page: currentPage, totalPages, total  } = response.data;
+    dispatch(fetchDoctorAssignmentSuccess({ topics, page: currentPage, totalPages, totalCount: total, }));
 
     return response.data;
   } catch (error) {

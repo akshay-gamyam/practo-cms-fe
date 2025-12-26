@@ -19,6 +19,7 @@ import UserProfile from "../components/home/userProfile/UserProfile";
 import Notifications from "../components/home/notifications/Notifications";
 import MedicalTopics from "../components/home/medicalTopics/MedicalTopics";
 import MyDoctorNotes from "../components/home/myDoctorNotes/MyDoctorNotes";
+import AgencyPOC from "../components/home/agencyPoc/AgencyPOC";
 
 const AppRouter = () => {
   return (
@@ -71,6 +72,7 @@ const AppRouter = () => {
           <Route path={ROUTES.USERS} element={<UserManagement />} />
           <Route path={ROUTES.SETTINGS} element={<Settings />} />
           <Route path={ROUTES.USER_PROFILE} element={<UserProfile />} />
+          <Route path={ROUTES.AGENCY_POC} element={<AgencyPOC />} />
           <Route path={ROUTES.NOCIFICATIONS} element={<Notifications />} />
         </Route>
 

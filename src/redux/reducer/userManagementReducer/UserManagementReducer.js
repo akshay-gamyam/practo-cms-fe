@@ -3,8 +3,11 @@ import { revertAll } from "../revertStateReducer/RevertStateReducer";
 
 const initialState = {
   users: [],
+  totalPages: 1,
+  totalCount: 0,
+  currentPage: 1,
   selectedUser: null,
-   isListLoading: false,
+  isListLoading: false,
   isViewLoading: false,
   isCreateLoading: false,
   isUpdateLoading: false,
@@ -23,6 +26,9 @@ const userSlice = createSlice({
     fetchUsersSuccess(state, action) {
       state.isListLoading = false;
       state.users = action.payload.users || [];
+      state.totalPages = action.payload.totalPages ?? 1;
+      state.totalCount = action.payload.totalCount ?? 0;
+      state.currentPage = action.payload.page ?? 1;
       state.error = null;
     },
     fetchUsersFailure(state, action) {
