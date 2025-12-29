@@ -9,7 +9,9 @@ const initialState = {
   selectedAgencyPoc: null,
   isPocListLoading: false,
   isViewPocLoading: false,
-  isUpdatePocLoading: false,
+  isScriptLoading: false,
+  isCreateScriptLoading: false,
+  isUpdateScriptLoading: false,
   error: null,
 };
 
@@ -25,7 +27,6 @@ const agencyPocSlice = createSlice({
     fetchAgencyPocSuccess(state, action) {
       state.isPocListLoading = false;
       state.agencyPoc = action.payload.agencyPoc;
-
       state.totalPages = action.payload.totalPages;
       state.totalCount = action.payload.totalCount;
       state.currentPage = action.payload.page;
@@ -50,30 +51,79 @@ const agencyPocSlice = createSlice({
       state.error = action.payload;
     },
 
-    // ................. update user role ........................
-    updateAgencyPocScriptStart(state) {
-      state.isUpdatePocLoading = true;
+    // ................. fetch script by ID ........................
+    fetchScriptStart(state) {
+      state.isScriptLoading = true;
+      state.error = null;
     },
-    updateAgencyPocScriptSuccess(state, action) {
-      state.isUpdatePocLoading = false;
-      const { userId, role } = action.payload;
-      const index = state.agencyPoc.findIndex((user) => user.id === userId);
-      if (index !== -1) {
-        state.agencyPoc[index].role = role;
-      }
-      if (state.selectedUser?.id === userId) {
-        state.selectedUser.role = role;
+    fetchScriptSuccess(state, action) {
+      state.isScriptLoading = false;
+      state.selectedScript = action.payload.script;
+      state.error = null;
+    },
+    fetchScriptFailure(state, action) {
+      state.isScriptLoading = false;
+      state.error = action.payload;
+    },
+
+     // ................. create script ........................
+    createScriptStart(state) {
+      state.isCreateScriptLoading = true;
+      state.error = null;
+    },
+    createScriptSuccess(state, action) {
+      state.isCreateScriptLoading = false;
+      state.selectedScript = action.payload.script;
+      const topicIndex = state.agencyPoc.findIndex(
+        (topic) => topic.id === action.payload.topicId
+      );
+      if (topicIndex !== -1) {
+        if (!state.agencyPoc[topicIndex].scripts) {
+          state.agencyPoc[topicIndex].scripts = [];
+        }
+        state.agencyPoc[topicIndex].scripts.push(action.payload.script);
       }
       state.error = null;
     },
-    updateAgencyPocScriptFailure(state, action) {
-      state.isUpdatePocLoading = false;
+    createScriptFailure(state, action) {
+      state.isCreateScriptLoading = false;
+      state.error = action.payload;
+    },
+
+       // ................. update script (continue draft/fix script) ........................
+    updateScriptStart(state) {
+      state.isUpdateScriptLoading = true;
+      state.error = null;
+    },
+    updateScriptSuccess(state, action) {
+      state.isUpdateScriptLoading = false;
+      state.selectedScript = action.payload.script;
+      const topicIndex = state.agencyPoc.findIndex((topic) =>
+        topic.scripts?.some((script) => script.id === action.payload.script.id)
+      );
+      if (topicIndex !== -1) {
+        const scriptIndex = state.agencyPoc[topicIndex].scripts.findIndex(
+          (script) => script.id === action.payload.script.id
+        );
+        if (scriptIndex !== -1) {
+          state.agencyPoc[topicIndex].scripts[scriptIndex] = action.payload.script;
+        }
+      }
+      state.error = null;
+    },
+    updateScriptFailure(state, action) {
+      state.isUpdateScriptLoading = false;
       state.error = action.payload;
     },
 
     // ................. clear selected user ........................
     clearSelectedPoc(state) {
       state.selectedAgencyPoc = null;
+    },
+
+     // ................. clear selected script ........................
+    clearSelectedScript(state) {
+      state.selectedScript = null;
     },
   },
 });
@@ -85,9 +135,17 @@ export const {
   fetchViewAgencyPocStart,
   fetchViewAgencyPocSuccess,
   fetchViewAgencyPocFailure,
-  updateAgencyPocScriptStart,
-  updateAgencyPocScriptSuccess,
-  updateAgencyPocScriptFailure,
+
+  fetchScriptStart,
+  fetchScriptSuccess,
+  fetchScriptFailure,
+  createScriptStart,
+  createScriptSuccess,
+  createScriptFailure,
+  updateScriptStart,
+  updateScriptSuccess,
+  updateScriptFailure,
+   clearSelectedScript,
   clearSelectedPoc,
 } = agencyPocSlice.actions;
 

@@ -28,3 +28,4 @@ export const MARK_ALL_NOTIFICATION_AS_READ = "/api/notifications/read-all";
 export const MARK_NOTIFICATION_AS_READ = (id) => `/api/notifications/${id}/read`;
 
 export const AGENCY_POC_MY_ASSESSMENT = "/api/topics/my-assignments";
+export const AGENCY_POC_SCRIPTS = "/api/scripts";

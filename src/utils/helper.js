@@ -6,6 +6,12 @@ import { PiUsers } from "react-icons/pi";
 import { CiSettings } from "react-icons/ci";
 import { MdOutlineDescription, MdOutlineMediation, MdOutlineMedicalInformation, MdOutlineTopic } from "react-icons/md";
 import { IoIosNotifications } from "react-icons/io";
+import {
+  HiOutlinePencilAlt,
+  HiOutlineRefresh,
+  HiOutlineEye,
+  HiOutlineDocumentAdd,
+} from "react-icons/hi";
 
 // Google OAuth Client ID
 export const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -317,3 +323,27 @@ export   const videos = [
       thumbnail: null
     }
   ];
+
+
+export const EDIT_BUTTON_CONFIG = {
+  "Write Script": {
+    icon: <HiOutlineDocumentAdd className="w-4 h-4" />,
+    classes:
+      "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600",
+  },
+  "Continue Draft": {
+    icon: <HiOutlinePencilAlt className="w-4 h-4" />,
+    classes:
+      "bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600",
+  },
+  "Fix Script": {
+    icon: <HiOutlineRefresh className="w-4 h-4" />,
+    classes:
+      "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600",
+  },
+  "View Script": {
+    icon: <HiOutlineEye className="w-4 h-4" />,
+    classes:
+      "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600",
+  },
+};

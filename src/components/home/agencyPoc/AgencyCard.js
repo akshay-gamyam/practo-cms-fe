@@ -1,6 +1,11 @@
 import React from 'react'
+import { EDIT_BUTTON_CONFIG } from '../../../utils/helper';
 
 const AgencyCard = ({ project, onViewProject, onEditProject, viewTextButton, editTextButton }) => {
+
+const config = EDIT_BUTTON_CONFIG[editTextButton] || {};
+const editTextButtonClasses = config.classes || "bg-gray-100 text-gray-600";
+const EditIcon = config.icon;
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 hover:shadow-md transition-shadow">
@@ -46,9 +51,10 @@ const AgencyCard = ({ project, onViewProject, onEditProject, viewTextButton, edi
             <div className="flex flex-col justify-between items-start">
               <button 
                 onClick={() => onEditProject(project?.id)} 
-                className="mt-4 w-full text-sm py-2 rounded-xl border border-gray-300 text-gray-900 font-medium hover:text-white hover:bg-teal-500 transition"
+                className={` mt-4 w-full flex items-center justify-center gap-2 text-sm py-2 rounded-xl border border-gray-300 font-medium text-white transition ${editTextButtonClasses}`}
               >
-                {editTextButton || "Edit Project"}
+                {EditIcon}
+                <span>{editTextButton || ""}</span>
               </button>
             </div>
           </div>

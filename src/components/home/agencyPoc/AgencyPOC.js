@@ -1,9 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CiFilter, CiSearch } from "react-icons/ci";
 import { useDispatch, useSelector } from "react-redux";
-// import { clearSelectedUser } from "../../../redux/reducer/userManagementReducer/UserManagementReducer";
-// import ViewUserModal from "./ViewUserModal";
-// import EditUserModal from "./EditUserModal";
 import SkeletonBlock from "../../common/skeletonBlock/SkeletonBlock";
 import { LIMIT } from "../../../utils/constants";
 import Pagination from "../../common/pagination/Pagination";
@@ -14,6 +11,7 @@ import {
 import AgencyCard from "./AgencyCard";
 import { clearSelectedPoc } from "../../../redux/reducer/agencyPocReducer/AgencyPocReducer";
 import TopicDetailsModal from "../dashboard/TopicViewDetailModal";
+import EditScriptModal from "./scriptting/EditScriptyModal";
 
 const AgencyPOC = () => {
   const dispatch = useDispatch();
@@ -23,19 +21,25 @@ const AgencyPOC = () => {
     isPocListLoading,
     error,
     totalPages,
+    currentPage,
     selectedAgencyPoc,
     isViewPocLoading,
   } = useSelector((state) => state.agencyPoc);
-  // console.log("agencyPoc", agencyPoc);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showViewUserModal, setShowViewUserModal] = useState(false);
-  //   const [showEditUserModal, setShowEditUserModal] = useState(false);
+  const [showEditScriptModal, setShowEditScriptModal] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState(null);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
     dispatch(fetchAgencyPocList());
   }, [dispatch]);
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+    dispatch(fetchAgencyPocList(newPage, LIMIT));
+  };
 
   useEffect(() => {
     setPage(1);
@@ -45,7 +49,7 @@ const AgencyPOC = () => {
     const query = searchQuery.toLowerCase();
 
     return agencyPoc
-      .filter((item) => item.status === "DOCTOR_INPUT_RECEIVED")
+      .filter((item) => item.status === "DOCTOR_INPUT_RECEIVED" || item.status === "IN_PROGRESS" )
       .filter(
         (item) =>
           item.title?.toLowerCase().includes(query) ||
@@ -57,54 +61,50 @@ const AgencyPOC = () => {
   // console.log("filteredAgencyPoc", filteredAgencyPoc)
 
   const getEditButtonText = (topic) => {
-  if (!topic?.scripts || topic.scripts.length === 0) {
-    return "Write Script";
-  }
-
-  const status = topic.scripts[0]?.status;
-
-  switch (status) {
-    case "DRAFT":
-      return "Continue Draft";
-    case "REJECTED":
-      return "Fix Script";
-    case "IN_REVIEW":
-    case "LOCKED":
-      return "View Script";
-    default:
+    if (!topic?.scripts || topic.scripts.length === 0) {
       return "Write Script";
-  }
-};
+    }
 
+    const status = topic.scripts[0]?.status;
 
-  const handleViewProfile = async (userId) => {
+    switch (status) {
+      case "DRAFT":
+        return "Continue Draft";
+      case "REJECTED":
+        return "Fix Script";
+      case "IN_REVIEW":
+      case "LOCKED":
+        return "View Script";
+      default:
+        return "Write Script";
+    }
+  };
+
+  const handleViewProfile = async (topicId) => {
     try {
       setShowViewUserModal(true);
-      await dispatch(fetchDetailedAgencyPocById(userId));
+      await dispatch(fetchDetailedAgencyPocById(topicId));
     } catch (error) {
       console.error("Failed to fetch user details:", error);
     }
   };
 
-  //   const handleEditUser = async (userId) => {
-  //     try {
-  //       setShowEditUserModal(true);
-  //       await dispatch(fetchUserById(userId));
-  //     } catch (error) {
-  //       console.error("Failed to fetch user details:", error);
-  //     }
-  //   };
+  const handleEditScript = (topic) => {
+    setSelectedTopic(topic);
+    setShowEditScriptModal(true);
+  };
 
   const handleCloseViewModal = useCallback(() => {
     setShowViewUserModal(false);
     dispatch(clearSelectedPoc());
   }, [dispatch]);
 
-  //   const handleCloseEditModal = useCallback(() => {
-  //     setShowEditUserModal(false);
-  //     dispatch(clearSelectedUser());
-  //     dispatch(fetchUserManagementList({ page, size: LIMIT }));
-  //   }, [dispatch, page]);
+  const handleCloseEditScriptModal = useCallback(() => {
+    setShowEditScriptModal(false);
+    setSelectedTopic(null);
+    // Refresh the list to get updated script status
+    dispatch(fetchAgencyPocList(page, LIMIT));
+  }, [dispatch, page]);
 
   return (
     <div className="h-screen bg-gray-100 flex flex-col">
@@ -148,18 +148,17 @@ const AgencyPOC = () => {
           )}
 
           {isPocListLoading && <SkeletonBlock />}
+
           {!isPocListLoading && agencyPoc.length > 0 && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {filteredAgencyPoc.map((agency) => (
                 <AgencyCard
-                  key={agency.id}
+                  key={agency?.id}
                   project={agency}
                   onViewProject={handleViewProfile}
-                  onEditProject={(id) => console.log("Edit project:", id)}
+                  onEditProject={() => handleEditScript(agency)}
                   viewTextButton="View Details"
-                  // editTextButton="Edit Project"
                   editTextButton={getEditButtonText(agency)}
-                  // onEditUser={handleEditUser}
                 />
               ))}
             </div>
@@ -190,6 +189,12 @@ const AgencyPOC = () => {
         topic={selectedAgencyPoc}
         isLoading={isViewPocLoading}
         onClose={handleCloseViewModal}
+      />
+
+      <EditScriptModal
+        open={showEditScriptModal}
+        onClose={handleCloseEditScriptModal}
+        topic={selectedTopic}
       />
     </div>
   );
