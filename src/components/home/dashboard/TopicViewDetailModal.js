@@ -1,14 +1,15 @@
 import React from "react";
 import CustomModal from "../../common/Modal/CustomModal";
 import { statusStyles } from "../../../utils/helper";
-import {
-  HiOutlineUser,
-  HiOutlineCalendar,
-} from "react-icons/hi";
+import { HiOutlineUser, HiOutlineCalendar } from "react-icons/hi";
 import SkeletonBlock from "../../common/skeletonBlock/SkeletonBlock";
-import "../../common/richTextEditor/viewRichTextEditor.css"
+import "../../common/richTextEditor/viewRichTextEditor.css";
 
 const TopicDetailsModal = ({ isOpen, onClose, topic, isLoading }) => {
+
+  const doctorNotes = topic?.doctorPointers?.filter(
+    (pointer) => pointer.topicId === topic.id
+  );
 
   return (
     <CustomModal isOpen={isOpen} onClose={onClose} title="Topic Details">
@@ -22,20 +23,35 @@ const TopicDetailsModal = ({ isOpen, onClose, topic, isLoading }) => {
             </h3>
 
             <span
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${statusStyles[topic.status]}`}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${
+                statusStyles[topic.status]
+              }`}
             >
               {topic.status.replace("_", " ")}
             </span>
           </div>
 
           <div className="bg-gray-50 border rounded-xl p-4">
-            <p className="text-sm font-medium text-gray-800 mb-2">
-              Overview
-            </p>
-             <div 
+            <p className="text-sm font-medium text-gray-800 mb-2">Overview</p>
+            <div
               className="text-sm text-gray-600 leading-relaxed richtext-content"
               dangerouslySetInnerHTML={{ __html: topic.description }}
             />
+          </div>
+
+          <div className="bg-gray-50 border rounded-xl p-4">
+            <p className="text-sm font-medium text-gray-800 mb-2">Notes</p>
+            {doctorNotes?.length > 0 ? (
+              doctorNotes.map((note) => (
+                <div
+                  key={note.id}
+                  className="text-sm text-gray-600 leading-relaxed "
+                  dangerouslySetInnerHTML={{ __html: note.notes }}
+                />
+              ))
+            ) : (
+              <p className="text-gray-500 mt-4">No doctor notes available</p>
+            )}
           </div>
 
           <div className="border rounded-xl p-5 bg-white shadow-sm">
@@ -55,9 +71,7 @@ const TopicDetailsModal = ({ isOpen, onClose, topic, isLoading }) => {
               </p>
               <p>{topic.assignedDoctor?.specialty}</p>
               {topic.assignedDoctor?.city && (
-                <p className="text-gray-500">
-                  {topic.assignedDoctor.city}
-                </p>
+                <p className="text-gray-500">{topic.assignedDoctor.city}</p>
               )}
               {topic.assignedDoctor?.email && (
                 <p className="text-blue-600 text-sm">
@@ -75,8 +89,7 @@ const TopicDetailsModal = ({ isOpen, onClose, topic, isLoading }) => {
               <div>
                 <p className="text-xs text-gray-500">Created By</p>
                 <p className="text-sm font-medium text-gray-800">
-                  {topic.createdBy?.firstName}{" "}
-                  {topic.createdBy?.lastName}
+                  {topic.createdBy?.firstName} {topic.createdBy?.lastName}
                 </p>
                 <p className="text-xs text-gray-500">
                   {topic.createdBy?.email}

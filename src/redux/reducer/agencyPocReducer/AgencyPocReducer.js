@@ -7,11 +7,13 @@ const initialState = {
   totalCount: 0,
   currentPage: 1,
   selectedAgencyPoc: null,
+  selectedScript: null,
   isPocListLoading: false,
   isViewPocLoading: false,
   isScriptLoading: false,
   isCreateScriptLoading: false,
   isUpdateScriptLoading: false,
+  isSubmitScriptLoading: false,
   error: null,
 };
 
@@ -20,9 +22,10 @@ const agencyPocSlice = createSlice({
   initialState,
   extraReducers: (builder) => builder.addCase(revertAll, () => initialState),
   reducers: {
-    // .................. fetch user management listing ....................
+    // .................. fetch agency POC listing ....................
     fetchAgencyPocStart(state) {
       state.isPocListLoading = true;
+      state.error = null;
     },
     fetchAgencyPocSuccess(state, action) {
       state.isPocListLoading = false;
@@ -40,6 +43,7 @@ const agencyPocSlice = createSlice({
     // ................. fetch single agency topic in detailed ........................
     fetchViewAgencyPocStart(state) {
       state.isViewPocLoading = true;
+      state.error = null;
     },
     fetchViewAgencyPocSuccess(state, action) {
       state.isViewPocLoading = false;
@@ -66,7 +70,7 @@ const agencyPocSlice = createSlice({
       state.error = action.payload;
     },
 
-     // ................. create script ........................
+    // ................. create script ........................
     createScriptStart(state) {
       state.isCreateScriptLoading = true;
       state.error = null;
@@ -90,7 +94,7 @@ const agencyPocSlice = createSlice({
       state.error = action.payload;
     },
 
-       // ................. update script (continue draft/fix script) ........................
+    // ................. update script (continue draft/fix script) ........................
     updateScriptStart(state) {
       state.isUpdateScriptLoading = true;
       state.error = null;
@@ -116,12 +120,38 @@ const agencyPocSlice = createSlice({
       state.error = action.payload;
     },
 
-    // ................. clear selected user ........................
+    // ................. submit script for review ........................
+    submitScriptStart(state) {
+      state.isSubmitScriptLoading = true;
+      state.error = null;
+    },
+    submitScriptSuccess(state, action) {
+      state.isSubmitScriptLoading = false;
+      state.selectedScript = action.payload.script;
+      const topicIndex = state.agencyPoc.findIndex((topic) =>
+        topic.scripts?.some((script) => script.id === action.payload.script.id)
+      );
+      if (topicIndex !== -1) {
+        const scriptIndex = state.agencyPoc[topicIndex].scripts.findIndex(
+          (script) => script.id === action.payload.script.id
+        );
+        if (scriptIndex !== -1) {
+          state.agencyPoc[topicIndex].scripts[scriptIndex] = action.payload.script;
+        }
+      }
+      state.error = null;
+    },
+    submitScriptFailure(state, action) {
+      state.isSubmitScriptLoading = false;
+      state.error = action.payload;
+    },
+
+    // ................. clear selected POC ........................
     clearSelectedPoc(state) {
       state.selectedAgencyPoc = null;
     },
 
-     // ................. clear selected script ........................
+    // ................. clear selected script ........................
     clearSelectedScript(state) {
       state.selectedScript = null;
     },
@@ -135,7 +165,6 @@ export const {
   fetchViewAgencyPocStart,
   fetchViewAgencyPocSuccess,
   fetchViewAgencyPocFailure,
-
   fetchScriptStart,
   fetchScriptSuccess,
   fetchScriptFailure,
@@ -145,8 +174,11 @@ export const {
   updateScriptStart,
   updateScriptSuccess,
   updateScriptFailure,
-   clearSelectedScript,
+  submitScriptStart,
+  submitScriptSuccess,
+  submitScriptFailure,
   clearSelectedPoc,
+  clearSelectedScript,
 } = agencyPocSlice.actions;
 
 export default agencyPocSlice.reducer;

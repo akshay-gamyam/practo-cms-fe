@@ -12,19 +12,12 @@ import AgencyCard from "./AgencyCard";
 import { clearSelectedPoc } from "../../../redux/reducer/agencyPocReducer/AgencyPocReducer";
 import TopicDetailsModal from "../dashboard/TopicViewDetailModal";
 import EditScriptModal from "./scriptting/EditScriptyModal";
+import { toast } from "react-toastify";
 
 const AgencyPOC = () => {
   const dispatch = useDispatch();
 
-  const {
-    agencyPoc,
-    isPocListLoading,
-    error,
-    totalPages,
-    currentPage,
-    selectedAgencyPoc,
-    isViewPocLoading,
-  } = useSelector((state) => state.agencyPoc);
+  const {agencyPoc, isPocListLoading, error, selectedAgencyPoc, isViewPocLoading } = useSelector((state) => state.agencyPoc);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showViewUserModal, setShowViewUserModal] = useState(false);
@@ -36,11 +29,6 @@ const AgencyPOC = () => {
     dispatch(fetchAgencyPocList());
   }, [dispatch]);
 
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
-    dispatch(fetchAgencyPocList(newPage, LIMIT));
-  };
-
   useEffect(() => {
     setPage(1);
   }, [searchQuery]);
@@ -49,19 +37,20 @@ const AgencyPOC = () => {
     const query = searchQuery.toLowerCase();
 
     return agencyPoc
-      .filter((item) => item.status === "DOCTOR_INPUT_RECEIVED" || item.status === "IN_PROGRESS" )
-      .filter(
-        (item) =>
+      .filter( (item) => item.status === "DOCTOR_INPUT_RECEIVED" || item.status === "IN_PROGRESS")
+      .filter((item) =>
           item.title?.toLowerCase().includes(query) ||
           item.assignedDoctor?.firstName?.toLowerCase().includes(query) ||
           item.assignedDoctor?.lastName?.toLowerCase().includes(query)
       );
   }, [agencyPoc, searchQuery]);
 
-  // console.log("filteredAgencyPoc", filteredAgencyPoc)
+  console.log("filteredAgencyPoc",filteredAgencyPoc)
+
+  const filteredTotalPages = Math.ceil(filteredAgencyPoc.length / LIMIT);
 
   const getEditButtonText = (topic) => {
-    if (!topic?.scripts || topic.scripts.length === 0) {
+    if (!topic?.scripts || topic?.scripts.length === 0) {
       return "Write Script";
     }
 
@@ -73,6 +62,13 @@ const AgencyPOC = () => {
       case "REJECTED":
         return "Fix Script";
       case "IN_REVIEW":
+        return "View Script";
+      case "MEDICAL_REVIEW":
+        return "View Script";
+      case "BRAND_REVIEW":
+        return "View Script";
+      case "DOCTOR_REVIEW":
+        return "View Script";
       case "LOCKED":
         return "View Script";
       default:
@@ -85,7 +81,7 @@ const AgencyPOC = () => {
       setShowViewUserModal(true);
       await dispatch(fetchDetailedAgencyPocById(topicId));
     } catch (error) {
-      console.error("Failed to fetch user details:", error);
+      toast.error("Failed to fetch user details:", error);
     }
   };
 
@@ -102,7 +98,6 @@ const AgencyPOC = () => {
   const handleCloseEditScriptModal = useCallback(() => {
     setShowEditScriptModal(false);
     setSelectedTopic(null);
-    // Refresh the list to get updated script status
     dispatch(fetchAgencyPocList(page, LIMIT));
   }, [dispatch, page]);
 
@@ -179,7 +174,7 @@ const AgencyPOC = () => {
       <div className=" sticky bottom-0 backdrop-blur-xl bg-white/30 border-t">
         <Pagination
           currentPage={page}
-          totalPages={totalPages}
+          totalPages={filteredTotalPages}
           onPageChange={(newPage) => setPage(newPage)}
         />
       </div>

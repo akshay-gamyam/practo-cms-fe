@@ -21,6 +21,9 @@ import {
   updateScriptStart,
   updateScriptSuccess,
   updateScriptFailure,
+  submitScriptStart,
+  submitScriptSuccess,
+  submitScriptFailure,
 } from "../../reducer/agencyPocReducer/AgencyPocReducer";
 
 let isFetchingAgencyPoc = false;
@@ -93,6 +96,7 @@ export const fetchDetailedAgencyPocById = (topicId) => async (dispatch) => {
   }
 };
 
+
 // .................... fetch script by ID (View Script) ...............
 
 export const fetchScriptById = (scriptId) => async (dispatch) => {
@@ -119,7 +123,8 @@ export const fetchScriptById = (scriptId) => async (dispatch) => {
   }
 };
 
-// .................... create new script (Write Script) ...............
+
+// .................... create new script (Write Script - Save as Draft) ...............
 
 export const createScript = (topicId, content) => async (dispatch) => {
   dispatch(createScriptStart());
@@ -145,6 +150,7 @@ export const createScript = (topicId, content) => async (dispatch) => {
   }
 };
 
+
 // .................... update script (Continue Draft / Fix Script) ...............
 
 export const updateScript = (scriptId, content) => async (dispatch) => {
@@ -166,6 +172,30 @@ export const updateScript = (scriptId, content) => async (dispatch) => {
       error.message ||
       "Failed to update script";
     dispatch(updateScriptFailure(errorMessage));
+    return { success: false, error: errorMessage };
+  }
+};
+
+
+// .................... submit script for review ...............
+
+export const submitScriptForReview = (scriptId) => async (dispatch) => {
+  dispatch(submitScriptStart());
+
+  try {
+    const response = await api.post(`${AGENCY_POC_SCRIPTS}/${scriptId}/submit`);
+
+    const { script } = response.data;
+
+    dispatch(submitScriptSuccess({ script }));
+
+    return { success: true, data: response.data };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to submit script for review";
+    dispatch(submitScriptFailure(errorMessage));
     return { success: false, error: errorMessage };
   }
 };

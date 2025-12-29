@@ -22,8 +22,6 @@ const PublicRoutes = ({ children }) => {
       return <Navigate to={ROUTES.REVIEW_QUEUE} replace />;
     } else if (user?.role === ROLE_VARIABLES_MAP?.SUPER_ADMIN) {
       return <Navigate to={ROUTES.DASHBOARD} replace />;
-    }else if(user?.role === ROLE_VARIABLES_MAP?.AGENCY_POC){
-      return <Navigate to={ROUTES.AGENCY_POC} replace />
     }
     // return <Navigate to={ROUTES.DASHBOARD} replace />;
   }
