@@ -24,8 +24,7 @@ const MyTopics = () => {
 
   const user = useSelector((state) => state.auth.user);
   const redirecttoUploadById =
-    user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR ||
-    ROLE_VARIABLES_MAP?.SUPER_ADMIN;
+    user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR || ROLE_VARIABLES_MAP?.SUPER_ADMIN;
 
   useEffect(() => {
     dispatch(fetchDoctorAssignmentList(1, LIMIT));
@@ -69,7 +68,7 @@ const MyTopics = () => {
             {doctorAssignments.map((topic) => (
               <DetailedCard
                 className={
-                  topic.status === "DOCTOR_INPUT_RECEIVED" || "IN_PROGRESS"
+                  topic.status === "DOCTOR_INPUT_RECEIVED" || topic.status === "IN_PROGRESS"
                     ? ""
                     : "cursor-pointer"
                 }
@@ -81,7 +80,7 @@ const MyTopics = () => {
                 createdAt={topic.createdAt}
                 counts={topic._count}
                 onClick={() => {
-                  if (topic.status === "DOCTOR_INPUT_RECEIVED" || "IN_PROGRESS") {
+                  if (topic.status === "DOCTOR_INPUT_RECEIVED" || topic.status === "IN_PROGRESS") {
                     return;
                   }
                   if (redirecttoUploadById) {

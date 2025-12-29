@@ -10,7 +10,6 @@ import "../../common/richTextEditor/viewRichTextEditor.css"
 
 const TopicDetailsModal = ({ isOpen, onClose, topic, isLoading }) => {
 
-  console.log("topic", topic)
   return (
     <CustomModal isOpen={isOpen} onClose={onClose} title="Topic Details">
       {isLoading && <SkeletonBlock />}

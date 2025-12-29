@@ -54,7 +54,28 @@ const AgencyPOC = () => {
       );
   }, [agencyPoc, searchQuery]);
 
-  console.log("filteredAgencyPoc", filteredAgencyPoc)
+  // console.log("filteredAgencyPoc", filteredAgencyPoc)
+
+  const getEditButtonText = (topic) => {
+  if (!topic?.scripts || topic.scripts.length === 0) {
+    return "Write Script";
+  }
+
+  const status = topic.scripts[0]?.status;
+
+  switch (status) {
+    case "DRAFT":
+      return "Continue Draft";
+    case "REJECTED":
+      return "Fix Script";
+    case "IN_REVIEW":
+    case "LOCKED":
+      return "View Script";
+    default:
+      return "Write Script";
+  }
+};
+
 
   const handleViewProfile = async (userId) => {
     try {
@@ -136,7 +157,8 @@ const AgencyPOC = () => {
                   onViewProject={handleViewProfile}
                   onEditProject={(id) => console.log("Edit project:", id)}
                   viewTextButton="View Details"
-                  editTextButton="Edit Project"
+                  // editTextButton="Edit Project"
+                  editTextButton={getEditButtonText(agency)}
                   // onEditUser={handleEditUser}
                 />
               ))}

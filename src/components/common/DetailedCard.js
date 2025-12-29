@@ -14,10 +14,10 @@ const DetailedCard = ({
   const statusClasses =
     status === "ASSIGNED"
       ? "bg-blue-100 text-blue-600 border border-blue-200"
-      : status === "ACTIVE"
+      : status === "DOCTOR_INPUT_RECEIVED"
       ? "bg-green-100 text-green-600 border border-green-200"
-      : status === "INACTIVE"
-      ? "bg-gray-100 text-gray-600 border border-gray-200"
+      : status === "IN_PROGRESS"
+      ? "bg-yellow-100 text-yellow-600 border border-yellow-200"
       : "bg-red-100 text-red-600 border border-red-200";
 
   return (
