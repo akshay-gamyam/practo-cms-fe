@@ -1,93 +1,102 @@
-import React, { useCallback, useEffect, useState } from "react";
-import UserCard from "../../common/userCard/UserCard";
-import { CiSearch } from "react-icons/ci";
-import { IoShieldOutline } from "react-icons/io5";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { CiFilter, CiSearch } from "react-icons/ci";
 import { useDispatch, useSelector } from "react-redux";
-import {
-//   fetchUserById,
-  fetchUserManagementList,
-} from "../../../redux/action/userManagementAction/UserManagementAction";
 // import { clearSelectedUser } from "../../../redux/reducer/userManagementReducer/UserManagementReducer";
 // import ViewUserModal from "./ViewUserModal";
 // import EditUserModal from "./EditUserModal";
 import SkeletonBlock from "../../common/skeletonBlock/SkeletonBlock";
 import { LIMIT } from "../../../utils/constants";
 import Pagination from "../../common/pagination/Pagination";
+import {
+  fetchAgencyPocList,
+  fetchDetailedAgencyPocById,
+} from "../../../redux/action/agencyPocAction/AgencyPocAction";
+import AgencyCard from "./AgencyCard";
+import { clearSelectedPoc } from "../../../redux/reducer/agencyPocReducer/AgencyPocReducer";
+import TopicDetailsModal from "../dashboard/TopicViewDetailModal";
 
 const AgencyPOC = () => {
   const dispatch = useDispatch();
 
-  const { users, isListLoading, error, totalPages } = useSelector(
-    (state) => state.user
-  );
+  const {
+    agencyPoc,
+    isPocListLoading,
+    error,
+    totalPages,
+    selectedAgencyPoc,
+    isViewPocLoading,
+  } = useSelector((state) => state.agencyPoc);
+  // console.log("agencyPoc", agencyPoc);
 
   const [searchQuery, setSearchQuery] = useState("");
-//   const [showViewUserModal, setShowViewUserModal] = useState(false);
-//   const [showEditUserModal, setShowEditUserModal] = useState(false);
+  const [showViewUserModal, setShowViewUserModal] = useState(false);
+  //   const [showEditUserModal, setShowEditUserModal] = useState(false);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    dispatch(
-      fetchUserManagementList({
-        page: page,
-        size: LIMIT,
-        search: searchQuery || undefined,
-      })
-    );
-  }, [dispatch, page, searchQuery]);
+    dispatch(fetchAgencyPocList());
+  }, [dispatch]);
 
   useEffect(() => {
     setPage(1);
   }, [searchQuery]);
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.role?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredAgencyPoc = useMemo(() => {
+    const query = searchQuery.toLowerCase();
 
-//   const handleViewProfile = async (userId) => {
-//     try {
-//       setShowViewUserModal(true);
-//       await dispatch(fetchUserById(userId));
-//     } catch (error) {
-//       console.error("Failed to fetch user details:", error);
-//     }
-//   };
+    return agencyPoc
+      .filter((item) => item.status === "DOCTOR_INPUT_RECEIVED")
+      .filter(
+        (item) =>
+          item.title?.toLowerCase().includes(query) ||
+          item.assignedDoctor?.firstName?.toLowerCase().includes(query) ||
+          item.assignedDoctor?.lastName?.toLowerCase().includes(query)
+      );
+  }, [agencyPoc, searchQuery]);
 
-//   const handleEditUser = async (userId) => {
-//     try {
-//       setShowEditUserModal(true);
-//       await dispatch(fetchUserById(userId));
-//     } catch (error) {
-//       console.error("Failed to fetch user details:", error);
-//     }
-//   };
+  console.log("filteredAgencyPoc", filteredAgencyPoc)
 
-//   const handleCloseViewModal = useCallback(() => {
-//     setShowViewUserModal(false);
-//     dispatch(clearSelectedUser());
-//   }, [dispatch]);
+  const handleViewProfile = async (userId) => {
+    try {
+      setShowViewUserModal(true);
+      await dispatch(fetchDetailedAgencyPocById(userId));
+    } catch (error) {
+      console.error("Failed to fetch user details:", error);
+    }
+  };
 
-//   const handleCloseEditModal = useCallback(() => {
-//     setShowEditUserModal(false);
-//     dispatch(clearSelectedUser());
-//     dispatch(fetchUserManagementList({ page, size: LIMIT }));
-//   }, [dispatch, page]);
+  //   const handleEditUser = async (userId) => {
+  //     try {
+  //       setShowEditUserModal(true);
+  //       await dispatch(fetchUserById(userId));
+  //     } catch (error) {
+  //       console.error("Failed to fetch user details:", error);
+  //     }
+  //   };
+
+  const handleCloseViewModal = useCallback(() => {
+    setShowViewUserModal(false);
+    dispatch(clearSelectedPoc());
+  }, [dispatch]);
+
+  //   const handleCloseEditModal = useCallback(() => {
+  //     setShowEditUserModal(false);
+  //     dispatch(clearSelectedUser());
+  //     dispatch(fetchUserManagementList({ page, size: LIMIT }));
+  //   }, [dispatch, page]);
 
   return (
     <div className="h-screen bg-gray-100 flex flex-col">
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto">
-           <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-                Agency POC
-              </h1>
-              <p className="text-gray-600 text-base sm:text-lg">
-                Topics assigned to you by doctors for script creation
-              </p>
-            </div>
+        <div className="w-full mx-auto">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+              Agency POC
+            </h1>
+            <p className="text-gray-600 text-base sm:text-lg">
+              Topics assigned to you by doctors for script creation
+            </p>
+          </div>
 
           <div className="bg-white rounded-lg shadow-md p-4 mb-6 mt-4">
             <div className="flex flex-col lg:flex-row gap-4">
@@ -105,7 +114,7 @@ const AgencyPOC = () => {
                 />
               </div>
               <button className="flex items-center justify-center gap-2 px-4 py-2 hover:bg-teal-500 hover:text-white border border-gray-300 rounded-xl text-gray-700 font-medium transition-colors whitespace-nowrap">
-                <IoShieldOutline size={20} />
+                <CiFilter size={20} />
                 Filter
               </button>
             </div>
@@ -117,25 +126,24 @@ const AgencyPOC = () => {
             </div>
           )}
 
-          {isListLoading && <SkeletonBlock />}
-
-          {/* {!isListLoading && ( */}
-          {!isListLoading && users.length > 0 && (
+          {isPocListLoading && <SkeletonBlock />}
+          {!isPocListLoading && agencyPoc.length > 0 && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {filteredUsers.map((user) => (
-                <UserCard
-                  key={user.id}
-                  user={user}
-                  viewTextButton="View Profile"
-                  editTextButton="Edit Role"
-                //   onViewProfile={handleViewProfile}
-                //   onEditUser={handleEditUser}
+              {filteredAgencyPoc.map((agency) => (
+                <AgencyCard
+                  key={agency.id}
+                  project={agency}
+                  onViewProject={handleViewProfile}
+                  onEditProject={(id) => console.log("Edit project:", id)}
+                  viewTextButton="View Details"
+                  editTextButton="Edit Project"
+                  // onEditUser={handleEditUser}
                 />
               ))}
             </div>
           )}
 
-          {!isListLoading && filteredUsers.length === 0 && (
+          {!isPocListLoading && filteredAgencyPoc.length === 0 && (
             <div className="text-center py-12">
               <p className="text-gray-500 text-lg">
                 {searchQuery
@@ -154,6 +162,13 @@ const AgencyPOC = () => {
           onPageChange={(newPage) => setPage(newPage)}
         />
       </div>
+
+      <TopicDetailsModal
+        isOpen={showViewUserModal}
+        topic={selectedAgencyPoc}
+        isLoading={isViewPocLoading}
+        onClose={handleCloseViewModal}
+      />
     </div>
   );
 };

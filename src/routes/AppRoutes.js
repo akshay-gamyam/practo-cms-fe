@@ -20,6 +20,8 @@ import Notifications from "../components/home/notifications/Notifications";
 import MedicalTopics from "../components/home/medicalTopics/MedicalTopics";
 import MyDoctorNotes from "../components/home/myDoctorNotes/MyDoctorNotes";
 import AgencyPOC from "../components/home/agencyPoc/AgencyPOC";
+import Script from "../components/home/agencyPoc/scriptting/Scripting";
+import AgencyPocVideos from "../components/home/agencyPoc/agencyPocVideos/AgencyPocVideos";
 
 const AppRouter = () => {
   return (
@@ -73,6 +75,8 @@ const AppRouter = () => {
           <Route path={ROUTES.SETTINGS} element={<Settings />} />
           <Route path={ROUTES.USER_PROFILE} element={<UserProfile />} />
           <Route path={ROUTES.AGENCY_POC} element={<AgencyPOC />} />
+          <Route path={ROUTES.SCRIPT} element={<Script />} />
+          <Route path={ROUTES.VIDEOS} element={<AgencyPocVideos />} />
           <Route path={ROUTES.NOCIFICATIONS} element={<Notifications />} />
         </Route>
 

@@ -21,13 +21,7 @@ const MyTopics = () => {
     totalPages,
   } = useSelector((state) => state.topics);
 
-  console.log("Pagination debug →", {
-  currentPage,
-  totalPages,
-  length: doctorAssignments.length,
-});
 
-  console.log("doctorAssignments", doctorAssignments);
   const user = useSelector((state) => state.auth.user);
   const redirecttoUploadById =
     user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR ||

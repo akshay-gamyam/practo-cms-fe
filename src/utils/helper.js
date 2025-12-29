@@ -1,10 +1,10 @@
-import { IoDocumentTextOutline, IoHome } from "react-icons/io5";
+import { IoDocumentTextOutline, IoHome, IoVideocam } from "react-icons/io5";
 import { ROUTES } from "../routes/RouterConstant";
 import { FiUpload } from "react-icons/fi";
 import { FaClipboardList, FaRegChartBar, FaSpinner, FaUserMd } from "react-icons/fa";
 import { PiUsers } from "react-icons/pi";
 import { CiSettings } from "react-icons/ci";
-import { MdOutlineMediation, MdOutlineMedicalInformation, MdOutlineTopic } from "react-icons/md";
+import { MdOutlineDescription, MdOutlineMediation, MdOutlineMedicalInformation, MdOutlineTopic } from "react-icons/md";
 import { IoIosNotifications } from "react-icons/io";
 
 // Google OAuth Client ID
@@ -19,6 +19,8 @@ export const MENU_ITEMS = [
   { label: "Doctor Notes", icon: <MdOutlineMedicalInformation size={20} />, path: ROUTES.MY_DOCTOR_NOTES },
   { label: "Medical Topics", icon: <MdOutlineMedicalInformation size={20} />, path: ROUTES.MEDICAL_TOPICS },
   { label: "Agency POC", icon: <MdOutlineMediation size={20} />, path: ROUTES.AGENCY_POC },
+  { label: "Script", icon: <MdOutlineDescription size={20} />, path: ROUTES.SCRIPT },
+  { label: "Videos", icon: <IoVideocam size={20} />, path: ROUTES.VIDEOS },
   { label: "Review Queue", icon: <FaRegChartBar size={20} />, path: ROUTES.REVIEW_QUEUE },
   { label: "Settings", icon: <CiSettings size={20} />, path: ROUTES.SETTINGS },
   { label: "Notifications", icon: <IoIosNotifications size={20} />, path: ROUTES.NOCIFICATIONS },
@@ -214,3 +216,104 @@ export const ROLE_VARIABLES_MAP = {
   AGENCY_POC: "AGENCY_POC",
   SUPER_ADMIN: "SUPER_ADMIN",
 };
+
+
+
+export   const scripts = [
+    {
+      id: 1,
+      title: "Post-Surgical Wound Care Best Practices",
+      status: "in-review",
+      lastUpdated: "2025-01-20",
+      words: 1200,
+      author: "Dr. James Rodriguez",
+      feedback: null,
+      lockedOn: null,
+      videoUploaded: false,
+    },
+    {
+      id: 2,
+      title: "Understanding Childhood Vaccines",
+      status: "rejected",
+      lastUpdated: "2025-01-18",
+      words: 950,
+      author: "Dr. Emily Chen",
+      feedback:
+        "Need more emphasis on CDC guidelines and recent research. Tone should be more reassuring.",
+      lockedOn: null,
+      videoUploaded: false,
+    },
+    {
+      id: 3,
+      title: "Heart Health and Exercise",
+      status: "locked",
+      lastUpdated: "2025-01-15",
+      words: 1100,
+      author: "Dr. Michael Thompson",
+      feedback: null,
+      lockedOn: "2025-01-16",
+      videoUploaded: true,
+    },
+    {
+      id: 4,
+      title: "Mental Health in Teenagers",
+      status: "draft",
+      lastUpdated: "2025-01-21",
+      words: 650,
+      author: "Dr. Lisa Park",
+      feedback: null,
+      lockedOn: null,
+      videoUploaded: false,
+    },
+    {
+      id: 5,
+      title: "Managing Type 2 Diabetes Through Diet",
+      status: "locked",
+      lastUpdated: "2025-01-22",
+      words: 1350,
+      author: "Dr. Sarah Mitchell",
+      feedback: null,
+      lockedOn: "2025-01-22",
+      videoUploaded: false,
+      readyForVideo: true,
+    },
+  ];
+
+
+export   const videos = [
+    {
+      id: 1,
+      title: "Heart Health and Exercise",
+      scriptId: "#3",
+      wordCount: 1100,
+      duration: "8:45",
+      uploadDate: "2025-01-16",
+      fileSize: "245 MB",
+      status: "approved",
+      thumbnail: null
+    },
+    {
+      id: 2,
+      title: "Understanding Childhood Vaccines",
+      scriptId: "#2",
+      wordCount: 950,
+      duration: "6:30",
+      uploadDate: "2025-01-18",
+      fileSize: "189 MB",
+      status: "rejected",
+      rejectionReason: "Audio quality needs improvement. Please re-record with better microphone.",
+      thumbnail: null,
+      hasPlayButton: true
+    },
+    {
+      id: 3,
+      title: "Post-Surgical Wound Care Best Practices",
+      scriptId: "#1",
+      wordCount: 1200,
+      duration: "7:15",
+      uploadDate: "2025-01-20",
+      fileSize: "210 MB",
+      status: "in-review",
+      thumbnail: null
+    }
+  ];

@@ -22,7 +22,7 @@ const AddMedicalTopicModal = ({ open, onClose }) => {
   const { user } = useSelector((state) => state.auth);
   const { doctors, isCreateLoading } = useSelector((state) => state.topics);
 
-  const isMedicalReviewer = user?.role === ROLE_VARIABLES_MAP?.MEDICAL_AFFAIRS;
+  const isMedicalReviewer = user?.role === ROLE_VARIABLES_MAP?.MEDICAL_AFFAIRS || ROLE_VARIABLES_MAP?.SUPER_ADMIN;
 
   const [formData, setFormData] = useState({
     title: "",

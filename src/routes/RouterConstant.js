@@ -15,4 +15,6 @@ export const ROUTES = {
   MEDICAL_TOPICS : "/medical-topics",
   MY_DOCTOR_NOTES : "/doctor-notes",
   AGENCY_POC : "/agency-poc",
+  SCRIPT : "/script",
+  VIDEOS : "/videos",
 };

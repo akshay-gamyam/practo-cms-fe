@@ -44,7 +44,7 @@ const MedicalTopics = () => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-                My Topics
+                Medical Topics
               </h1>
               <p className="text-gray-600 text-base sm:text-lg">
                 Overview of Consultant Doctors

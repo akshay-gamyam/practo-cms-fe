@@ -5,7 +5,6 @@ import { getToken, ROLE_VARIABLES_MAP } from "../../utils/helper";
 
 const PublicRoutes = ({ children }) => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
-  console.log("user", user);
   const token = getToken();
 
   if (isAuthenticated && token) {
