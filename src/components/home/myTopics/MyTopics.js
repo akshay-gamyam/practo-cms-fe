@@ -69,7 +69,7 @@ const MyTopics = () => {
             {doctorAssignments.map((topic) => (
               <DetailedCard
                 className={
-                  topic.status === "DOCTOR_INPUT_RECEIVED"
+                  topic.status === "DOCTOR_INPUT_RECEIVED" || "IN_PROGRESS"
                     ? ""
                     : "cursor-pointer"
                 }
@@ -81,7 +81,7 @@ const MyTopics = () => {
                 createdAt={topic.createdAt}
                 counts={topic._count}
                 onClick={() => {
-                  if (topic.status === "DOCTOR_INPUT_RECEIVED") {
+                  if (topic.status === "DOCTOR_INPUT_RECEIVED" || "IN_PROGRESS") {
                     return;
                   }
                   if (redirecttoUploadById) {
