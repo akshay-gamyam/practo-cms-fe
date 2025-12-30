@@ -11,7 +11,7 @@ import {
 import AgencyCard from "./AgencyCard";
 import { clearSelectedPoc } from "../../../redux/reducer/agencyPocReducer/AgencyPocReducer";
 import TopicDetailsModal from "../dashboard/TopicViewDetailModal";
-import EditScriptModal from "./scriptting/EditScriptyModal";
+import EditScriptModal from "./scriptting/EditScriptModal";
 import { toast } from "react-toastify";
 
 const AgencyPOC = () => {
