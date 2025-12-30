@@ -3,7 +3,6 @@ export const ROUTES = {
   FORGET_PASSWORD: "/forgot-password",
   RESET_PASSWORD: "/reset-password",  
   DASHBOARD: "/dashboard",
-  CONTENT_LIBRARY: "/content-library",
   UPLOAD: "/upload",
   UPLOAD_WITH_ID: "/upload/:id",
   MY_TOPICS: "/my-topics",
@@ -17,4 +16,6 @@ export const ROUTES = {
   AGENCY_POC : "/agency-poc",
   SCRIPT : "/script",
   VIDEOS : "/videos",
+  CONTENT_APPROVER_SCRIPTS : "/content-approver-script",
+  CONTENT_APPROVER_VIDEOS : "/content-approver-videos",
 };

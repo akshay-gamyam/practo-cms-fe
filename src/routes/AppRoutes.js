@@ -4,7 +4,6 @@ import { ROUTES } from "./RouterConstant";
 import MainLayout from "../components/layout/MainLayout";
 
 import Dashboard from "../components/home/dashboard/Dashboard";
-import ContentLibrary from "../components/home/contentLibrary/ContentLibrary";
 import Upload from "../components/home/upload/Upload";
 import Settings from "../components/home/settings/Settings";
 import ReviewQueue from "../components/home/reviewQueue/ReviewQueue";
@@ -22,6 +21,8 @@ import MyDoctorNotes from "../components/home/myDoctorNotes/MyDoctorNotes";
 import AgencyPOC from "../components/home/agencyPoc/AgencyPOC";
 import Script from "../components/home/agencyPoc/scriptting/Scripting";
 import AgencyPocVideos from "../components/home/agencyPoc/agencyPocVideos/AgencyPocVideos";
+import ContentApproverScript from "../components/home/contentApprover/contentApproverScript/ContentApproverScript";
+import ContentApproverVideos from "../components/home/contentApprover/contentApproverVideos/ContentApproverVideos";
 
 const AppRouter = () => {
   return (
@@ -64,7 +65,8 @@ const AppRouter = () => {
           }
         >
           <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
-          <Route path={ROUTES.CONTENT_LIBRARY} element={<ContentLibrary />} />
+          <Route path={ROUTES.CONTENT_APPROVER_SCRIPTS} element={<ContentApproverScript />} />
+          <Route path={ROUTES.CONTENT_APPROVER_VIDEOS} element={<ContentApproverVideos />} />
           <Route path={ROUTES.REVIEW_QUEUE} element={<ReviewQueue />} />
           <Route path={ROUTES.UPLOAD} element={<Upload />} />
           <Route path={ROUTES.UPLOAD_WITH_ID} element={<Upload />} />

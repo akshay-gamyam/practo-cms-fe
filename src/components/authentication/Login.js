@@ -87,12 +87,12 @@ const Login = ({ setScreen }) => {
         return navigate(ROUTES.MY_TOPICS);
       } else if (user?.role === ROLE_VARIABLES_MAP?.AGENCY_POC) {
         return navigate(ROUTES.AGENCY_POC);
-      } else if (user?.role === ROLE_VARIABLES_MAP?.CONTENT_APPROVER) {
-        return navigate(ROUTES.REVIEW_QUEUE);
       } else if (user?.role === ROLE_VARIABLES_MAP?.PUBLISHER) {
         return navigate(ROUTES.REVIEW_QUEUE);
       } else if (user?.role === ROLE_VARIABLES_MAP?.SUPER_ADMIN) {
         return navigate(ROUTES.DASHBOARD);
+      } else if (user?.role === ROLE_VARIABLES_MAP?.CONTENT_APPROVER) {
+        return navigate(ROUTES.CONTENT_APPROVER_SCRIPTS);
       }
 
       // navigate(ROUTES.DASHBOARD);
@@ -126,12 +126,12 @@ const Login = ({ setScreen }) => {
         return navigate(ROUTES.MY_TOPICS);
       } else if (user?.role === ROLE_VARIABLES_MAP?.AGENCY_POC) {
         return navigate(ROUTES.AGENCY_POC);
-      } else if (user?.role === ROLE_VARIABLES_MAP?.CONTENT_APPROVER) {
-        return navigate(ROUTES.REVIEW_QUEUE);
       } else if (user?.role === ROLE_VARIABLES_MAP?.PUBLISHER) {
         return navigate(ROUTES.REVIEW_QUEUE);
       } else if (user?.role === ROLE_VARIABLES_MAP?.SUPER_ADMIN) {
         return navigate(ROUTES.DASHBOARD);
+      } else if (user?.role === ROLE_VARIABLES_MAP?.CONTENT_APPROVER) {
+        return navigate(ROUTES.CONTENT_APPROVER_SCRIPTS);
       }
     } catch (error) {
       const errorMessage =

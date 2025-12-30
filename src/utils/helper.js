@@ -6,6 +6,8 @@ import { PiUsers } from "react-icons/pi";
 import { CiSettings } from "react-icons/ci";
 import { MdOutlineDescription, MdOutlineMediation, MdOutlineMedicalInformation, MdOutlineTopic } from "react-icons/md";
 import { IoIosNotifications } from "react-icons/io";
+import { LiaFileVideoSolid } from "react-icons/lia";
+import { CgTranscript } from "react-icons/cg";
 import {
   HiOutlinePencilAlt,
   HiOutlineRefresh,
@@ -26,6 +28,8 @@ export const MENU_ITEMS = [
   { label: "Medical Topics", icon: <MdOutlineMedicalInformation size={20} />, path: ROUTES.MEDICAL_TOPICS },
   { label: "Agency POC", icon: <MdOutlineMediation size={20} />, path: ROUTES.AGENCY_POC },
   { label: "Script", icon: <MdOutlineDescription size={20} />, path: ROUTES.SCRIPT },
+  { label: "Assigned Scripts", icon: <CgTranscript size={20} />, path: ROUTES.CONTENT_APPROVER_SCRIPTS },
+  { label: "Assigned Videos", icon: <LiaFileVideoSolid size={20} />, path: ROUTES.CONTENT_APPROVER_VIDEOS },
   { label: "Videos", icon: <IoVideocam size={20} />, path: ROUTES.VIDEOS },
   { label: "Review Queue", icon: <FaRegChartBar size={20} />, path: ROUTES.REVIEW_QUEUE },
   { label: "Settings", icon: <CiSettings size={20} />, path: ROUTES.SETTINGS },
