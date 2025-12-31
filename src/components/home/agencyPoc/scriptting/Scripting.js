@@ -18,6 +18,7 @@ import { fetchAllScripts,
  } from "../../../../redux/action/agencyPocAction/AgencyPocAction";
 import EditScriptModal from "./EditScriptModal";
 import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
+import VideoUploadModal from "./ViewUploadModal";
 
 const Scriptting = () => {
   const dispatch = useDispatch();
@@ -26,6 +27,8 @@ console.log("scripts", scripts)
   const [activeTab, setActiveTab] = useState("all");
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedScript, setSelectedScript] = useState(null);
+  const [scriptForUpload, setScriptForUpload] = useState(null);
+  const [showVideoUploadModal, setShowVideoUploadModal] = useState(false);
   // const [scriptToDelete, setScriptToDelete] = useState(null);
 
   useEffect(() => {
@@ -163,9 +166,27 @@ console.log("scripts", scripts)
   //   setScriptToDelete(null);
   // };
 
+
+   // New function to handle video upload modal
+  const handleUploadVideo = (script) => {
+    setScriptForUpload(script);
+    setShowVideoUploadModal(true);
+  };
+
+
   const handleCloseEditModal = useCallback(() => {
     setShowEditModal(false);
     setSelectedScript(null);
+    dispatch(fetchAllScripts());
+  }, [dispatch]);
+
+   const handleCloseVideoUploadModal = useCallback(() => {
+    setShowVideoUploadModal(false);
+    setScriptForUpload(null);
+  }, []);
+
+   const handleVideoUploadSuccess = useCallback((videoData) => {
+    toast.success("Video uploaded successfully!");
     dispatch(fetchAllScripts());
   }, [dispatch]);
 
@@ -277,7 +298,7 @@ console.log("scripts", scripts)
                         )}
 
                         {script.status === "LOCKED" && (
-                          <button className="flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors">
+                          <button onClick={() => handleUploadVideo(script)} className="flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors">
                             <FiUpload size={14} />
                             <span className="hidden sm:inline">
                               Upload Video
@@ -396,6 +417,15 @@ console.log("scripts", scripts)
           open={showEditModal}
           onClose={handleCloseEditModal}
           topic={selectedScript}
+        />
+      )}
+
+       {scriptForUpload && (
+        <VideoUploadModal
+          open={showVideoUploadModal}
+          onClose={handleCloseVideoUploadModal}
+          script={scriptForUpload}
+          onUploadSuccess={handleVideoUploadSuccess}
         />
       )}
     </div>

@@ -31,7 +31,6 @@ import {
   deleteScriptStart,
   deleteScriptSuccess,
   deleteScriptFailure,
-
   fetchVideosStart,
   fetchVideosSuccess,
   fetchVideosFailure,
@@ -41,6 +40,13 @@ import {
   uploadVideoStart,
   uploadVideoSuccess,
   uploadVideoFailure,
+  getVideoUploadUrlStart,
+  getVideoUploadUrlSuccess,
+  getVideoUploadUrlFailure,
+  getThumbnailUploadUrlStart,
+  getThumbnailUploadUrlSuccess,
+  getThumbnailUploadUrlFailure,
+  clearUploadState,
 } from "../../reducer/agencyPocReducer/AgencyPocReducer";
 
 let isFetchingAgencyPoc = false;
@@ -115,7 +121,6 @@ export const fetchDetailedAgencyPocById = (topicId) => async (dispatch) => {
   }
 };
 
-
 // .................... fetch script by ID (View Script) ...............
 
 export const fetchScriptById = (scriptId) => async (dispatch) => {
@@ -141,7 +146,6 @@ export const fetchScriptById = (scriptId) => async (dispatch) => {
     isFetchingScript = false;
   }
 };
-
 
 // .................... create new script (Write Script - Save as Draft) ...............
 
@@ -169,7 +173,6 @@ export const createScript = (topicId, content) => async (dispatch) => {
   }
 };
 
-
 // .................... update script (Continue Draft / Fix Script) ...............
 
 export const updateScript = (scriptId, content) => async (dispatch) => {
@@ -195,7 +198,6 @@ export const updateScript = (scriptId, content) => async (dispatch) => {
   }
 };
 
-
 // .................... submit script for review ...............
 
 export const submitScriptForReview = (scriptId) => async (dispatch) => {
@@ -218,8 +220,6 @@ export const submitScriptForReview = (scriptId) => async (dispatch) => {
     return { success: false, error: errorMessage };
   }
 };
-
-
 
 // .................... fetch all scripts ...............
 export const fetchAllScripts = () => async (dispatch) => {
@@ -245,8 +245,6 @@ export const fetchAllScripts = () => async (dispatch) => {
     isFetchingAllScripts = false;
   }
 };
-
-
 
 // .................... fetch all videos ...............
 
@@ -274,66 +272,267 @@ export const fetchAllVideos = () => async (dispatch) => {
   }
 };
 
-// .................... fetch video by ID ...............
-// export const fetchVideoById = (videoId) => async (dispatch) => {
-//   dispatch(fetchVideoStart());
 
-//   try {
-//     const response = await api.get(`${AGENCY_POC_VIDEOS}/${videoId}`);
-//     const { video } = response.data;
+// .................... Helper function to upload file to S3 using PUT ...............
+const uploadFileToS3 = (presignedUrl, file, onProgress) => {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
 
-//     dispatch(fetchVideoSuccess({ video }));
+    if (onProgress) {
+      xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable) {
+          const percentComplete = Math.round((e.loaded / e.total) * 100);
+          onProgress(percentComplete);
+        }
+      });
+    }
 
-//     return { success: true, data: response.data };
-//   } catch (error) {
-//     const errorMessage =
-//       error.response?.data?.message ||
-//       error.message ||
-//       "Failed to fetch video";
-//     dispatch(fetchVideoFailure(errorMessage));
-//     return { success: false, error: errorMessage };
-//   }
-// };
+    xhr.addEventListener("load", () => {
+      if (xhr.status === 200) {
+        resolve();
+      } else {
+        reject(new Error(`Upload failed with status ${xhr.status}`));
+      }
+    });
+
+    xhr.addEventListener("error", () => {
+      reject(new Error("Upload failed"));
+    });
+
+    xhr.open("PUT", presignedUrl);
+    xhr.setRequestHeader("Content-Type", file.type);
+    xhr.send(file);
+  });
+};
 
 
-// .................... upload video ...............
+// .................... Step 3: Upload file to S3 (PUT) - No Redux needed, just returns success/failure ...............
+export const uploadToS3 = (presignedUrl, file, onProgress) => {
+  return uploadFileToS3(presignedUrl, file, onProgress);
+};
 
-// export const uploadVideo = (scriptId, videoFile, formData) => async (dispatch) => {
-//   dispatch(uploadVideoStart());
+// .................... get video upload URL ...............
+export const getVideoUploadUrl = (fileName, fileType) => async (dispatch) => {
+  dispatch(getVideoUploadUrlStart());
 
-//   try {
-//     const uploadData = new FormData();
-//     uploadData.append('video', videoFile);
-//     uploadData.append('scriptId', scriptId);
+  try {
+    const response = await api.post(`${AGENCY_POC_VIDEOS}/upload-url`, {
+      fileName,
+      fileType,
+    });
+
+    const { uploadUrl, fileUrl } = response.data;
+
+    dispatch(getVideoUploadUrlSuccess({ uploadUrl, fileUrl }));
+
+    return { success: true, data: response.data };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to get video upload URL";
     
-//     // Append any additional form data
-//     if (formData) {
-//       Object.keys(formData).forEach(key => {
-//         uploadData.append(key, formData[key]);
-//       });
-//     }
+    dispatch(getVideoUploadUrlFailure(errorMessage));
+    return { success: false, error: errorMessage };
+  }
+};
 
-//     const response = await api.post(AGENCY_POC_VIDEOS, uploadData, {
-//       headers: {
-//         'Content-Type': 'multipart/form-data',
-//       },
-//     });
 
-//     const { video } = response.data;
+// .................... get thumbnail upload URL ...............
 
-//     dispatch(uploadVideoSuccess({ video }));
+export const getThumbnailUploadUrl = (fileName, fileType) => async (dispatch) => {
+  dispatch(getThumbnailUploadUrlStart());
 
-//     return { success: true, data: response.data };
-//   } catch (error) {
-//     const errorMessage =
-//       error.response?.data?.message ||
-//       error.message ||
-//       "Failed to upload video";
-//     dispatch(uploadVideoFailure(errorMessage));
-//     return { success: false, error: errorMessage };
-//   }
-// };
+  try {
+    const response = await api.post(`${AGENCY_POC_VIDEOS}/thumbnail-upload-url`, {
+      fileName,
+      fileType,
+    });
 
+    const { uploadUrl, fileUrl } = response.data;
+
+    dispatch(getThumbnailUploadUrlSuccess({ uploadUrl, fileUrl }));
+
+    return { success: true, data: response.data };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to get thumbnail upload URL";
+    
+    dispatch(getThumbnailUploadUrlFailure(errorMessage));
+    return { success: false, error: errorMessage };
+  }
+};
+
+
+// .................... Main orchestrator function - calls all steps in sequence ...............
+export const uploadVideoComplete = (videoFile, thumbnailFile, formData, onProgress) => async (dispatch) => {
+  try {
+    // Step 1: Get presigned URL for video (POST)
+    if (onProgress) {
+      onProgress({
+        video: 0,
+        thumbnail: 0,
+        status: "Getting upload URL for video...",
+      });
+    }
+
+    const videoUrlResult = await dispatch(
+      getVideoUploadUrl(videoFile.name, videoFile.type)
+    );
+
+    if (!videoUrlResult.success) {
+      throw new Error(videoUrlResult.error);
+    }
+
+    const { uploadUrl: videoUploadUrl, fileUrl: videoFileUrl } = videoUrlResult.data;
+
+    // Step 2: Upload video to S3 (PUT)
+    if (onProgress) {
+      onProgress({
+        video: 0,
+        thumbnail: 0,
+        status: "Uploading video...",
+      });
+    }
+
+    await uploadFileToS3(videoUploadUrl, videoFile, (percent) => {
+      if (onProgress) {
+        onProgress({
+          video: percent,
+          thumbnail: 0,
+          status: "Uploading video...",
+        });
+      }
+    });
+
+    // Step 3: Get presigned URL for thumbnail (POST)
+    if (onProgress) {
+      onProgress({
+        video: 100,
+        thumbnail: 0,
+        status: "Getting upload URL for thumbnail...",
+      });
+    }
+
+    const thumbnailUrlResult = await dispatch(
+      getThumbnailUploadUrl(thumbnailFile.name, thumbnailFile.type)
+    );
+
+    if (!thumbnailUrlResult.success) {
+      throw new Error(thumbnailUrlResult.error);
+    }
+
+    const { uploadUrl: thumbnailUploadUrl, fileUrl: thumbnailFileUrl } =
+      thumbnailUrlResult.data;
+
+    // Step 4: Upload thumbnail to S3 (PUT)
+    if (onProgress) {
+      onProgress({
+        video: 100,
+        thumbnail: 0,
+        status: "Uploading thumbnail...",
+      });
+    }
+
+    await uploadFileToS3(thumbnailUploadUrl, thumbnailFile, (percent) => {
+      if (onProgress) {
+        onProgress({
+          video: 100,
+          thumbnail: percent,
+          status: "Uploading thumbnail...",
+        });
+      }
+    });
+
+    // Step 5: Create video record in database (POST)
+    if (onProgress) {
+      onProgress({
+        video: 100,
+        thumbnail: 100,
+        status: "Saving video information...",
+      });
+    }
+
+    const createVideoResult = await dispatch(
+      createVideoRecord({
+        topicId: formData.topicId,
+        title: formData.title,
+        description: formData.description,
+        videoUrl: videoFileUrl,
+        thumbnailUrl: thumbnailFileUrl,
+        duration: formData.duration,
+        doctorName: formData.doctorName,
+        specialty: formData.specialty,
+        language: formData.language,
+        city: formData.city,
+        ctaType: formData.ctaType,
+      })
+    );
+
+    if (!createVideoResult.success) {
+      throw new Error(createVideoResult.error);
+    }
+
+    if (onProgress) {
+      onProgress({
+        video: 100,
+        thumbnail: 100,
+        status: "Upload complete!",
+      });
+    }
+
+    return { success: true, data: createVideoResult.data };
+  } catch (error) {
+    const errorMessage = error.message || "Failed to upload video";
+    return { success: false, error: errorMessage };
+  }
+};
+
+// .................... create video record ...............
+export const createVideoRecord = (videoData) => async (dispatch) => {
+  dispatch(uploadVideoStart());
+
+  try {
+    const response = await api.post(AGENCY_POC_VIDEOS, videoData);
+
+    const { video } = response.data;
+
+    dispatch(uploadVideoSuccess({ video }));
+
+    return { success: true, data: response.data };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to create video record";
+    
+    dispatch(uploadVideoFailure(errorMessage));
+    return { success: false, error: errorMessage };
+  }
+};
+
+// .................... fetch video by ID ...............
+export const fetchVideoById = (videoId) => async (dispatch) => {
+  dispatch(fetchVideoStart());
+
+  try {
+    const response = await api.get(`${AGENCY_POC_VIDEOS}/${videoId}`);
+    const { video } = response.data;
+
+    dispatch(fetchVideoSuccess({ video }));
+
+    return { success: true, data: response.data };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to fetch video";
+    dispatch(fetchVideoFailure(errorMessage));
+    return { success: false, error: errorMessage };
+  }
+};
 
 // // .................... delete script ...............
 // export const deleteScript = (scriptId) => async (dispatch) => {

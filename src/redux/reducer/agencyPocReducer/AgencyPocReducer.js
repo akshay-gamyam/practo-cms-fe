@@ -11,6 +11,14 @@ const initialState = {
   selectedAgencyPoc: null,
   selectedScript: null,
   selectedVideo: null,
+
+    // Upload state
+  videoUploadUrl: null,
+  videoFileUrl: null,
+  thumbnailUploadUrl: null,
+  thumbnailFileUrl: null,
+
+
   isPocListLoading: false,
   isViewPocLoading: false,
   isScriptLoading: false,
@@ -23,6 +31,8 @@ const initialState = {
   isVideoLoading: false,
   isUploadVideoLoading: false,
   isDeleteVideoLoading: false,
+  isGetVideoUploadUrlLoading: false,
+  isGetThumbnailUploadUrlLoading: false,
   error: null,
 };
 
@@ -233,6 +243,11 @@ const agencyPocSlice = createSlice({
     uploadVideoSuccess(state, action) {
       state.isUploadVideoLoading = false;
       state.videos.push(action.payload.video);
+      // Clear upload URLs after successful upload
+      state.videoUploadUrl = null;
+      state.videoFileUrl = null;
+      state.thumbnailUploadUrl = null;
+      state.thumbnailFileUrl = null;
       state.error = null;
     },
     uploadVideoFailure(state, action) {
@@ -240,6 +255,48 @@ const agencyPocSlice = createSlice({
       state.error = action.payload;
     },
 
+     // ................. get video upload URL ........................
+    getVideoUploadUrlStart(state) {
+      state.isGetVideoUploadUrlLoading = true;
+      state.error = null;
+    },
+    getVideoUploadUrlSuccess(state, action) {
+      state.isGetVideoUploadUrlLoading = false;
+      state.videoUploadUrl = action.payload.uploadUrl;
+      state.videoFileUrl = action.payload.fileUrl;
+      state.error = null;
+    },
+    getVideoUploadUrlFailure(state, action) {
+      state.isGetVideoUploadUrlLoading = false;
+      state.error = action.payload;
+    },
+
+     // ................. get thumbnail upload URL ........................
+    getThumbnailUploadUrlStart(state) {
+      state.isGetThumbnailUploadUrlLoading = true;
+      state.error = null;
+    },
+    getThumbnailUploadUrlSuccess(state, action) {
+      state.isGetThumbnailUploadUrlLoading = false;
+      state.thumbnailUploadUrl = action.payload.uploadUrl;
+      state.thumbnailFileUrl = action.payload.fileUrl;
+      state.error = null;
+    },
+    getThumbnailUploadUrlFailure(state, action) {
+      state.isGetThumbnailUploadUrlLoading = false;
+      state.error = action.payload;
+    },
+
+
+    // ................. clear upload state ........................
+    clearUploadState(state) {
+      state.videoUploadUrl = null;
+      state.videoFileUrl = null;
+      state.thumbnailUploadUrl = null;
+      state.thumbnailFileUrl = null;
+      state.isUploadVideoLoading = false;
+      state.error = null;
+    },
 
     // ................. clear selected POC ........................
     clearSelectedPoc(state) {
@@ -285,9 +342,17 @@ export const {
   fetchVideoStart,
   fetchVideoSuccess,
   fetchVideoFailure,
+
   uploadVideoStart,
   uploadVideoSuccess,
   uploadVideoFailure,
+  getVideoUploadUrlStart,
+  getVideoUploadUrlSuccess,
+  getVideoUploadUrlFailure,
+  getThumbnailUploadUrlStart,
+  getThumbnailUploadUrlSuccess,
+  getThumbnailUploadUrlFailure,
+  clearUploadState,
   
   clearSelectedPoc,
   clearSelectedScript,

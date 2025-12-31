@@ -30,3 +30,8 @@ export const MARK_NOTIFICATION_AS_READ = (id) => `/api/notifications/${id}/read`
 export const AGENCY_POC_MY_ASSESSMENT = "/api/topics/my-assignments";
 export const AGENCY_POC_SCRIPTS = "/api/scripts";
 export const AGENCY_POC_VIDEOS = "/api/videos";
+
+export const CONTENT_APPROVER_SCRIPTS = "/api/scripts/queue";
+export const CONTENT_APPROVER_APPROVE = (script_id) => `/api/scripts/${script_id}/lock`;
+export const CONTENT_APPROVER_REJECT = (script_id) => `/api/scripts/${script_id}/reject`;
+export const CONTENT_APPROVER_CLAIM = (script_id) => `/api/scripts/${script_id}/claim`;

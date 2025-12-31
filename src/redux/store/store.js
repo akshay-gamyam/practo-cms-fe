@@ -7,6 +7,7 @@ import topicReducer from "../reducer/topicsReducer/TopicsReducer";
 import doctorPointerReducer from "../reducer/doctorReducer/DoctorReducer"
 import notificationReducer from "../reducer/notificationReducer/NotificationReducer";
 import agencyPocReducer from "../reducer/agencyPocReducer/AgencyPocReducer"
+import contnentApproverReducer from "../reducer/contentApproverReducer/ContentApproverReducer"
 
 const authPersistConfig = {
   key: "auth",
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   agencyPoc: agencyPocReducer,
   doctor_pointers: doctorPointerReducer,
+  contentApprover: contnentApproverReducer,
 });
 
 export const store = configureStore({   
