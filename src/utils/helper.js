@@ -1,10 +1,25 @@
-import { IoDocumentTextOutline, IoHome, IoVideocam } from "react-icons/io5";
+import {
+  IoClose,
+  IoDocumentTextOutline,
+  IoHome,
+  IoVideocam,
+} from "react-icons/io5";
 import { ROUTES } from "../routes/RouterConstant";
-import { FiUpload } from "react-icons/fi";
-import { FaClipboardList, FaRegChartBar, FaSpinner, FaUserMd } from "react-icons/fa";
+import { FiCheckCircle, FiClock, FiUpload } from "react-icons/fi";
+import {
+  FaClipboardList,
+  FaRegChartBar,
+  FaSpinner,
+  FaUserMd,
+} from "react-icons/fa";
 import { PiUsers } from "react-icons/pi";
 import { CiSettings } from "react-icons/ci";
-import { MdOutlineDescription, MdOutlineMediation, MdOutlineMedicalInformation, MdOutlineTopic } from "react-icons/md";
+import {
+  MdOutlineDescription,
+  MdOutlineMediation,
+  MdOutlineMedicalInformation,
+  MdOutlineTopic,
+} from "react-icons/md";
 import { IoIosNotifications } from "react-icons/io";
 import { LiaFileVideoSolid } from "react-icons/lia";
 import { CgTranscript } from "react-icons/cg";
@@ -21,25 +36,64 @@ export const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 export const MENU_ITEMS = [
   { label: "Dashboard", icon: <IoHome size={20} />, path: ROUTES.DASHBOARD },
   { label: "Users", icon: <PiUsers size={20} />, path: ROUTES.USERS },
-  { label: "Content Library", icon: <IoDocumentTextOutline size={20} />, path: ROUTES.CONTENT_LIBRARY },
+  {
+    label: "Content Library",
+    icon: <IoDocumentTextOutline size={20} />,
+    path: ROUTES.CONTENT_LIBRARY,
+  },
   { label: "Upload", icon: <FiUpload size={20} />, path: ROUTES.UPLOAD },
-  { label: "Assigned Topics", icon: <MdOutlineTopic size={20} />, path: ROUTES.MY_TOPICS },
-  { label: "Doctor Notes", icon: <MdOutlineMedicalInformation size={20} />, path: ROUTES.MY_DOCTOR_NOTES },
-  { label: "Medical Topics", icon: <MdOutlineMedicalInformation size={20} />, path: ROUTES.MEDICAL_TOPICS },
-  { label: "Agency POC", icon: <MdOutlineMediation size={20} />, path: ROUTES.AGENCY_POC },
-  { label: "Script", icon: <MdOutlineDescription size={20} />, path: ROUTES.SCRIPT },
-  { label: "Assigned Scripts", icon: <CgTranscript size={20} />, path: ROUTES.CONTENT_APPROVER_SCRIPTS },
-  { label: "Assigned Videos", icon: <LiaFileVideoSolid size={20} />, path: ROUTES.CONTENT_APPROVER_VIDEOS },
+  {
+    label: "Assigned Topics",
+    icon: <MdOutlineTopic size={20} />,
+    path: ROUTES.MY_TOPICS,
+  },
+  {
+    label: "Doctor Notes",
+    icon: <MdOutlineMedicalInformation size={20} />,
+    path: ROUTES.MY_DOCTOR_NOTES,
+  },
+  {
+    label: "Medical Topics",
+    icon: <MdOutlineMedicalInformation size={20} />,
+    path: ROUTES.MEDICAL_TOPICS,
+  },
+  {
+    label: "Agency POC",
+    icon: <MdOutlineMediation size={20} />,
+    path: ROUTES.AGENCY_POC,
+  },
+  {
+    label: "Script",
+    icon: <MdOutlineDescription size={20} />,
+    path: ROUTES.SCRIPT,
+  },
+  {
+    label: "Assigned Scripts",
+    icon: <CgTranscript size={20} />,
+    path: ROUTES.CONTENT_APPROVER_SCRIPTS,
+  },
+  {
+    label: "Assigned Videos",
+    icon: <LiaFileVideoSolid size={20} />,
+    path: ROUTES.CONTENT_APPROVER_VIDEOS,
+  },
   { label: "Videos", icon: <IoVideocam size={20} />, path: ROUTES.VIDEOS },
-  { label: "Review Queue", icon: <FaRegChartBar size={20} />, path: ROUTES.REVIEW_QUEUE },
+  {
+    label: "Review Queue",
+    icon: <FaRegChartBar size={20} />,
+    path: ROUTES.REVIEW_QUEUE,
+  },
   { label: "Settings", icon: <CiSettings size={20} />, path: ROUTES.SETTINGS },
-  { label: "Notifications", icon: <IoIosNotifications size={20} />, path: ROUTES.NOCIFICATIONS },
+  {
+    label: "Notifications",
+    icon: <IoIosNotifications size={20} />,
+    path: ROUTES.NOCIFICATIONS,
+  },
 ];
 
 export const ROLE_DISPLAY_NAME = {
-    MEDICAL_AFFAIRS: "Medical Affairs",
-  };
-
+  MEDICAL_AFFAIRS: "Medical Affairs",
+};
 
 // Get token from localStorage
 export const getToken = () => {
@@ -48,7 +102,7 @@ export const getToken = () => {
 
 // Check if user is authenticated
 export const isAuthenticated = () => {
-  const token = getToken()
+  const token = getToken();
   return !!token;
   // return token && token.trim() !== "";
 };
@@ -156,7 +210,6 @@ export const rolesList = [
   // { label: "Viewer", value: "VIEWER" },
 ];
 
-
 // ..................... change color according to status ......................
 
 export const statusList = [
@@ -164,7 +217,6 @@ export const statusList = [
   { label: "Inactive", value: "INACTIVE", color: "gray" },
   { label: "Suspended", value: "SUSPENDED", color: "red" },
 ];
-
 
 // ......................... topics status style ...................
 export const statusStyles = {
@@ -174,7 +226,6 @@ export const statusStyles = {
   PUBLISHED: "bg-green-100 text-green-700",
   REJECTED: "bg-red-100 text-red-700",
 };
-
 
 export const buildStats = (stats) => [
   {
@@ -191,31 +242,29 @@ export const buildStats = (stats) => [
     title: "In Progress",
     value: stats?.byStatus?.IN_PROGRESS ?? 0,
     icon: FaSpinner,
-  }
+  },
 ];
 
-
-export  const passwordFields = [
-    {
-      field: "current",
-      label: "Current Password",
-      name: "currentpassword",
-      placeholder: "Enter current password"
-    },
-    {
-      field: "new",
-      label: "New Password",
-      name: "newPassword",
-      placeholder: "Enter new password"
-    },
-    {
-      field: "confirm",
-      label: "Confirm New Password",
-      name: "confirmPassword",
-      placeholder: "Confirm new password"
-    }
-  ];
-
+export const passwordFields = [
+  {
+    field: "current",
+    label: "Current Password",
+    name: "currentpassword",
+    placeholder: "Enter current password",
+  },
+  {
+    field: "new",
+    label: "New Password",
+    name: "newPassword",
+    placeholder: "Enter new password",
+  },
+  {
+    field: "confirm",
+    label: "Confirm New Password",
+    name: "confirmPassword",
+    placeholder: "Confirm new password",
+  },
+];
 
 export const ROLE_VARIABLES_MAP = {
   MEDICAL_AFFAIRS: "MEDICAL_AFFAIRS",
@@ -227,107 +276,104 @@ export const ROLE_VARIABLES_MAP = {
   SUPER_ADMIN: "SUPER_ADMIN",
 };
 
+export const scripts = [
+  {
+    id: 1,
+    title: "Post-Surgical Wound Care Best Practices",
+    status: "in-review",
+    lastUpdated: "2025-01-20",
+    words: 1200,
+    author: "Dr. James Rodriguez",
+    feedback: null,
+    lockedOn: null,
+    videoUploaded: false,
+  },
+  {
+    id: 2,
+    title: "Understanding Childhood Vaccines",
+    status: "rejected",
+    lastUpdated: "2025-01-18",
+    words: 950,
+    author: "Dr. Emily Chen",
+    feedback:
+      "Need more emphasis on CDC guidelines and recent research. Tone should be more reassuring.",
+    lockedOn: null,
+    videoUploaded: false,
+  },
+  {
+    id: 3,
+    title: "Heart Health and Exercise",
+    status: "locked",
+    lastUpdated: "2025-01-15",
+    words: 1100,
+    author: "Dr. Michael Thompson",
+    feedback: null,
+    lockedOn: "2025-01-16",
+    videoUploaded: true,
+  },
+  {
+    id: 4,
+    title: "Mental Health in Teenagers",
+    status: "draft",
+    lastUpdated: "2025-01-21",
+    words: 650,
+    author: "Dr. Lisa Park",
+    feedback: null,
+    lockedOn: null,
+    videoUploaded: false,
+  },
+  {
+    id: 5,
+    title: "Managing Type 2 Diabetes Through Diet",
+    status: "locked",
+    lastUpdated: "2025-01-22",
+    words: 1350,
+    author: "Dr. Sarah Mitchell",
+    feedback: null,
+    lockedOn: "2025-01-22",
+    videoUploaded: false,
+    readyForVideo: true,
+  },
+];
 
-
-export   const scripts = [
-    {
-      id: 1,
-      title: "Post-Surgical Wound Care Best Practices",
-      status: "in-review",
-      lastUpdated: "2025-01-20",
-      words: 1200,
-      author: "Dr. James Rodriguez",
-      feedback: null,
-      lockedOn: null,
-      videoUploaded: false,
-    },
-    {
-      id: 2,
-      title: "Understanding Childhood Vaccines",
-      status: "rejected",
-      lastUpdated: "2025-01-18",
-      words: 950,
-      author: "Dr. Emily Chen",
-      feedback:
-        "Need more emphasis on CDC guidelines and recent research. Tone should be more reassuring.",
-      lockedOn: null,
-      videoUploaded: false,
-    },
-    {
-      id: 3,
-      title: "Heart Health and Exercise",
-      status: "locked",
-      lastUpdated: "2025-01-15",
-      words: 1100,
-      author: "Dr. Michael Thompson",
-      feedback: null,
-      lockedOn: "2025-01-16",
-      videoUploaded: true,
-    },
-    {
-      id: 4,
-      title: "Mental Health in Teenagers",
-      status: "draft",
-      lastUpdated: "2025-01-21",
-      words: 650,
-      author: "Dr. Lisa Park",
-      feedback: null,
-      lockedOn: null,
-      videoUploaded: false,
-    },
-    {
-      id: 5,
-      title: "Managing Type 2 Diabetes Through Diet",
-      status: "locked",
-      lastUpdated: "2025-01-22",
-      words: 1350,
-      author: "Dr. Sarah Mitchell",
-      feedback: null,
-      lockedOn: "2025-01-22",
-      videoUploaded: false,
-      readyForVideo: true,
-    },
-  ];
-
-
-export   const videos = [
-    {
-      id: 1,
-      title: "Heart Health and Exercise",
-      scriptId: "#3",
-      wordCount: 1100,
-      duration: "8:45",
-      uploadDate: "2025-01-16",
-      fileSize: "245 MB",
-      status: "approved",
-      thumbnail: null
-    },
-    {
-      id: 2,
-      title: "Understanding Childhood Vaccines",
-      scriptId: "#2",
-      wordCount: 950,
-      duration: "6:30",
-      uploadDate: "2025-01-18",
-      fileSize: "189 MB",
-      status: "rejected",
-      rejectionReason: "Audio quality needs improvement. Please re-record with better microphone.",
-      thumbnail: null,
-      hasPlayButton: true
-    },
-    {
-      id: 3,
-      title: "Post-Surgical Wound Care Best Practices",
-      scriptId: "#1",
-      wordCount: 1200,
-      duration: "7:15",
-      uploadDate: "2025-01-20",
-      fileSize: "210 MB",
-      status: "in-review",
-      thumbnail: null
-    }
-  ];
-
+export const videos = [
+  {
+    id: 1,
+    title: "Heart Health and Exercise",
+    scriptId: "#3",
+    wordCount: 1100,
+    duration: "8:45",
+    uploadDate: "2025-01-16",
+    fileSize: "245 MB",
+    status: "approved",
+    thumbnail: null,
+  },
+  {
+    id: 2,
+    title: "Understanding Childhood Vaccines",
+    scriptId: "#2",
+    wordCount: 950,
+    duration: "6:30",
+    uploadDate: "2025-01-18",
+    fileSize: "189 MB",
+    status: "rejected",
+    rejectionReason:
+      "Audio quality needs improvement. Please re-record with better microphone.",
+    thumbnail: null,
+    hasPlayButton: true,
+  },
+  {
+    id: 3,
+    title: "Post-Surgical Wound Care Best Practices",
+    scriptId: "#1",
+    wordCount: 1200,
+    duration: "7:15",
+    uploadDate: "2025-01-20",
+    fileSize: "210 MB",
+    status: "in-review",
+    thumbnail: null,
+  },
+];
 
 export const EDIT_BUTTON_CONFIG = {
   "Write Script": {
@@ -350,4 +396,72 @@ export const EDIT_BUTTON_CONFIG = {
     classes:
       "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600",
   },
+};
+
+export const formatDate = (dateString) => {
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffTime = Math.abs(now - date);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 1) {
+    const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+    return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+  }
+  if (diffDays <= 7) return `${diffDays} days ago`;
+  return date.toLocaleDateString();
+};
+
+export const getWordCount = (htmlContent) => {
+  if (!htmlContent) return 0;
+  const text = htmlContent.replace(/<[^>]*>/g, " ");
+  return text.trim().split(/\s+/).length;
+};
+
+export const getStatusBadge = (status) => {
+  const statusLower = status?.toLowerCase();
+  switch (statusLower) {
+    case "approved":
+      return {
+        icon: <FiCheckCircle className="w-3 h-3" />,
+        text: "APPROVED",
+        class: "bg-green-50 text-green-700 border border-green-200",
+      };
+    case "rejected":
+      return {
+        icon: <IoClose className="w-3 h-3" />,
+        text: "REJECTED",
+        class: "bg-red-50 text-red-700 border border-red-200",
+      };
+    case "pending":
+    case "medical_review":
+      return {
+        icon: <FiClock className="w-3 h-3" />,
+        text: "PENDING REVIEW",
+        class: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+      };
+    case "claimed":
+      return {
+        icon: <FiClock className="w-3 h-3" />,
+        text: "CLAIMED",
+        class: "bg-blue-50 text-blue-700 border border-blue-200",
+      };
+    default:
+      return {
+        icon: null,
+        text: status?.toUpperCase() || "UNKNOWN",
+        class: "bg-gray-50 text-gray-700",
+      };
+  }
+};
+
+export const getContentPreview = (htmlContent, maxLength = 500) => {
+  if (!htmlContent) return "No content available";
+  const text = htmlContent
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };

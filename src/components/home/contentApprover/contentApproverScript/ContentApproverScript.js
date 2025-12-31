@@ -16,6 +16,8 @@ import {
   approveScript,
   rejectScript,
 } from '../../../../redux/action/contentApproverAction/ContentApproverAction';
+import { formatDate, getStatusBadge, getWordCount } from '../../../../utils/helper';
+import { toast } from 'react-toastify';
 
 const ContentApproverScript = () => {
   const dispatch = useDispatch();
@@ -33,7 +35,6 @@ const ContentApproverScript = () => {
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [commentType, setCommentType] = useState('comment');
 
-  // Fetch scripts on component mount
   useEffect(() => {
     dispatch(fetchContentApproverScripts());
   }, [dispatch]);
@@ -41,17 +42,14 @@ const ContentApproverScript = () => {
   const handleClaim = async (id) => {
     try {
       await dispatch(claimScript(id));
-      // Optional: Show success notification
+      
     } catch (error) {
-      console.error('Failed to claim script:', error);
-      // Optional: Show error notification
+      toast.error('Failed to claim script:', error);
     }
   };
 
   const handleApprove = (id) => {
     const script = contentApproverScripts.find(s => s.id === id);
-    
-    // Always open comment modal for approve - comment is mandatory
     setSelectedScript(script);
     setCommentType('approve');
     setShowCommentModal(true);
@@ -59,8 +57,6 @@ const ContentApproverScript = () => {
 
   const handleReject = (id) => {
     const script = contentApproverScripts.find(s => s.id === id);
-    
-    // Always open comment modal for reject - comment is mandatory
     setSelectedScript(script);
     setCommentType('reject');
     setShowCommentModal(true);
@@ -99,23 +95,6 @@ const ContentApproverScript = () => {
     const matchesFilter = filterStatus === 'all' || script.status.toLowerCase() === filterStatus;
     return matchesSearch && matchesFilter;
   });
-
-  const getStatusBadge = (status) => {
-    const statusLower = status?.toLowerCase();
-    switch(statusLower) {
-      case 'approved': 
-        return { icon: <FiCheckCircle className="w-3 h-3" />, text: 'APPROVED', class: 'bg-green-50 text-green-700 border border-green-200' };
-      case 'rejected': 
-        return { icon: <IoClose className="w-3 h-3" />, text: 'REJECTED', class: 'bg-red-50 text-red-700 border border-red-200' };
-      case 'pending': 
-      case 'medical_review':
-        return { icon: <FiClock className="w-3 h-3" />, text: 'PENDING REVIEW', class: 'bg-yellow-50 text-yellow-700 border border-yellow-200' };
-      case 'claimed':
-        return { icon: <FiClock className="w-3 h-3" />, text: 'CLAIMED', class: 'bg-blue-50 text-blue-700 border border-blue-200' };
-      default: 
-        return { icon: null, text: status?.toUpperCase() || 'UNKNOWN', class: 'bg-gray-50 text-gray-700' };
-    }
-  };
 
   const statusCounts = {
     all: contentApproverScripts.length,
@@ -189,12 +168,10 @@ const ContentApproverScript = () => {
               const isClaimed = script.lockedById !== null;
               const canInteract = isClaimed && (script.status?.toLowerCase() === 'pending' || script.status?.toLowerCase() === 'claimed' || script.status?.toLowerCase() === 'medical_review');
               
-              // Get author name from uploadedBy
               const authorName = script.uploadedBy 
                 ? `${script.uploadedBy.firstName} ${script.uploadedBy.lastName}`
                 : 'Unknown Author';
               
-              // Get initials for badge
               const getInitials = (firstName = '', lastName = '') => {
                 return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
               };
@@ -202,33 +179,9 @@ const ContentApproverScript = () => {
               const badge = script.uploadedBy 
                 ? getInitials(script.uploadedBy.firstName, script.uploadedBy.lastName)
                 : 'NA';
-              
-              // Calculate word count from content
-              const getWordCount = (htmlContent) => {
-                if (!htmlContent) return 0;
-                const text = htmlContent.replace(/<[^>]*>/g, ' ');
-                return text.trim().split(/\s+/).length;
-              };
-              
+               
               const wordCount = getWordCount(script.content);
               
-              // Format date
-              const formatDate = (dateString) => {
-                if (!dateString) return 'N/A';
-                const date = new Date(dateString);
-                const now = new Date();
-                const diffTime = Math.abs(now - date);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
-                if (diffDays === 1) return 'Yesterday';
-                if (diffDays < 1) {
-                  const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
-                  return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-                }
-                if (diffDays <= 7) return `${diffDays} days ago`;
-                return date.toLocaleDateString();
-              };
-
               return (
                 <div key={script.id} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                   <div className="p-6">
