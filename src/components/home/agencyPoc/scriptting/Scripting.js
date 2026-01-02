@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   FiEye,
   FiEdit2,
-  FiTrash2,
   FiUpload,
   FiCheckCircle,
   FiClock,

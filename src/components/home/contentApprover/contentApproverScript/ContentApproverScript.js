@@ -277,6 +277,8 @@ useEffect(() => {
                   )
                 : "NA";
 
+                console.log("scripts",script )
+
               const wordCount = getWordCount(script.content);
 
               return (
@@ -354,7 +356,7 @@ useEffect(() => {
                       <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                         <div className="flex items-center gap-2 text-xs text-green-700">
                           <FiCheckCircle className="w-3.5 h-3.5" />
-                          <span className="font-medium">Approved</span>
+                          <span className="font-medium">{script?.reviewComments}</span>
                         </div>
                       </div>
                     )}
@@ -363,7 +365,7 @@ useEffect(() => {
                       <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                         <div className="flex items-center gap-2 text-xs text-red-700 mb-2">
                           <IoClose className="w-3.5 h-3.5" />
-                          <span className="font-medium">Rejected</span>
+                          <span className="font-medium">{script?.reviewComments}</span>
                         </div>
                       </div>
                     )}

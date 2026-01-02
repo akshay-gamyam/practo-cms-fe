@@ -71,9 +71,9 @@ const CreateTopics = () => {
     },
   });
 
-  useEffect(() => {
-    dispatch(fetchUplodedTopcsList());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchUplodedTopcsList());
+  // }, [dispatch]);
 
   useEffect(() => {
     if (isDoctorCreator && selectedTopic) {

@@ -29,7 +29,6 @@ const AgencyPocVideos = () => {
     "MEDICAL_REVIEW",
     "BRAND_REVIEW",
     "DOCTOR_REVIEW",
-    "DRAFT",
   ];
 
   useEffect(() => {
@@ -73,8 +72,13 @@ const AgencyPocVideos = () => {
         text: "DOCTOR REVIEW",
         color: "text-indigo-700 bg-indigo-50 border-indigo-200",
       },
+       LOCKED: {
+        icon: <IoMdTime className="h-4 w-4" />,
+        text: "LOCKED",
+        color: "text-red-700 bg-red-50 border-red-200",
+      },
     };
-    return badges[status] || badges.IN_REVIEW;
+    return badges[status];
   };
 
   const filteredVideos = videos.filter((video) => {
@@ -91,7 +95,9 @@ const AgencyPocVideos = () => {
     all: videos.length,
     IN_REVIEW: videos.filter((v) => REVIEW_STATUSES.includes(v.status)).length,
     REJECTED: videos.filter((v) => v.status === "REJECTED").length,
-    APPROVED: videos.filter((v) => v.status === "APPROVED").length,
+    // APPROVED: videos.filter((v) => v.status === "APPROVED").length,
+    LOCKED: videos.filter((v) => v.status === "LOCKED").length,
+    DRAFT: videos.filter((v) => v.status === "DRAFT").length,
   };
 
   const formatDate = (dateString) => {
@@ -217,14 +223,24 @@ const AgencyPocVideos = () => {
               Rejected ({tabCounts.REJECTED})
             </button>
             <button
-              onClick={() => setActiveTab("APPROVED")}
+              onClick={() => setActiveTab("DRAFT")}
               className={`pb-4 px-1 font-medium whitespace-nowrap transition-colors ${
                 activeTab === "APPROVED"
                   ? "text-cyan-600 border-b-2 border-cyan-600"
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              Approved ({tabCounts.APPROVED})
+              Draft ({tabCounts.DRAFT})
+            </button>
+             <button
+              onClick={() => setActiveTab("LOCKED")}
+              className={`pb-4 px-1 font-medium whitespace-nowrap transition-colors ${
+                activeTab === "APPROVED"
+                  ? "text-cyan-600 border-b-2 border-cyan-600"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Locked ({tabCounts.LOCKED})
             </button>
           </div>
         </div>
@@ -234,10 +250,11 @@ const AgencyPocVideos = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredVideos.map((video) => {
-              const badge = getStatusBadge(video.status);
+              console.log("video", video)
+              const badge = getStatusBadge(video?.status);
               return (
                 <div
-                  key={video.id}
+                  key={video?.id}
                   className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-200"
                 >
                   <div className="relative aspect-video bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
