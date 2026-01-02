@@ -3,6 +3,14 @@ import {
   CONTENT_APPROVER_APPROVE,
   CONTENT_APPROVER_REJECT,
   CONTENT_APPROVER_CLAIM,
+  MEDICAL_AFFAIRS_APPROVE,
+  CONTENT_APPROVER_GET_ALL_SCRIPTS,
+  CONTENT_APPROVER_VIDEOS,
+  CONTENT_APPROVER_GET_ALL_VIDEOS,
+  CONTENT_APPROVER_APPROVE_VIDEO,
+  MEDICAL_AFFAIRS_APPROVE_VIDEO,
+  CONTENT_APPROVER_REJECT_VIDEO,
+  CONTENT_APPROVER_CLAIM_VIDEO,
 } from "../../../api/apiEndPoints";
 import api from "../../../api/interceptor";
 import {
@@ -18,44 +26,130 @@ import {
   rejectScriptStart,
   rejectScriptSuccess,
   rejectScriptFailure,
+  fetchVideosStart,
+  fetchVideosSuccess,
+  fetchVideosFailure,
+  claimVideoStart,
+  claimVideoSuccess,
+  claimVideoFailure,
+  approveVideoStart,
+  approveVideoSuccess,
+  approveVideoFailure,
+  rejectVideoStart,
+  rejectVideoSuccess,
+  rejectVideoFailure,
 } from "../../reducer/contentApproverReducer/ContentApproverReducer";
+import { ROLE_VARIABLES_MAP } from "../../../utils/helper";
 
 let isFetchingScripts = false;
 let isClaimingScript = false;
 let isApprovingScript = false;
 let isRejectingScript = false;
+let isFetchingVideos = false;
+let isClaimingVideos = false;
+let isApprovingVideos = false;
+let isRejectingVideos = false;
 
 // ........................ fetch scripts queue .........................
-export const fetchContentApproverScripts = () => async (dispatch) => {
-  if (isFetchingScripts) return;
-  isFetchingScripts = true;
-  dispatch(fetchScriptsStart());
+export const fetchContentApproverScripts =
+  (params = {}) =>
+  async (dispatch) => {
+    if (isFetchingScripts) return;
+    isFetchingScripts = true;
+    dispatch(fetchScriptsStart());
 
-  try {
-    const response = await api.get(CONTENT_APPROVER_SCRIPTS);
-    console.log("Scripts queue response:", response);
-    
-    const { available, page, totalPages, totalCount } = response.data;
+    try {
+      let url = CONTENT_APPROVER_SCRIPTS;
+      let tabType = "all";
+      let scriptsData = [];
 
-    dispatch(fetchScriptsSuccess({ 
-      scripts: available || [], 
-      page: page || 1, 
-      totalPages: totalPages || 1, 
-      totalCount: totalCount || 0 
-    }));
+      if (params.decision === "APPROVED" || params.decision === "REJECTED") {
+        const queryParams = new URLSearchParams();
+        queryParams.append("decision", params.decision);
 
-    return response.data;
-  } catch (error) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "Failed to fetch scripts queue";
-    dispatch(fetchScriptsFailure(errorMessage));
-    throw error;
-  } finally {
-    isFetchingScripts = false;
-  }
-};
+        if (params.search) {
+          queryParams.append("search", params.search);
+        }
+        if (params.page) {
+          queryParams.append("page", params.page);
+        }
+        if (params.limit) {
+          queryParams.append("limit", params.limit);
+        }
+
+        const queryString = queryParams.toString();
+        url = `${CONTENT_APPROVER_GET_ALL_SCRIPTS}${
+          queryString ? `?${queryString}` : ""
+        }`;
+
+        tabType = params.decision === "APPROVED" ? "approved" : "rejected";
+      }
+
+      const response = await api.get(url);
+
+      if (params.decision) {
+        const reviews = response.data.reviews || [];
+
+        scriptsData = reviews.map((review) => ({
+          ...review.script,
+          reviewId: review.id,
+          reviewerId: review.reviewerId,
+          reviewerType: review.reviewerType,
+          decision: review.decision,
+          reviewComments: review.comments,
+          reviewedAt: review.reviewedAt,
+          reviewer: review.reviewer,
+        }));
+      } else {
+        const available = response.data.available || [];
+        const myReviews = response.data.myReviews || [];
+
+        scriptsData = available;
+
+        if (myReviews.length > 0) {
+          dispatch(
+            fetchScriptsSuccess({
+              scripts: myReviews,
+              page: 1,
+              totalPages: 1,
+              totalCount: myReviews.length,
+              tabType: "my-claims",
+            })
+          );
+        }
+      }
+
+      if (!Array.isArray(scriptsData)) {
+        scriptsData = [];
+      }
+
+      const page = response.data.page || params.page || 1;
+      const totalPages = response.data.totalPages || 1;
+      const totalCount =
+        response.data.total || response.data.totalCount || scriptsData.length;
+
+      dispatch(
+        fetchScriptsSuccess({
+          scripts: scriptsData,
+          page: page,
+          totalPages: totalPages,
+          totalCount: totalCount,
+          tabType: tabType,
+        })
+      );
+
+      return response.data;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch scripts queue";
+      dispatch(fetchScriptsFailure(errorMessage));
+      throw error;
+    } finally {
+      isFetchingScripts = false;
+    }
+  };
 
 // ........................ claim/lock script .........................
 export const claimScript = (scriptId) => async (dispatch) => {
@@ -65,14 +159,15 @@ export const claimScript = (scriptId) => async (dispatch) => {
 
   try {
     const response = await api.post(CONTENT_APPROVER_CLAIM(scriptId));
-    console.log("Claim script response:", response);
-    
+
     const { claimedBy } = response.data;
 
-    dispatch(claimScriptSuccess({ 
-      scriptId, 
-      claimedBy: claimedBy || 'Current User' 
-    }));
+    dispatch(
+      claimScriptSuccess({
+        scriptId,
+        claimedBy: claimedBy || "Current User",
+      })
+    );
 
     return response.data;
   } catch (error) {
@@ -88,38 +183,50 @@ export const claimScript = (scriptId) => async (dispatch) => {
 };
 
 // ........................ approve script with comment .........................
-export const approveScript = (scriptId, comment) => async (dispatch) => {
-  if (isApprovingScript) return;
-  isApprovingScript = true;
-  dispatch(approveScriptStart());
+export const approveScript =
+  (scriptId, comment = "") =>
+  async (dispatch, getState) => {
+    if (isApprovingScript) return;
+    isApprovingScript = true;
 
-  try {
-    const response = await api.post(CONTENT_APPROVER_APPROVE(scriptId), {
-      action: 'approve',
-      comment: comment || ''
-    });
-    console.log("Approve script response:", response);
-    
-    const { approvedBy } = response.data;
+    dispatch(approveScriptStart());
 
-    dispatch(approveScriptSuccess({ 
-      scriptId, 
-      approvedBy: approvedBy || 'Current User',
-      comment 
-    }));
+    try {
+      const {
+        auth: { user },
+      } = getState();
 
-    return response.data;
-  } catch (error) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "Failed to approve script";
-    dispatch(approveScriptFailure(errorMessage));
-    throw error;
-  } finally {
-    isApprovingScript = false;
-  }
-};
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      const endpoint =
+        user.role === ROLE_VARIABLES_MAP.CONTENT_APPROVER
+          ? CONTENT_APPROVER_APPROVE(scriptId)
+          : MEDICAL_AFFAIRS_APPROVE(scriptId);
+
+      const response = await api.post(endpoint, {
+        comment,
+      });
+
+      dispatch(
+        approveScriptSuccess({
+          scriptId,
+          approvedBy: response.data?.approvedBy || user.name,
+          comment,
+        })
+      );
+
+      return response.data;
+    } catch (error) {
+      dispatch(
+        approveScriptFailure(error?.response?.data?.message || error.message)
+      );
+      throw error;
+    } finally {
+      isApprovingScript = false;
+    }
+  };
 
 // ........................ reject script with comment .........................
 export const rejectScript = (scriptId, comment) => async (dispatch) => {
@@ -129,18 +236,19 @@ export const rejectScript = (scriptId, comment) => async (dispatch) => {
 
   try {
     const response = await api.post(CONTENT_APPROVER_REJECT(scriptId), {
-      comment: comment || ''
+      comments: comment || "",
     });
-    console.log("Reject script response:", response);
-    
+
     const { rejectedBy } = response.data;
 
-    dispatch(rejectScriptSuccess({ 
-      scriptId, 
-      rejectedBy: rejectedBy || 'Current User',
-      comment,
-      reason: comment
-    }));
+    dispatch(
+      rejectScriptSuccess({
+        scriptId,
+        rejectedBy: rejectedBy || "Current User",
+        comment,
+        reason: comment,
+      })
+    );
 
     return response.data;
   } catch (error) {
@@ -152,5 +260,219 @@ export const rejectScript = (scriptId, comment) => async (dispatch) => {
     throw error;
   } finally {
     isRejectingScript = false;
+  }
+};
+
+
+// ........................ fetch scripts queue .........................
+export const fetchContentApproverVideos =
+  (params = {}) =>
+  async (dispatch) => {
+    if (isFetchingVideos) return;
+    isFetchingVideos = true;
+    dispatch(fetchVideosStart());
+
+    try {
+      let url = CONTENT_APPROVER_VIDEOS;
+      let tabType = "all";
+      let videosData = [];
+
+      if (params.decision === "APPROVED" || params.decision === "REJECTED") {
+        const queryParams = new URLSearchParams();
+        queryParams.append("decision", params.decision);
+
+        if (params.search) {
+          queryParams.append("search", params.search);
+        }
+        if (params.page) {
+          queryParams.append("page", params.page);
+        }
+        if (params.limit) {
+          queryParams.append("limit", params.limit);
+        }
+
+        const queryString = queryParams.toString();
+        url = `${CONTENT_APPROVER_GET_ALL_VIDEOS}${
+          queryString ? `?${queryString}` : ""
+        }`;
+
+        tabType = params.decision === "APPROVED" ? "approved" : "rejected";
+      }
+
+      const response = await api.get(url);
+
+      if (params.decision) {
+        const reviews = response.data.reviews || [];
+
+        videosData = reviews.map((review) => ({
+          ...review.video,
+          reviewId: review.id,
+          reviewerId: review.reviewerId,
+          reviewerType: review.reviewerType,
+          decision: review.decision,
+          reviewComments: review.comments,
+          reviewedAt: review.reviewedAt,
+          reviewer: review.reviewer,
+        }));
+      } else {
+        const available = response.data.available || [];
+        const myReviews = response.data.myReviews || [];
+
+        videosData = available;
+
+        if (myReviews.length > 0) {
+          dispatch(
+            fetchVideosSuccess({
+              videos: myReviews,
+              page: 1,
+              totalPages: 1,
+              totalCount: myReviews.length,
+              tabType: "my-claims",
+            })
+          );
+        }
+      }
+
+      if (!Array.isArray(videosData)) {
+        videosData = [];
+      }
+
+      const page = response.data.page || params.page || 1;
+      const totalPages = response.data.totalPages || 1;
+      const totalCount =
+        response.data.total || response.data.totalCount || videosData.length;
+
+      dispatch(
+        fetchVideosSuccess({
+          videos: videosData,
+          page: page,
+          totalPages: totalPages,
+          totalCount: totalCount,
+          tabType: tabType,
+        })
+      );
+
+      return response.data;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch scripts queue";
+      dispatch(fetchVideosFailure(errorMessage));
+      throw error;
+    } finally {
+      isFetchingVideos = false;
+    }
+  };
+
+// ........................ claim/lock script .........................
+export const claimVideos = (videoId) => async (dispatch) => {
+  if (isClaimingVideos) return;
+  isClaimingVideos = true;
+  dispatch(claimVideoStart());
+
+  try {
+    const response = await api.post(CONTENT_APPROVER_CLAIM_VIDEO(videoId));
+
+    const { claimedBy } = response.data;
+
+    dispatch(
+      claimVideoSuccess({
+        videoId,
+        claimedBy: claimedBy || "Current User",
+      })
+    );
+
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to claim script";
+    dispatch(claimVideoFailure(errorMessage));
+    throw error;
+  } finally {
+    isClaimingVideos = false;
+  }
+};
+
+// ........................ approve script with comment .........................
+export const approveVideos =
+  (videoId, comment = "") =>
+  async (dispatch, getState) => {
+    if (isApprovingVideos) return;
+    isApprovingVideos = true;
+
+    dispatch(approveVideoStart());
+
+    try {
+      const {
+        auth: { user },
+      } = getState();
+
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      const endpoint =
+        user.role === ROLE_VARIABLES_MAP.CONTENT_APPROVER
+          ? CONTENT_APPROVER_APPROVE_VIDEO(videoId)
+          : MEDICAL_AFFAIRS_APPROVE_VIDEO(videoId);
+
+      const response = await api.post(endpoint, {
+        comment,
+      });
+
+      dispatch(
+        approveVideoSuccess({
+          videoId,
+          approvedBy: response.data?.approvedBy || user.name,
+          comment,
+        })
+      );
+
+      return response.data;
+    } catch (error) {
+      dispatch(
+        approveVideoFailure(error?.response?.data?.message || error.message)
+      );
+      throw error;
+    } finally {
+      isApprovingVideos = false;
+    }
+  };
+
+// ........................ reject script with comment .........................
+export const rejectVideos = (videoId, comment) => async (dispatch) => {
+  if (isRejectingVideos) return;
+  isRejectingVideos = true;
+  dispatch(rejectVideoStart());
+
+  try {
+    const response = await api.post(CONTENT_APPROVER_REJECT_VIDEO(videoId), {
+      comments: comment || "",
+    });
+
+    const { rejectedBy } = response.data;
+
+    dispatch(
+      rejectVideoSuccess({
+        videoId,
+        rejectedBy: rejectedBy || "Current User",
+        comment,
+        reason: comment,
+      })
+    );
+
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to reject script";
+    dispatch(rejectVideoFailure(errorMessage));
+    throw error;
+  } finally {
+    isRejectingVideos = false;
   }
 };

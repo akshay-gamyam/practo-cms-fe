@@ -1,146 +1,167 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   FiSearch,
   FiClock,
   FiCheckCircle,
   FiPlay,
-  FiMessageSquare,
   FiDownload,
-  FiVideo
-} from 'react-icons/fi';
-import { IoClose } from 'react-icons/io5';
-import ContentPreviewModal from './ContentPreviewModal';
-import ContentDetailsModal from '../contentApproverScript/ContentDetailsScriptModal';
-import ContentCommentModal from './ContentCommentModal';
+  FiVideo,
+} from "react-icons/fi";
+import { IoClose } from "react-icons/io5";
+import ContentPreviewModal from "./ContentPreviewModal";
+import ContentDetailsModal from "../contentApproverScript/ContentDetailsScriptModal";
+import ContentCommentModal from "./ContentCommentModal";
+import {
+  fetchContentApproverVideos,
+  claimVideos,
+  approveVideos,
+  rejectVideos,
+} from "../../../../redux/action/contentApproverAction/ContentApproverAction";
+import { formatDate, getStatusBadge } from "../../../../utils/helper";
+import { toast } from "react-toastify";
+import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
 
 const ContentApproverVideos = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [videos, setVideos] = useState([
-    {
-      id: 1,
-      title: 'Exercise for Seniors',
-      author: 'Dr. Lisa Brown',
-      department: 'Geriatrics',
-      category: 'Geriatrics',
-      submittedDate: '5 hours ago',
-      duration: '5:30',
-      fileSize: '189 MB',
-      thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800',
-      status: 'pending',
-      badge: 'DLB',
-      badgeColor: 'bg-cyan-500',
-      priority: 'high',
-      comments: []
-    },
-    {
-      id: 2,
-      title: 'Heart Health Basics',
-      author: 'Dr. Michael Chen',
-      department: 'Cardiology',
-      category: 'Cardiology',
-      submittedDate: '1 day ago',
-      duration: '8:15',
-      fileSize: '245 MB',
-      thumbnail: 'https://images.unsplash.com/photo-1628348070889-cb656235b4eb?w=800',
-      status: 'pending',
-      badge: 'DMC',
-      badgeColor: 'bg-cyan-500',
-      priority: 'medium',
-      comments: []
-    },
-    {
-      id: 3,
-      title: 'Nutrition Tips for Diabetics',
-      author: 'Dr. Sarah Smith',
-      department: 'Endocrinology',
-      category: 'Endocrinology',
-      submittedDate: '2 days ago',
-      duration: '6:45',
-      fileSize: '198 MB',
-      thumbnail: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800',
-      status: 'approved',
-      badge: 'DSS',
-      badgeColor: 'bg-cyan-500',
-      approvedBy: 'John Approver',
-      priority: 'low',
-      comments: []
-    },
-    {
-      id: 4,
-      title: 'Breathing Techniques',
-      author: 'Dr. Emily Watson',
-      department: 'Pulmonology',
-      category: 'Pulmonology',
-      submittedDate: '3 days ago',
-      duration: '4:20',
-      fileSize: '156 MB',
-      thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800',
-      status: 'rejected',
-      badge: 'DEW',
-      badgeColor: 'bg-cyan-500',
-      rejectedBy: 'John Approver',
-      reason: 'Video quality needs improvement and audio is unclear',
-      priority: 'medium',
-      comments: []
-    }
-  ]);
+  const dispatch = useDispatch();
+  const {
+    contentApproverVideos,
+    myClaimsVideos,
+    approvedVideos,
+    rejectedVideos,
+    isVideosListLoading,
+    isVideosActionLoading,
+    error,
+  } = useSelector((state) => state.contentApprover);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
+  const [commentType, setCommentType] = useState("comment");
+
+  useEffect(() => {
+    const params = {};
+
+    if (filterStatus === "approved") {
+      params.decision = "APPROVED";
+    } else if (filterStatus === "rejected") {
+      params.decision = "REJECTED";
+    }
+
+    if (searchTerm) {
+      params.search = searchTerm;
+    }
+
+    dispatch(fetchContentApproverVideos(params));
+  }, [dispatch, filterStatus]);
+
+  const getCurrentTabData = () => {
+    switch (filterStatus) {
+      case "my-claims":
+        return myClaimsVideos;
+      case "approved":
+        return approvedVideos;
+      case "rejected":
+        return rejectedVideos;
+      case "all":
+      default:
+        return contentApproverVideos;
+    }
+  };
+
+  const handleClaim = async (id, e) => {
+    if (e) e.stopPropagation();
+    try {
+      await dispatch(claimVideos(id));
+    } catch (error) {
+      toast.error("Failed to claim video");
+    }
+  };
 
   const handleApprove = (id) => {
-    setVideos(videos.map(video => 
-      video.id === id ? { ...video, status: 'approved', approvedBy: 'John Approver' } : video
-    ));
+    const currentData = getCurrentTabData();
+    const video = currentData.find((v) => v.id === id);
+    setSelectedVideo(video);
+    setCommentType("approve");
+    setShowCommentModal(true);
   };
 
   const handleReject = (id) => {
-    setVideos(videos.map(video => 
-      video.id === id ? { ...video, status: 'rejected', rejectedBy: 'John Approver' } : video
-    ));
+    const currentData = getCurrentTabData();
+    const video = currentData.find((v) => v.id === id);
+    setSelectedVideo(video);
+    setCommentType("reject");
+    setShowCommentModal(true);
   };
 
   const handleAddComment = (comment) => {
     if (selectedVideo && comment.trim()) {
-      const newComment = { text: comment, date: new Date().toISOString() };
-      setVideos(videos.map(video =>
-        video.id === selectedVideo.id
-          ? { ...video, comments: [...video.comments, newComment] }
-          : video
-      ));
-      setShowCommentModal(false);
+      if (commentType === "approve") {
+        dispatch(approveVideos(selectedVideo?.id, comment))
+          .then(() => {
+            setShowCommentModal(false);
+            setSelectedVideo(null);
+            setCommentType("comment");
+          })
+          .catch((error) => {
+            console.error("Failed to approve video:", error);
+          });
+      } else if (commentType === "reject") {
+        dispatch(rejectVideos(selectedVideo.id, comment))
+          .then(() => {
+            setShowCommentModal(false);
+            setSelectedVideo(null);
+            setCommentType("comment");
+          })
+          .catch((error) => {
+            console.error("Failed to reject video:", error);
+          });
+      }
     }
   };
 
-  const filteredVideos = videos.filter(video => {
-    const matchesSearch = video.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         video.author.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || video.status === filterStatus;
-    return matchesSearch && matchesFilter;
+  const handleThumbnailClick = (video) => {
+    setSelectedVideo(video);
+    setShowPreviewModal(true);
+  };
+
+  const currentTabData = getCurrentTabData();
+
+  const filteredVideos = currentTabData.filter((video) => {
+    const matchesSearch =
+      video.topic?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      video.uploadedBy?.firstName
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      video.uploadedBy?.lastName
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase());
+    return matchesSearch;
   });
 
-  const getStatusBadge = (status) => {
-    switch(status) {
-      case 'approved': 
-        return { icon: <FiCheckCircle className="w-3 h-3" />, text: 'APPROVED', class: 'bg-green-50 text-green-700 border border-green-200' };
-      case 'rejected': 
-        return { icon: <IoClose className="w-3 h-3" />, text: 'REJECTED', class: 'bg-red-50 text-red-700 border border-red-200' };
-      case 'pending': 
-        return { icon: <FiClock className="w-3 h-3" />, text: 'PENDING REVIEW', class: 'bg-yellow-50 text-yellow-700 border border-yellow-200' };
-      default: 
-        return { icon: null, text: status, class: 'bg-gray-50 text-gray-700' };
-    }
+  const formatFileSize = (bytes) => {
+    if (!bytes) return "N/A";
+    const mb = bytes / (1024 * 1024);
+    return `${mb.toFixed(2)} MB`;
   };
 
-  const statusCounts = {
-    all: videos.length,
-    pending: videos.filter(v => v.status === 'pending').length,
-    approved: videos.filter(v => v.status === 'approved').length,
-    rejected: videos.filter(v => v.status === 'rejected').length
+  const formatDuration = (seconds) => {
+    if (!seconds) return "N/A";
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center py-10 text-red-500">
+        Failed to load videos
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -150,7 +171,10 @@ const ContentApproverVideos = () => {
             <FiVideo className="w-8 h-8" />
             Videos Review
           </h1>
-          <p className="text-sm text-gray-600">Final approval authority - Review all content before moving to production</p>
+          <p className="text-sm text-gray-600">
+            Final approval authority - Review all content before moving to
+            production
+          </p>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
@@ -166,8 +190,18 @@ const ContentApproverVideos = () => {
               />
             </div>
             <button className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                />
               </svg>
               Filter
             </button>
@@ -175,159 +209,239 @@ const ContentApproverVideos = () => {
 
           <div className="flex gap-6 mt-4 border-b border-gray-200">
             {[
-              { key: 'all', label: 'All' },
-              { key: 'pending', label: 'Pending Review' },
-              { key: 'approved', label: 'Approved' },
-              { key: 'rejected', label: 'Rejected' }
+              { key: "all", label: "All" },
+              { key: "my-claims", label: "My Claims" },
+              { key: "approved", label: "Approved" },
+              { key: "rejected", label: "Rejected" },
             ].map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setFilterStatus(tab.key)}
                 className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
                   filterStatus === tab.key
-                    ? 'border-cyan-500 text-cyan-600'
-                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                    ? "border-cyan-500 text-cyan-600"
+                    : "border-transparent text-gray-600 hover:text-gray-900"
                 }`}
               >
-                {tab.label} ({statusCounts[tab.key]})
+                {tab.label}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="space-y-6">
-          {filteredVideos.map((video) => {
-            const statusBadge = getStatusBadge(video.status);
-            return (
-              <div key={video.id} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <div className="flex flex-col lg:flex-row">
-                  <div className="lg:w-2/5 relative bg-gradient-to-br from-blue-100 to-cyan-100 h-64 lg:h-auto">
-                    <div className="absolute top-4 left-4">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md ${statusBadge.class}`}>
-                        {statusBadge.icon}
-                        {statusBadge.text}
-                      </span>
-                    </div>
-                    <div className="absolute bottom-4 right-4 bg-gray-900/80 backdrop-blur-sm text-white text-sm font-bold px-3 py-1.5 rounded-lg">
-                      {video.duration}
-                    </div>
-                    <img 
-                      src={video.thumbnail} 
-                      alt={video.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  
-                  <div className="lg:w-3/5 p-6 flex flex-col justify-between">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-4">{video.title}</h3>
+        {isVideosListLoading ? (
+          <SkeletonBlock />
+        ) : filteredVideos.length === 0 ? (
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
+            <p className="text-gray-500">No videos found</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {filteredVideos.map((video) => {
+              const statusBadge = getStatusBadge(video.status);
+              const isClaimed = video.lockedById !== null;
+              
+              // Check if status is APPROVED or REJECTED (final decision made)
+              const isFinalStatus = 
+                video.decision?.toUpperCase() === "APPROVED" || 
+                video.decision?.toUpperCase() === "REJECTED";
+              
+              // Can interact only if claimed and not in final status
+              const canInteract = isClaimed && !isFinalStatus;
 
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className={`w-12 h-12 ${video.badgeColor} rounded-full flex items-center justify-center text-white text-sm font-bold`}>
-                          {video.badge}
-                        </div>
-                        <div>
-                          <p className="text-base font-semibold text-gray-900">{video.author}</p>
-                          <p className="text-sm text-gray-500">{video.department}</p>
-                        </div>
-                      </div>
+              const authorName = video.uploadedBy
+                ? `${video.uploadedBy.firstName} ${video.uploadedBy.lastName}`
+                : "Unknown Author";
 
-                      <div className="flex items-center gap-6 text-sm text-gray-500 mb-4">
-                        <span className="flex items-center gap-2">
-                          <FiDownload className="w-4 h-4" />
-                          {video.fileSize}
+              const getInitials = (firstName = "", lastName = "") => {
+                return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+              };
+
+              const badge = video.uploadedBy
+                ? getInitials(
+                    video.uploadedBy.firstName,
+                    video.uploadedBy.lastName
+                  )
+                : "NA";
+
+              return (
+                <div
+                  key={video.id}
+                  className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+                >
+                  <div className="flex flex-col lg:flex-row">
+                    {/* Video Thumbnail with Play Button Overlay */}
+                    <div 
+                      className="lg:w-2/5 relative bg-gradient-to-br from-blue-100 to-cyan-100 h-64 lg:h-auto group cursor-pointer"
+                      onClick={() => handleThumbnailClick(video)}
+                    >
+                      <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md ${statusBadge.class}`}
+                        >
+                          {statusBadge.icon}
+                          {statusBadge.text}
                         </span>
-                        <span className="flex items-center gap-2">
-                          <FiClock className="w-4 h-4" />
-                          {video.submittedDate}
+                        <span className="text-xs text-gray-500 font-medium bg-white px-2 py-1 rounded-md">
+                          Version {video.version}
                         </span>
                       </div>
-
-                      {video.status === 'approved' && video.approvedBy && (
-                        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                          <div className="flex items-center gap-2 text-sm text-green-700">
-                            <FiCheckCircle className="w-4 h-4" />
-                            <span className="font-medium">Approved by {video.approvedBy}</span>
-                          </div>
+                      
+                      {/* Claim Button - Only show if not final status and not claimed */}
+                      {!isFinalStatus && !isClaimed && (
+                        <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={(e) => handleClaim(video.id, e)}
+                            disabled={isVideosActionLoading}
+                            className="bg-white border border-gray-400 rounded-xl px-4 py-1 hover:bg-gray-50 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {isVideosActionLoading ? "Claiming..." : "Claim"}
+                          </button>
+                        </div>
+                      )}
+                      
+                      {/* Claimed Badge - Only show if not final status and is claimed */}
+                      {!isFinalStatus && isClaimed && (
+                        <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
+                          <span className="text-xs text-green-600 font-medium bg-green-50 px-3 py-1 rounded-full">
+                            Claimed
+                          </span>
                         </div>
                       )}
 
-                      {video.status === 'rejected' && video.rejectedBy && (
-                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                          <div className="flex items-center gap-2 text-sm text-red-700 mb-2">
-                            <IoClose className="w-4 h-4" />
-                            <span className="font-medium">Rejected by {video.rejectedBy}</span>
-                          </div>
-                          {video.reason && (
-                            <p className="text-sm text-red-600"><span className="font-medium">Reason:</span> {video.reason}</p>
-                          )}
+                      {/* Play Button Overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                        <div className="w-16 h-16 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-cyan-500 group-hover:scale-110 transition-all duration-300 shadow-lg pointer-events-auto">
+                          <FiPlay className="w-8 h-8 text-gray-900 group-hover:text-white ml-1" />
+                        </div>
+                      </div>
+                      
+                      <div className="absolute bottom-4 right-4 bg-gray-900/80 backdrop-blur-sm text-white text-sm font-bold px-3 py-1.5 rounded-lg z-10">
+                        {formatDuration(video.duration)}
+                      </div>
+
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
+                      
+                      {video.thumbnailUrl ? (
+                        <img
+                          src={video.thumbnailUrl}
+                          alt={video.topic?.title || "Video thumbnail"}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <FiVideo className="w-16 h-16 text-gray-400" />
                         </div>
                       )}
                     </div>
 
-                    {video.status === 'pending' ? (
-                      <div className="flex gap-3">
+                    <div className="lg:w-3/5 p-6 flex flex-col justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">
+                          {video.topic?.title || "Untitled Video"}
+                        </h3>
+
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-12 h-12 bg-cyan-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                            {badge}
+                          </div>
+                          <div>
+                            <p className="text-base font-semibold text-gray-900">
+                              {authorName}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              Content Creator
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-6 text-sm text-gray-500 mb-4">
+                          <span className="flex items-center gap-2">
+                            <FiDownload className="w-4 h-4" />
+                            {formatFileSize(video.fileSize)}
+                          </span>
+                          <span className="flex items-center gap-2">
+                            <FiClock className="w-4 h-4" />
+                            {formatDate(video.createdAt)}
+                          </span>
+                        </div>
+
+                        {video.status?.toUpperCase() === "APPROVED" && (
+                          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <div className="flex items-center gap-2 text-sm text-green-700">
+                              <FiCheckCircle className="w-4 h-4" />
+                              <span className="font-medium">Approved</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {video.status?.toUpperCase() === "REJECTED" && (
+                          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <div className="flex items-center gap-2 text-sm text-red-700 mb-2">
+                              <IoClose className="w-4 h-4" />
+                              <span className="font-medium">Rejected</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Show Approve/Reject buttons only if NOT in final status */}
+                      {!isFinalStatus ? (
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => handleThumbnailClick(video)}
+                            className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors text-sm font-semibold flex items-center justify-center gap-2"
+                          >
+                            <FiPlay className="w-4 h-4" />
+                            Preview
+                          </button>
+                          <button
+                            onClick={() => handleApprove(video.id)}
+                            disabled={!canInteract || isVideosActionLoading}
+                            className="flex-1 px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <FiCheckCircle className="w-5 h-5" />
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => handleReject(video.id)}
+                            disabled={!canInteract || isVideosActionLoading}
+                            className="flex-1 px-6 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <IoClose className="w-5 h-5" />
+                            Reject
+                          </button>
+                        </div>
+                      ) : (
+                        // Show only View Content button if in final status
                         <button
                           onClick={() => {
                             setSelectedVideo(video);
-                            setShowPreviewModal(true);
+                            setShowDetailsModal(true);
                           }}
-                          className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors text-sm font-semibold flex items-center justify-center gap-2"
+                          className="w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors text-sm font-semibold flex items-center justify-center gap-2"
                         >
                           <FiPlay className="w-4 h-4" />
-                          Preview
+                          View Content
                         </button>
-                        <button
-                          onClick={() => handleApprove(video.id)}
-                          className="flex-1 px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors text-sm font-semibold flex items-center justify-center gap-2"
-                        >
-                          <FiCheckCircle className="w-5 h-5" />
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handleReject(video.id)}
-                          className="flex-1 px-6 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors text-sm font-semibold flex items-center justify-center gap-2"
-                        >
-                          <IoClose className="w-5 h-5" />
-                          Reject
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSelectedVideo(video);
-                            setShowCommentModal(true);
-                          }}
-                          className="px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors text-sm font-semibold flex items-center justify-center gap-2"
-                        >
-                          <FiMessageSquare className="w-5 h-5" />
-                          Comment
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          setSelectedVideo(video);
-                          setShowDetailsModal(true);
-                        }}
-                        className="w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors text-sm font-semibold flex items-center justify-center gap-2"
-                      >
-                        <FiPlay className="w-4 h-4" />
-                        View Content
-                      </button>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <ContentPreviewModal
         isOpen={showPreviewModal}
-        onClose={() => setShowPreviewModal(false)}
+        onClose={() => {
+          setShowPreviewModal(false);
+          setSelectedVideo(null);
+        }}
         video={selectedVideo}
-        onApprove={handleApprove}
-        onReject={handleReject}
       />
 
       <ContentDetailsModal
@@ -342,9 +456,13 @@ const ContentApproverVideos = () => {
 
       <ContentCommentModal
         isOpen={showCommentModal}
-        onClose={() => setShowCommentModal(false)}
+        onClose={() => {
+          setShowCommentModal(false);
+          setCommentType("comment");
+        }}
         video={selectedVideo}
         onSubmit={handleAddComment}
+        commentType={commentType}
       />
     </div>
   );

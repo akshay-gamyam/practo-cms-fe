@@ -32,6 +32,17 @@ export const AGENCY_POC_SCRIPTS = "/api/scripts";
 export const AGENCY_POC_VIDEOS = "/api/videos";
 
 export const CONTENT_APPROVER_SCRIPTS = "/api/scripts/queue";
+export const CONTENT_APPROVER_GET_ALL_SCRIPTS= "/api/scripts/my-reviews";
 export const CONTENT_APPROVER_APPROVE = (script_id) => `/api/scripts/${script_id}/lock`;
+export const MEDICAL_AFFAIRS_APPROVE = (script_id) => `/api/scripts/${script_id}/approve`;
 export const CONTENT_APPROVER_REJECT = (script_id) => `/api/scripts/${script_id}/reject`;
 export const CONTENT_APPROVER_CLAIM = (script_id) => `/api/scripts/${script_id}/claim`;
+
+
+
+export const CONTENT_APPROVER_VIDEOS = "/api/videos/queue";
+export const CONTENT_APPROVER_GET_ALL_VIDEOS= "/api/videos/my-reviews";
+export const CONTENT_APPROVER_APPROVE_VIDEO = (script_id) => `/api/videos/${script_id}/lock`;
+export const MEDICAL_AFFAIRS_APPROVE_VIDEO = (script_id) => `/api/videos/${script_id}/approve`;
+export const CONTENT_APPROVER_REJECT_VIDEO = (script_id) => `/api/videos/${script_id}/reject`;
+export const CONTENT_APPROVER_CLAIM_VIDEO = (script_id) => `/api/videos/${script_id}/claim`;

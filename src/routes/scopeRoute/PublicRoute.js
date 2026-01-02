@@ -11,7 +11,7 @@ const PublicRoutes = ({ children }) => {
     if (user?.role === ROLE_VARIABLES_MAP?.MEDICAL_AFFAIRS) {
       return <Navigate to={ROUTES.MEDICAL_TOPICS} replace />;
     } else if (user?.role === ROLE_VARIABLES_MAP?.BRAND_REVIEWER) {
-      return <Navigate to={ROUTES.REVIEW_QUEUE} replace />;
+      return <Navigate to={ROUTES.CONTENT_APPROVER_SCRIPTS} replace />;
     } else if (user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR) {
       return <Navigate to={ROUTES.MY_TOPICS} replace />;
     } else if (user?.role === ROLE_VARIABLES_MAP?.AGENCY_POC) {

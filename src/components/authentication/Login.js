@@ -82,7 +82,7 @@ const Login = ({ setScreen }) => {
       if (user?.role === ROLE_VARIABLES_MAP?.MEDICAL_AFFAIRS) {
         return navigate(ROUTES.MEDICAL_TOPICS);
       } else if (user?.role === ROLE_VARIABLES_MAP?.BRAND_REVIEWER) {
-        return navigate(ROUTES.REVIEW_QUEUE);
+        return navigate(ROUTES.CONTENT_APPROVER_SCRIPTS);
       } else if (user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR) {
         return navigate(ROUTES.MY_TOPICS);
       } else if (user?.role === ROLE_VARIABLES_MAP?.AGENCY_POC) {
@@ -121,7 +121,7 @@ const Login = ({ setScreen }) => {
       if (user?.role === ROLE_VARIABLES_MAP?.MEDICAL_AFFAIRS) {
         return navigate(ROUTES.MEDICAL_TOPICS);
       } else if (user?.role === ROLE_VARIABLES_MAP?.BRAND_REVIEWER) {
-        return navigate(ROUTES.REVIEW_QUEUE);
+        return navigate(ROUTES.CONTENT_APPROVER_SCRIPTS);
       } else if (user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR) {
         return navigate(ROUTES.MY_TOPICS);
       } else if (user?.role === ROLE_VARIABLES_MAP?.AGENCY_POC) {
