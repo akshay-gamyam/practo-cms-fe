@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { fetchUplodedTopcsList } from "../../../../redux/action/topicAction/TopicAction";
@@ -22,10 +22,14 @@ const CreateTopics = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id: topicId } = useParams();
+  const location = useLocation();
+  const topicFromState = location.state;
 
   const { user } = useSelector((state) => state.auth);
   const { topics, isCreateLoading } = useSelector((state) => state.topics);
-  const isDoctorCreator = user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR || ROLE_VARIABLES_MAP?.SUPER_ADMIN ;
+  const isDoctorCreator =
+    user?.role === ROLE_VARIABLES_MAP?.DOCTOR_CREATOR ||
+    user?.role === ROLE_VARIABLES_MAP?.SUPER_ADMIN;
 
   const [formData, setFormData] = useState({
     title: "",
@@ -34,8 +38,9 @@ const CreateTopics = () => {
   });
 
   const selectedTopic = useMemo(() => {
-    return topics?.find((topic) => topic?.id === topicId);
-  }, [topics, topicId]);
+    const topicFromRedux = topics?.find((topic) => topic?.id === topicId);
+    return topicFromRedux || topicFromState;
+  }, [topics, topicId, topicFromState]);
 
   const selectedDoctorId = selectedTopic?.assignedDoctor?.id;
 
