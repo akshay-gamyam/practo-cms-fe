@@ -59,10 +59,8 @@ const ContentApproverScript = () => {
   }, [dispatch, buildFetchParams]);
 
 useEffect(() => {
-  if (!isScriptActionLoading) {
     refetchScripts();
-  }
-}, [isScriptActionLoading]);
+}, [dispatch]);
 
 
   const getCurrentTabData = () => {
