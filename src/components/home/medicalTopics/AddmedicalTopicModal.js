@@ -145,9 +145,9 @@ const AddMedicalTopicModal = ({ open, onClose }) => {
           <label className="block text-sm font-medium mb-2">
             Description *
           </label>
-          <div className="border rounded-lg">
+          <div className="border rounded-lg" onClick={() => editor.chain().focus().run()}>
             <TipTopRichTextEditor editor={editor} />
-            <EditorContent className="p-4 min-h-[200px]" editor={editor} />
+            <EditorContent className="tiptap-editor"  editor={editor} />
           </div>
         </div>
 

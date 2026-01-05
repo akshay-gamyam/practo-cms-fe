@@ -255,7 +255,7 @@ const EditScriptModal = ({ open, onClose, topic, mode = "create" }) => {
 
 
   const showUpdateButton = isDraftMode ? hasUnsavedChanges : !!modalConfig.submitText;
-  const canSubmitForReview = isDraftMode 
+  const canSubmitForReview = isDraftMode
     ? !hasUnsavedChanges && hasSavedDraft
     : hasSavedDraft && (modalConfig.mode === "update" || (modalConfig.mode === "create" && selectedScript?.id));
 
@@ -288,13 +288,19 @@ const EditScriptModal = ({ open, onClose, topic, mode = "create" }) => {
             <label className="block text-sm font-medium mb-2">
               Script Content {!modalConfig.isReadOnly && "*"}
             </label>
-            <div className="border rounded-lg overflow-hidden">
+            <div
+              className="border rounded-lg overflow-hidden"
+              onClick={() => editor?.chain().focus().run()}
+            >
               {!modalConfig.isReadOnly && (
                 <TipTopRichTextEditor editor={editor} />
               )}
               <EditorContent
-                className={`p-4 ${
-                  modalConfig.isReadOnly ? "min-h-[400px]" : "min-h-[300px]"
+                // className={`p-4 ${
+                //   modalConfig.isReadOnly ? "min-h-[400px]" : "min-h-[300px]"
+                // } ${isScriptLoading ? "opacity-50" : ""}`}
+                className={`tiptap-editor ${
+                  modalConfig.isReadOnly ? "read-only" : ""
                 } ${isScriptLoading ? "opacity-50" : ""}`}
                 editor={editor}
               />
@@ -306,16 +312,16 @@ const EditScriptModal = ({ open, onClose, topic, mode = "create" }) => {
 
           <div className="flex justify-between items-center pt-4 border-t">
             <div>
-                {isDraftMode && hasUnsavedChanges && (
+              {isDraftMode && hasUnsavedChanges && (
                 <p className="text-sm text-amber-600 italic">
                   You have unsaved changes. Update draft to enable "Submit for Review"
                 </p>
               )}
               {!isDraftMode && !canSubmitForReview && !modalConfig.isReadOnly && (
-                <p className="text-sm text-gray-500 italic">
-                  Save as draft first to enable "Submit for Review"
-                </p>
-              )}
+                  <p className="text-sm text-gray-500 italic">
+                    Save as draft first to enable "Submit for Review"
+                  </p>
+                )}
             </div>
             <div className="flex gap-3">
               <button
@@ -327,7 +333,7 @@ const EditScriptModal = ({ open, onClose, topic, mode = "create" }) => {
                 {modalConfig.isReadOnly ? "Close" : "Cancel"}
               </button>
 
-               {showUpdateButton && (
+              {showUpdateButton && (
                 <button
                   type="submit"
                   disabled={isLoading}

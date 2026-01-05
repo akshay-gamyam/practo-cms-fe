@@ -1,3 +1,19 @@
+/* wrapper */
+.tiptap-editor {
+  cursor: text;
+}
+
+.tiptap-editor .ProseMirror {
+  min-height: 200px;
+  padding: 16px;
+  outline: none;
+}
+
+.tiptap-editor.read-only .ProseMirror {
+  min-height: 400px;
+}
+
+
 .richtext-content h1 {
   font-size: 2em;
   font-weight: 700;

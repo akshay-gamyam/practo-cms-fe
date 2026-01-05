@@ -161,11 +161,11 @@ const CreateTopics = () => {
               <label className="block text-sm font-medium mb-2">
                 Doctor Notes *
               </label>
-              <div className="border rounded-lg overflow-hidden">
+              <div className="border rounded-lg overflow-hidden" onClick={() => editor.chain().focus().run()}>
                 <TipTopRichTextEditor editor={editor} />
                 <EditorContent
                   editor={editor}
-                  className="tiptap-editor p-4 min-h-[200px]"
+                  className="tiptap-editor"
                 />
               </div>
             </div>
