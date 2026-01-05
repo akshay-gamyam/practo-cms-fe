@@ -36,7 +36,6 @@ const ContentApproverScript = () => {
     error,
   } = useSelector((state) => state.contentApprover);
 
-
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedScript, setSelectedScript] = useState(null);
@@ -44,24 +43,29 @@ const ContentApproverScript = () => {
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [commentType, setCommentType] = useState("comment");
 
-  const buildFetchParams = useCallback(() => {
+  const buildFetchParams = () => {
     const params = {};
 
-    if (filterStatus === "approved") params.decision = "APPROVED";
-    if (filterStatus === "rejected") params.decision = "REJECTED";
-    if (searchTerm) params.search = searchTerm;
+    if (filterStatus === "approved") {
+      params.decision = "APPROVED";
+    } else if (filterStatus === "rejected") {
+      params.decision = "REJECTED";
+    }
+
+    if (searchTerm) {
+      params.search = searchTerm;
+    }
 
     return params;
-  }, [filterStatus, searchTerm]);
+  };
 
-  const refetchScripts = useCallback(() => {
+  const refetchScripts = () => {
     dispatch(fetchContentApproverScripts(buildFetchParams()));
-  }, [dispatch, buildFetchParams]);
+  };
 
 useEffect(() => {
-    refetchScripts();
-}, [dispatch]);
-
+  refetchScripts();
+}, [filterStatus, searchTerm]);
 
   const getCurrentTabData = () => {
     switch (filterStatus) {
@@ -239,7 +243,11 @@ useEffect(() => {
             {filteredScripts.map((script) => {
               const statusBadge = getStatusBadge(script.status);
               // const isClaimed = script.lockedById !== null;
-              const isClaimed = filterStatus === "my-claims" ? script.assignedReviewerId !== null : script.lockedById !== null;
+              const isClaimed =
+                filterStatus === "my-claims"
+                  ? script.assignedReviewerId !== null
+                  : script.lockedById !== null;
+
               const scriptStatus = getScriptStatus(script);
               const isFinalized = isFinalStatus(script);
 
