@@ -171,280 +171,141 @@ const contentApproverSlice = createSlice({
       state.error = action.payload;
     },
 
-    // // .................. fetch Videos queue ....................
-    // fetchVideosStart(state) {
-    //   state.isVideosListLoading = true;
-    //   state.error = null;
-    // },
-    // fetchVideosSuccess(state, action) {
-    //   state.isVideosListLoading = false;
-    //   const { video, page, totalPages, totalCount, tabType } = action.payload;
-
-    //   if (tabType === "my-claims") {
-    //     state.myClaimsVideos = video || [];
-    //   } else if (tabType === "approved") {
-    //     state.approvedVideos = video || [];
-    //   } else if (tabType === "rejected") {
-    //     state.rejectedVideos = video || [];
-    //   } else {
-    //     state.contentApproverVideos = video || [];
-    //   }
-
-    //   state.currentPage = page || 1;
-    //   state.totalPages = totalPages || 1;
-    //   state.totalCount = totalCount || 0;
-    //   state.error = null;
-    // },
-    // fetchVideosFailure(state, action) {
-    //   state.isVideosListLoading = false;
-    //   state.error = action.payload;
-    // },
-
-    // // ................. claim/lock Videos ........................
-    // claimVideoStart(state) {
-    //   state.isVideosActionLoading = true;
-    //   state.error = null;
-    // },
-    // claimVideoSuccess(state, action) {
-    //   state.isVideosActionLoading = false;
-    //   const { videoId, claimedBy } = action.payload;
-
-    //   const videoInAll = state.contentApproverVideos.find(
-    //     (s) => s.id === videoId
-    //   );
-    //   if (videoInAll) {
-    //     videoInAll.lockedById = claimedBy;
-    //     videoInAll.lockedAt = new Date().toISOString();
-    //   }
-
-    //   const videoInClaims = state.myClaimsVideos.find((s) => s.id === videoId);
-    //   if (videoInClaims) {
-    //     videoInClaims.lockedById = claimedBy;
-    //     videoInClaims.lockedAt = new Date().toISOString();
-    //   }
-
-    //   state.error = null;
-    // },
-    // claimVideoFailure(state, action) {
-    //   state.isVideosActionLoading = false;
-    //   state.error = action.payload;
-    // },
-
-    // // ................. approve Videos ........................
-    // approveVideoStart(state) {
-    //   state.isVideosActionLoading = true;
-    //   state.error = null;
-    // },
-    // approveVideoSuccess(state, action) {
-    //   state.isVideosActionLoading = false;
-    //   const { videotId, approvedBy, comment } = action.payload;
-
-    //   const updateVideo = (video) => {
-    //     if (video.id === videotId) {
-    //       video.status = "APPROVED";
-    //       video.approvedBy = approvedBy;
-    //       video.lockedById = approvedBy;
-    //       if (comment) {
-    //         video.comments = [
-    //           ...(video.comments || []),
-    //           {
-    //             text: comment,
-    //             date: new Date().toISOString(),
-    //             type: "approve",
-    //           },
-    //         ];
-    //       }
-    //     }
-    //   };
-
-    //   state.contentApproverVideos.forEach(updateVideo);
-    //   state.myClaimsVideos.forEach(updateVideo);
-    //   state.approvedVideos.forEach(updateVideo);
-
-    //   state.error = null;
-    // },
-    // approveVideoFailure(state, action) {
-    //   state.isVideosActionLoading = false;
-    //   state.error = action.payload;
-    // },
-
-    // // ................. reject Videos ........................
-    // rejectVideoStart(state) {
-    //   state.isVideosActionLoading = true;
-    //   state.error = null;
-    // },
-    // rejectVideoSuccess(state, action) {
-    //   state.isVideosActionLoading = false;
-    //   const { videoId, rejectedBy, comment, reason } = action.payload;
-
-    //   const updateVideo = (video) => {
-    //     if (video.id === videoId) {
-    //       video.status = "REJECTED";
-    //       video.rejectedBy = rejectedBy;
-    //       video.reason = reason || comment;
-    //       video.lockedById = rejectedBy;
-    //       if (comment) {
-    //         video.comments = [
-    //           ...(video.comments || []),
-    //           {
-    //             text: comment,
-    //             date: new Date().toISOString(),
-    //             type: "reject",
-    //           },
-    //         ];
-    //       }
-    //     }
-    //   };
-
-    //   state.contentApproverVideos.forEach(updateVideo);
-    //   state.myClaimsVideos.forEach(updateVideo);
-    //   state.rejectedVideos.forEach(updateVideo);
-
-    //   state.error = null;
-    // },
-    // rejectVideoFailure(state, action) {
-    //   state.isVideosActionLoading = false;
-    //   state.error = action.payload;
-    // },
-
-
-
-
     // .................. fetch Videos queue ....................
-fetchVideosStart(state) {
-  state.isVideosListLoading = true;
-  state.error = null;
-},
-fetchVideosSuccess(state, action) {
-  state.isVideosListLoading = false;
-  const { videos, page, totalPages, totalCount, tabType } = action.payload;
+    fetchVideosStart(state) {
+      state.isVideosListLoading = true;
+      state.error = null;
+    },
+    fetchVideosSuccess(state, action) {
+      state.isVideosListLoading = false;
+      const { videos, page, totalPages, totalCount, tabType } = action.payload;
 
-  if (tabType === "my-claims") {
-    state.myClaimsVideos = videos || [];
-  } else if (tabType === "approved") {
-    state.approvedVideos = videos || [];
-  } else if (tabType === "rejected") {
-    state.rejectedVideos = videos || [];
-  } else {
-    state.contentApproverVideos = videos || [];
-  }
-
-  state.currentPage = page || 1;
-  state.totalPages = totalPages || 1;
-  state.totalCount = totalCount || 0;
-  state.error = null;
-},
-fetchVideosFailure(state, action) {
-  state.isVideosListLoading = false;
-  state.error = action.payload;
-},
-
-// ................. claim/lock Videos ........................
-claimVideoStart(state) {
-  state.isVideosActionLoading = true;
-  state.error = null;
-},
-claimVideoSuccess(state, action) {
-  state.isVideosActionLoading = false;
-  const { videoId, claimedBy } = action.payload;
-
-  const videoInAll = state.contentApproverVideos.find(
-    (s) => s.id === videoId
-  );
-  if (videoInAll) {
-    videoInAll.lockedById = claimedBy;
-    videoInAll.lockedAt = new Date().toISOString();
-  }
-
-  const videoInClaims = state.myClaimsVideos.find((s) => s.id === videoId);
-  if (videoInClaims) {
-    videoInClaims.lockedById = claimedBy;
-    videoInClaims.lockedAt = new Date().toISOString();
-  }
-
-  state.error = null;
-},
-claimVideoFailure(state, action) {
-  state.isVideosActionLoading = false;
-  state.error = action.payload;
-},
-
-// ................. approve Videos ........................
-approveVideoStart(state) {
-  state.isVideosActionLoading = true;
-  state.error = null;
-},
-approveVideoSuccess(state, action) {
-  state.isVideosActionLoading = false;
-  const { videoId, approvedBy, comment } = action.payload;
-
-  const updateVideo = (video) => {
-    if (video.id === videoId) {
-      video.status = "APPROVED";
-      video.approvedBy = approvedBy;
-      video.lockedById = approvedBy;
-      if (comment) {
-        video.comments = [
-          ...(video.comments || []),
-          {
-            text: comment,
-            date: new Date().toISOString(),
-            type: "approve",
-          },
-        ];
+      if (tabType === "my-claims") {
+        state.myClaimsVideos = videos || [];
+      } else if (tabType === "approved") {
+        state.approvedVideos = videos || [];
+      } else if (tabType === "rejected") {
+        state.rejectedVideos = videos || [];
+      } else {
+        state.contentApproverVideos = videos || [];
       }
-    }
-  };
 
-  state.contentApproverVideos.forEach(updateVideo);
-  state.myClaimsVideos.forEach(updateVideo);
-  state.approvedVideos.forEach(updateVideo);
+      state.currentPage = page || 1;
+      state.totalPages = totalPages || 1;
+      state.totalCount = totalCount || 0;
+      state.error = null;
+    },
+    fetchVideosFailure(state, action) {
+      state.isVideosListLoading = false;
+      state.error = action.payload;
+    },
 
-  state.error = null;
-},
-approveVideoFailure(state, action) {
-  state.isVideosActionLoading = false;
-  state.error = action.payload;
-},
+    // ................. claim/lock Videos ........................
+    claimVideoStart(state) {
+      state.isVideosActionLoading = true;
+      state.error = null;
+    },
+    claimVideoSuccess(state, action) {
+      state.isVideosActionLoading = false;
+      const { videoId, claimedBy } = action.payload;
 
-// ................. reject Videos ........................
-rejectVideoStart(state) {
-  state.isVideosActionLoading = true;
-  state.error = null;
-},
-rejectVideoSuccess(state, action) {
-  state.isVideosActionLoading = false;
-  const { videoId, rejectedBy, comment, reason } = action.payload;
-
-  const updateVideo = (video) => {
-    if (video.id === videoId) {
-      video.status = "REJECTED";
-      video.rejectedBy = rejectedBy;
-      video.reason = reason || comment;
-      video.lockedById = rejectedBy;
-      if (comment) {
-        video.comments = [
-          ...(video.comments || []),
-          {
-            text: comment,
-            date: new Date().toISOString(),
-            type: "reject",
-          },
-        ];
+      const videoInAll = state.contentApproverVideos.find(
+        (s) => s.id === videoId
+      );
+      if (videoInAll) {
+        videoInAll.lockedById = claimedBy;
+        videoInAll.lockedAt = new Date().toISOString();
       }
-    }
-  };
 
-  state.contentApproverVideos.forEach(updateVideo);
-  state.myClaimsVideos.forEach(updateVideo);
-  state.rejectedVideos.forEach(updateVideo);
+      const videoInClaims = state.myClaimsVideos.find((s) => s.id === videoId);
+      if (videoInClaims) {
+        videoInClaims.lockedById = claimedBy;
+        videoInClaims.lockedAt = new Date().toISOString();
+      }
 
-  state.error = null;
-},
-rejectVideoFailure(state, action) {
-  state.isVideosActionLoading = false;
-  state.error = action.payload;
-},
+      state.error = null;
+    },
+    claimVideoFailure(state, action) {
+      state.isVideosActionLoading = false;
+      state.error = action.payload;
+    },
+
+    // ................. approve Videos ........................
+    approveVideoStart(state) {
+      state.isVideosActionLoading = true;
+      state.error = null;
+    },
+    approveVideoSuccess(state, action) {
+      state.isVideosActionLoading = false;
+      const { videoId, approvedBy, comment } = action.payload;
+
+      const updateVideo = (video) => {
+        if (video.id === videoId) {
+          video.status = "APPROVED";
+          video.approvedBy = approvedBy;
+          video.lockedById = approvedBy;
+          if (comment) {
+            video.comments = [
+              ...(video.comments || []),
+              {
+                text: comment,
+                date: new Date().toISOString(),
+                type: "approve",
+              },
+            ];
+          }
+        }
+      };
+
+      state.contentApproverVideos.forEach(updateVideo);
+      state.myClaimsVideos.forEach(updateVideo);
+      state.approvedVideos.forEach(updateVideo);
+
+      state.error = null;
+    },
+    approveVideoFailure(state, action) {
+      state.isVideosActionLoading = false;
+      state.error = action.payload;
+    },
+
+    // ................. reject Videos ........................
+    rejectVideoStart(state) {
+      state.isVideosActionLoading = true;
+      state.error = null;
+    },
+    rejectVideoSuccess(state, action) {
+      state.isVideosActionLoading = false;
+      const { videoId, rejectedBy, comment, reason } = action.payload;
+
+      const updateVideo = (video) => {
+        if (video.id === videoId) {
+          video.status = "REJECTED";
+          video.rejectedBy = rejectedBy;
+          video.reason = reason || comment;
+          video.lockedById = rejectedBy;
+          if (comment) {
+            video.comments = [
+              ...(video.comments || []),
+              {
+                text: comment,
+                date: new Date().toISOString(),
+                type: "reject",
+              },
+            ];
+          }
+        }
+      };
+
+      state.contentApproverVideos.forEach(updateVideo);
+      state.myClaimsVideos.forEach(updateVideo);
+      state.rejectedVideos.forEach(updateVideo);
+
+      state.error = null;
+    },
+    rejectVideoFailure(state, action) {
+      state.isVideosActionLoading = false;
+      state.error = action.payload;
+    },
 
     // ................. set selected script ........................
     setSelectedScript(state, action) {

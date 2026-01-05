@@ -239,7 +239,8 @@ const ContentApproverVideos = () => {
           <div className="space-y-6">
             {filteredVideos.map((video) => {
               const statusBadge = getStatusBadge(video.status);
-              const isClaimed = video.lockedById !== null;
+              // const isClaimed = video.lockedById !== null;
+              const isClaimed = filterStatus === "my-claims" ? video.assignedReviewerId !== null : video.lockedById !== null;
               
               // Check if status is APPROVED or REJECTED (final decision made)
               const isFinalStatus = 

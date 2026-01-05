@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   FiSearch,
@@ -36,7 +36,6 @@ const ContentApproverScript = () => {
     error,
   } = useSelector((state) => state.contentApprover);
 
-  console.log("rejectedScripts", rejectedScripts)
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -45,31 +44,25 @@ const ContentApproverScript = () => {
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [commentType, setCommentType] = useState("comment");
 
-  const buildFetchParams = () => {
-  const params = {};
+  const buildFetchParams = useCallback(() => {
+    const params = {};
 
-  if (filterStatus === "approved") {
-    params.decision = "APPROVED";
-  } else if (filterStatus === "rejected") {
-    params.decision = "REJECTED";
-  }
+    if (filterStatus === "approved") params.decision = "APPROVED";
+    if (filterStatus === "rejected") params.decision = "REJECTED";
+    if (searchTerm) params.search = searchTerm;
 
-  if (searchTerm) {
-    params.search = searchTerm;
-  }
+    return params;
+  }, [filterStatus, searchTerm]);
 
-  return params;
-};
-
-
-const refetchScripts = () => {
-  dispatch(fetchContentApproverScripts(buildFetchParams()));
-};
-
+  const refetchScripts = useCallback(() => {
+    dispatch(fetchContentApproverScripts(buildFetchParams()));
+  }, [dispatch, buildFetchParams]);
 
 useEffect(() => {
-  refetchScripts();
-}, [filterStatus, searchTerm]);
+  if (!isScriptActionLoading) {
+    refetchScripts();
+  }
+}, [isScriptActionLoading]);
 
 
   const getCurrentTabData = () => {
@@ -247,7 +240,8 @@ useEffect(() => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filteredScripts.map((script) => {
               const statusBadge = getStatusBadge(script.status);
-              const isClaimed = script.lockedById !== null;
+              // const isClaimed = script.lockedById !== null;
+              const isClaimed = filterStatus === "my-claims" ? script.assignedReviewerId !== null : script.lockedById !== null;
               const scriptStatus = getScriptStatus(script);
               const isFinalized = isFinalStatus(script);
 
@@ -278,8 +272,6 @@ useEffect(() => {
                     script.uploadedBy.lastName
                   )
                 : "NA";
-
-                console.log("scripts",script )
 
               const wordCount = getWordCount(script.content);
 
@@ -358,7 +350,9 @@ useEffect(() => {
                       <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                         <div className="flex items-center gap-2 text-xs text-green-700">
                           <FiCheckCircle className="w-3.5 h-3.5" />
-                          <span className="font-medium">{script?.reviewComments}</span>
+                          <span className="font-medium">
+                            {script?.reviewComments}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -367,7 +361,9 @@ useEffect(() => {
                       <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                         <div className="flex items-center gap-2 text-xs text-red-700 mb-2">
                           <IoClose className="w-3.5 h-3.5" />
-                          <span className="font-medium">{script?.reviewComments}</span>
+                          <span className="font-medium">
+                            {script?.reviewComments}
+                          </span>
                         </div>
                       </div>
                     )}

@@ -186,8 +186,6 @@ export const claimScript = (scriptId) => async (dispatch) => {
 export const approveScript =
   (scriptId, comments = "") =>
   async (dispatch, getState) => {
-    if (isApprovingScript) return;
-    isApprovingScript = true;
 
     dispatch(approveScriptStart());
 
@@ -223,8 +221,6 @@ export const approveScript =
         approveScriptFailure(error?.response?.data?.message || error.message)
       );
       throw error;
-    } finally {
-      isApprovingScript = false;
     }
   };
 
