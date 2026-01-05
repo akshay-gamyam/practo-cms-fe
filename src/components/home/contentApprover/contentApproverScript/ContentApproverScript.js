@@ -36,6 +36,8 @@ const ContentApproverScript = () => {
     error,
   } = useSelector((state) => state.contentApprover);
 
+  console.log("rejectedScripts", rejectedScripts)
+
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedScript, setSelectedScript] = useState(null);

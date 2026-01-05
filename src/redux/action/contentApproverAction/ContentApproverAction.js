@@ -184,7 +184,7 @@ export const claimScript = (scriptId) => async (dispatch) => {
 
 // ........................ approve script with comment .........................
 export const approveScript =
-  (scriptId, comment = "") =>
+  (scriptId, comments = "") =>
   async (dispatch, getState) => {
     if (isApprovingScript) return;
     isApprovingScript = true;
@@ -206,14 +206,14 @@ export const approveScript =
           : MEDICAL_AFFAIRS_APPROVE(scriptId);
 
       const response = await api.post(endpoint, {
-        comment,
+        comments,
       });
 
       dispatch(
         approveScriptSuccess({
           scriptId,
           approvedBy: response.data?.approvedBy || user.name,
-          comment,
+          comment: comments,
         })
       );
 
@@ -398,7 +398,7 @@ export const claimVideos = (videoId) => async (dispatch) => {
 
 // ........................ approve script with comment .........................
 export const approveVideos =
-  (videoId, comment = "") =>
+  (videoId, comments = "") =>
   async (dispatch, getState) => {
     if (isApprovingVideos) return;
     isApprovingVideos = true;
@@ -420,14 +420,14 @@ export const approveVideos =
           : MEDICAL_AFFAIRS_APPROVE_VIDEO(videoId);
 
       const response = await api.post(endpoint, {
-        comment,
+        comments,
       });
 
       dispatch(
         approveVideoSuccess({
           videoId,
           approvedBy: response.data?.approvedBy || user.name,
-          comment,
+          comment: comments,
         })
       );
 
