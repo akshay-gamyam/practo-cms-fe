@@ -37,6 +37,8 @@ const ContentApproverScript = () => {
     isScriptActionLoading,
     error,
   } = useSelector((state) => state.contentApprover);
+  const user = useSelector((state) => state.auth.user);
+  const isContentApprover = user?.role === "CONTENT_APPROVER";
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -65,9 +67,9 @@ const ContentApproverScript = () => {
     dispatch(fetchContentApproverScripts(buildFetchParams()));
   };
 
-  useEffect(() => {
-    dispatch(fetchAllVersion("d20c603e-0f0f-4ccd-87d3-52bf22160f3b"));
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchAllVersion("d20c603e-0f0f-4ccd-87d3-52bf22160f3b"));
+  // }, [dispatch]);
 
   useEffect(() => {
     refetchScripts();
@@ -260,13 +262,13 @@ const ContentApproverScript = () => {
               const canInteract =
                 isClaimed &&
                 !isFinalized &&
-                (scriptStatus === "pending" ||
-                  scriptStatus === "claimed" ||
-                  scriptStatus === "doctor_review" ||
-                  scriptStatus === "content_review" ||
-                  scriptStatus === "content_approval" ||
-                  scriptStatus === "brand_review" ||
-                  scriptStatus === "medical_review");
+                  (scriptStatus === "pending" ||
+                    scriptStatus === "claimed" ||
+                    scriptStatus === "doctor_review" ||
+                    scriptStatus === "content_review" ||
+                    scriptStatus === "content_approval" ||
+                    scriptStatus === "brand_review" ||
+                    scriptStatus === "medical_review");
 
               const authorName = script.uploadedBy
                 ? `${script.uploadedBy.firstName} ${script.uploadedBy.lastName}`
@@ -290,7 +292,8 @@ const ContentApproverScript = () => {
               return (
                 <div
                   key={script.id}
-                  className={`${script?.latestRejection?.decision === "REJECTED" ?"border-red-600" : "border-gray-200"} bg-white border shadow-sm rounded-xl border border-gray-200  overflow-hidden`}
+                  className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+                  // className={`${script?.latestRejection?.decision === "REJECTED" ?"border-red-600" : "border-gray-200"} bg-white border shadow-sm rounded-xl border border-gray-200  overflow-hidden`}
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
@@ -325,21 +328,21 @@ const ContentApproverScript = () => {
                       <div>
                         {!isFinalized &&
                           !isClaimed &&
-                          (scriptStatus === "pending" ||
-                            scriptStatus === "claimed" ||
-                            scriptStatus === "doctor_review" ||
-                            scriptStatus === "content_review" ||
-                            scriptStatus === "content_approval" ||
-                            scriptStatus === "brand_review" ||
-                            scriptStatus === "medical_review") && (
-                            <button
-                              onClick={() => handleClaim(script.id)}
-                              disabled={isScriptActionLoading}
-                              className="border border-gray-400 rounded-xl px-6 py-1 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
+                            (scriptStatus === "pending" ||
+                              scriptStatus === "claimed" ||
+                              scriptStatus === "doctor_review" ||
+                              scriptStatus === "content_review" ||
+                              scriptStatus === "content_approval" ||
+                              scriptStatus === "brand_review" ||
+                              scriptStatus === "medical_review") && (
+                              <button
+                                onClick={() => handleClaim(script.id)}
+                                disabled={isScriptActionLoading}
+                                className="border border-gray-400 rounded-xl px-6 py-1 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
                               {isScriptActionLoading ? "Claiming..." : "Claim"}
-                            </button>
-                          )}
+                              </button>
+                            )}
                         {!isFinalized && isClaimed && (
                           <span className="text-xs text-green-600 font-medium bg-green-50 px-3 py-1 rounded-full">
                             Claimed
@@ -375,7 +378,7 @@ const ContentApproverScript = () => {
                       </span>
                     </div>
                     <div className="py-1 mb-2">
-                    {script?.latestRejection?.decision && (
+                      {/* {script?.latestRejection?.decision && (
                       <div
                         className={`text-sm rounded-xl p-1 px-2 ${
                           script.latestRejection.decision === "REJECTED"
@@ -385,7 +388,7 @@ const ContentApproverScript = () => {
                       >
                         {script.latestRejection.comments}
                       </div>
-                    )}
+                    )} */}
                     </div>
 
                     {scriptStatus === "approved" && (
@@ -430,7 +433,7 @@ const ContentApproverScript = () => {
                           <FiCheckCircle className="w-4 h-4" />
                           Approve
                         </button>
-                       {script?.latestRejection?.decision !== "REJECTED" && (
+                        {/* {script?.latestRejection?.decision !== "REJECTED" && ( */}
                         <button
                           onClick={() => handleReject(script.id)}
                           disabled={!canInteract || isScriptActionLoading}
@@ -439,7 +442,7 @@ const ContentApproverScript = () => {
                           <IoClose className="w-4 h-4" />
                           Reject
                         </button>
-                       )}
+                        {/* )} */}
                       </div>
                     ) : (
                       <button

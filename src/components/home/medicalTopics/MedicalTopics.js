@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUplodedTopcsList } from "../../../redux/action/topicAction/TopicAction";
 import { statusStyles } from "../../../utils/helper";
@@ -12,6 +12,7 @@ import { LIMIT } from "../../../utils/constants";
 
 const MedicalTopics = () => {
   const dispatch = useDispatch();
+  const isFirstRender = useRef(true);
   // const navigate = useNavigate();
 
   const { topics, isTopicsListLoading, error, currentPage, totalPages } =
@@ -21,9 +22,16 @@ const MedicalTopics = () => {
   // const handleCardClick = (topicId) => {
   //   navigate(`${ROUTES.UPLOAD}/${topicId}`);
   // };
-  useEffect(() => {
+useEffect(() => {
+  if (isFirstRender.current) {
+    isFirstRender.current = false;
+    return;
+  }
+
+  if (!openMedicalTopicModal) {
     dispatch(fetchUplodedTopcsList());
-  }, [dispatch]);
+  }
+}, [openMedicalTopicModal, dispatch]);
 
   const handlePageChange = (page) => {
     dispatch(fetchUplodedTopcsList(page, LIMIT));
