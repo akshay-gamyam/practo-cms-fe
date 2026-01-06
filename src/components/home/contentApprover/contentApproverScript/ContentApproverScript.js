@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   FiSearch,
@@ -15,6 +15,7 @@ import {
   claimScript,
   approveScript,
   rejectScript,
+  fetchAllVersion,
 } from "../../../../redux/action/contentApproverAction/ContentApproverAction";
 import {
   formatDate,
@@ -23,6 +24,7 @@ import {
 } from "../../../../utils/helper";
 import { toast } from "react-toastify";
 import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
+import CustomSelect from "../../../common/customSelect/CustomSelect";
 
 const ContentApproverScript = () => {
   const dispatch = useDispatch();
@@ -63,9 +65,13 @@ const ContentApproverScript = () => {
     dispatch(fetchContentApproverScripts(buildFetchParams()));
   };
 
-useEffect(() => {
-  refetchScripts();
-}, [filterStatus, searchTerm]);
+  useEffect(() => {
+    dispatch(fetchAllVersion("d20c603e-0f0f-4ccd-87d3-52bf22160f3b"));
+  }, [dispatch]);
+
+  useEffect(() => {
+    refetchScripts();
+  }, [filterStatus, searchTerm]);
 
   const getCurrentTabData = () => {
     switch (filterStatus) {
@@ -284,7 +290,7 @@ useEffect(() => {
               return (
                 <div
                   key={script.id}
-                  className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+                  className={`${script?.latestRejection?.decision === "REJECTED" ?"border-red-600" : "border-gray-200"} bg-white border shadow-sm rounded-xl border border-gray-200  overflow-hidden`}
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
@@ -299,6 +305,23 @@ useEffect(() => {
                           Version {script.version}
                         </span>
                       </div>
+
+                      {/* {filterStatus === "my-claims" && script?.version >= 1 && (
+                        <CustomSelect
+                          className="ml-auto w-44"
+                          placeholder="Version History"
+                          value=""
+                          options={[
+                            { value: 1, label: "Version 1" },
+                            { value: 2, label: "Version 2" },
+                            { value: 3, label: "Version 3" },
+                          ]}
+                          onChange={(value) => {
+                            console.log("gjh");
+                          }}
+                        />
+                      )} */}
+
                       <div>
                         {!isFinalized &&
                           !isClaimed &&
@@ -351,6 +374,19 @@ useEffect(() => {
                         {formatDate(script.createdAt)}
                       </span>
                     </div>
+                    <div className="py-1 mb-2">
+                    {script?.latestRejection?.decision && (
+                      <div
+                        className={`text-sm rounded-xl p-1 px-2 ${
+                          script.latestRejection.decision === "REJECTED"
+                            ? "bg-red-50 text-red-700"
+                            : " bg-green-300 text-green-600"
+                        }`}
+                      >
+                        {script.latestRejection.comments}
+                      </div>
+                    )}
+                    </div>
 
                     {scriptStatus === "approved" && (
                       <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
@@ -394,6 +430,7 @@ useEffect(() => {
                           <FiCheckCircle className="w-4 h-4" />
                           Approve
                         </button>
+                       {script?.latestRejection?.decision !== "REJECTED" && (
                         <button
                           onClick={() => handleReject(script.id)}
                           disabled={!canInteract || isScriptActionLoading}
@@ -402,6 +439,7 @@ useEffect(() => {
                           <IoClose className="w-4 h-4" />
                           Reject
                         </button>
+                       )}
                       </div>
                     ) : (
                       <button

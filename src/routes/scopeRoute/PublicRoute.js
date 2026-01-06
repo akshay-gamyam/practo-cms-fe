@@ -17,7 +17,7 @@ const PublicRoutes = ({ children }) => {
     } else if (user?.role === ROLE_VARIABLES_MAP?.AGENCY_POC) {
       return <Navigate to={ROUTES.AGENCY_POC} replace />;
     } else if (user?.role === ROLE_VARIABLES_MAP?.PUBLISHER) {
-      return <Navigate to={ROUTES.REVIEW_QUEUE} replace />;
+      return <Navigate to={ROUTES.PUBLISHER} replace />;
     } else if (user?.role === ROLE_VARIABLES_MAP?.SUPER_ADMIN) {
       return <Navigate to={ROUTES.DASHBOARD} replace />;
     } else if (user?.role === ROLE_VARIABLES_MAP?.CONTENT_APPROVER) {

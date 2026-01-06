@@ -46,3 +46,4 @@ export const CONTENT_APPROVER_APPROVE_VIDEO = (script_id) => `/api/videos/${scri
 export const MEDICAL_AFFAIRS_APPROVE_VIDEO = (script_id) => `/api/videos/${script_id}/approve`;
 export const CONTENT_APPROVER_REJECT_VIDEO = (script_id) => `/api/videos/${script_id}/reject`;
 export const CONTENT_APPROVER_CLAIM_VIDEO = (script_id) => `/api/videos/${script_id}/claim`;
+export const GET_ALL_SCRIPT_VERSION = "/api/scripts/my-reviews/topic";

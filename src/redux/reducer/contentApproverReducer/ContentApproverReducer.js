@@ -10,6 +10,7 @@ const initialState = {
   myClaimsVideos: [],
   approvedVideos: [],
   rejectedVideos: [],
+  scriptVersion: [],
   selectedScript: null,
   selectedVideo: null,
   isScriptsListLoading: false,
@@ -312,6 +313,22 @@ const contentApproverSlice = createSlice({
       state.selectedScript = action.payload;
     },
 
+    // ................... fetch all version of scripts .................
+
+    fetchScriptVersionStart(state) {
+      state.isDoctorPointerViewLoading = true;
+    },
+
+    fetchScriptVersionSuccess(state, action) {
+      state.isTopicsViewLoading = false;
+      state.scriptVersion = action.payload;
+      state.error = null;
+    },
+    fetchScriptVersionFailure(state, action) {
+      state.isTopicsViewLoading = false;
+      state.error = action.payload;
+    },
+
     // ................. clear selected script ........................
     clearSelectedScript(state) {
       state.selectedScript = null;
@@ -365,6 +382,10 @@ export const {
   rejectVideoStart,
   rejectVideoSuccess,
   rejectVideoFailure,
+
+  fetchScriptVersionStart,
+  fetchScriptVersionSuccess,
+  fetchScriptVersionFailure,
 
   setSelectedScript,
   clearSelectedScript,

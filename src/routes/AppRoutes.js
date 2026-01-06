@@ -23,6 +23,7 @@ import Script from "../components/home/agencyPoc/scriptting/Scripting";
 import AgencyPocVideos from "../components/home/agencyPoc/agencyPocVideos/AgencyPocVideos";
 import ContentApproverScript from "../components/home/contentApprover/contentApproverScript/ContentApproverScript";
 import ContentApproverVideos from "../components/home/contentApprover/contentApproverVideos/ContentApproverVideos";
+import Publish from "../components/home/publisher/Publish";
 
 const AppRouter = () => {
   return (
@@ -80,6 +81,7 @@ const AppRouter = () => {
           <Route path={ROUTES.SCRIPT} element={<Script />} />
           <Route path={ROUTES.VIDEOS} element={<AgencyPocVideos />} />
           <Route path={ROUTES.NOCIFICATIONS} element={<Notifications />} />
+          <Route path={ROUTES.PUBLISHER} element={<Publish />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

@@ -88,7 +88,7 @@ const Login = ({ setScreen }) => {
       } else if (user?.role === ROLE_VARIABLES_MAP?.AGENCY_POC) {
         return navigate(ROUTES.AGENCY_POC);
       } else if (user?.role === ROLE_VARIABLES_MAP?.PUBLISHER) {
-        return navigate(ROUTES.REVIEW_QUEUE);
+        return navigate(ROUTES.PUBLISHER);
       } else if (user?.role === ROLE_VARIABLES_MAP?.SUPER_ADMIN) {
         return navigate(ROUTES.DASHBOARD);
       } else if (user?.role === ROLE_VARIABLES_MAP?.CONTENT_APPROVER) {
@@ -127,7 +127,7 @@ const Login = ({ setScreen }) => {
       } else if (user?.role === ROLE_VARIABLES_MAP?.AGENCY_POC) {
         return navigate(ROUTES.AGENCY_POC);
       } else if (user?.role === ROLE_VARIABLES_MAP?.PUBLISHER) {
-        return navigate(ROUTES.REVIEW_QUEUE);
+        return navigate(ROUTES.PUBLISHER);
       } else if (user?.role === ROLE_VARIABLES_MAP?.SUPER_ADMIN) {
         return navigate(ROUTES.DASHBOARD);
       } else if (user?.role === ROLE_VARIABLES_MAP?.CONTENT_APPROVER) {

@@ -11,6 +11,7 @@ import {
   MEDICAL_AFFAIRS_APPROVE_VIDEO,
   CONTENT_APPROVER_REJECT_VIDEO,
   CONTENT_APPROVER_CLAIM_VIDEO,
+  GET_ALL_SCRIPT_VERSION,
 } from "../../../api/apiEndPoints";
 import api from "../../../api/interceptor";
 import {
@@ -38,12 +39,15 @@ import {
   rejectVideoStart,
   rejectVideoSuccess,
   rejectVideoFailure,
+  fetchScriptVersionStart,
+  fetchScriptVersionSuccess,
+  fetchScriptVersionFailure,
 } from "../../reducer/contentApproverReducer/ContentApproverReducer";
 import { ROLE_VARIABLES_MAP } from "../../../utils/helper";
 
 let isFetchingScripts = false;
 let isClaimingScript = false;
-let isApprovingScript = false;
+let isApprovingScriptVersion = false;
 let isRejectingScript = false;
 let isFetchingVideos = false;
 let isClaimingVideos = false;
@@ -470,5 +474,36 @@ export const rejectVideos = (videoId, comment) => async (dispatch) => {
     throw error;
   } finally {
     isRejectingVideos = false;
+  }
+};
+
+
+
+// ........................ get all version data comments .........................
+
+
+export const fetchAllVersion = (topicId) => async (dispatch) => {
+  if (isApprovingScriptVersion) return;
+  isApprovingScriptVersion = true;
+  dispatch(fetchScriptVersionStart());
+
+  try {
+    const response = await api.get(`${GET_ALL_SCRIPT_VERSION}/${topicId}`);
+    console.log("response script", response);
+    const { topic } = response.data;
+
+    console.log("topic", topic);
+    dispatch(fetchScriptVersionSuccess({ topic }));
+
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to fetch user details";
+    dispatch(fetchScriptVersionFailure(errorMessage));
+    throw error;
+  } finally {
+    isApprovingScriptVersion = false;
   }
 };

@@ -18,6 +18,7 @@ import {
   MdOutlineDescription,
   MdOutlineMediation,
   MdOutlineMedicalInformation,
+  MdOutlinePublishedWithChanges,
   MdOutlineTopic,
 } from "react-icons/md";
 import { IoIosNotifications } from "react-icons/io";
@@ -84,6 +85,11 @@ export const MENU_ITEMS = [
     path: ROUTES.REVIEW_QUEUE,
   },
   { label: "Settings", icon: <CiSettings size={20} />, path: ROUTES.SETTINGS },
+  {
+    label: "Publish",
+    icon: <MdOutlinePublishedWithChanges size={20} />,
+    path: ROUTES.PUBLISHER,
+  },
   {
     label: "Notifications",
     icon: <IoIosNotifications size={20} />,
@@ -206,7 +212,7 @@ export const rolesList = [
   { label: "Doctor", value: "DOCTOR" },
   { label: "Agency POC", value: "AGENCY_POC" },
   { label: "Content Approver", value: "CONTENT_APPROVER" },
-  // { label: "Publisher", value: "PUBLISHER" },
+  { label: "Publisher", value: "PUBLISHER" },
   // { label: "Viewer", value: "VIEWER" },
 ];
 
