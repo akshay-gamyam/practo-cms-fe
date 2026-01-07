@@ -2,76 +2,37 @@ import { createSlice } from "@reduxjs/toolkit";
 import { revertAll } from "../revertStateReducer/RevertStateReducer";
 
 const initialState = {
-  notifications: [],
+  publisher: [],
   total: 0,
-  unreadCount: 0,
-  isNotificationLoading: false,
-  isUnreadCountLoading: false,
+  isPublisherLoading: false,
   error: null,
 };
 
-const notificationSlice = createSlice({
-  name: "notification",
+const publisherSlice = createSlice({
+  name: "publish",
   initialState,
   extraReducers: (builder) => builder.addCase(revertAll, () => initialState),
   reducers: {
     // .................. fetch notification listing ....................
-    fetchNotificationStart(state) {
-      state.isNotificationLoading = true;
+    fetchPublisherStart(state) {
+      state.isPublisherLoading = true;
     },
-    fetchNotificationSuccess(state, action) {
-      state.isNotificationLoading = false;
-      state.notifications = action.payload.notifications || [];
+    fetchPublisherSuccess(state, action) {
+      state.isPublisherLoading = false;
+      state.publisher = action.payload.publisher || [];
       state.total = action.payload.total || 0;
-      state.unreadCount = action.payload.unreadCount ?? state.unreadCount;
     },
-    fetchNotificationFailure(state, action) {
-      state.isNotificationLoading = false;
+    fetchPublisherFailure(state, action) {
+      state.isPublisherLoading = false;
       state.error = action.payload;
-    },
-
-    // .................. read message ...................
-    markNotificationReadSuccess(state, action) {
-      const id = action.payload;
-      state.notifications = state.notifications.map((n) =>
-        n.id === id ? { ...n, isRead: true, readAt: new Date() } : n
-      );
-      state.unreadCount = Math.max(0, state.unreadCount - 1);
-    },
-
-    // .................. mark all as read ................
-    markAllReadSuccess(state) {
-      state.notifications = state.notifications.map((n) => ({
-        ...n,
-        isRead: true,
-        readAt: n.readAt || new Date(),
-      }));
-      state.unreadCount = 0;
-    },
-
-    // ..................... unrerad count ................
-    fetchUnreadCountStart(state) {
-      state.isUnreadCountLoading = true;
-    },
-    fetchUnreadCountSuccess(state, action) {
-      state.isUnreadCountLoading = false;
-      state.unreadCount = action.payload;
-    },
-    fetchUnreadCountFailure(state) {
-      state.isUnreadCountLoading = false;
-    },
+    }
   },
 });
 
 export const {
-  fetchNotificationStart,
-  fetchNotificationSuccess,
-  fetchNotificationFailure,
-  markNotificationReadSuccess,
-  markAllReadSuccess,
-  fetchUnreadCountStart,
-  fetchUnreadCountSuccess,
-  fetchUnreadCountFailure,
-} = notificationSlice.actions;
+  fetchPublisherStart,
+  fetchPublisherSuccess,
+  fetchPublisherFailure,
+} = publisherSlice.actions;
 
-export default notificationSlice.reducer;
+export default publisherSlice.reducer;

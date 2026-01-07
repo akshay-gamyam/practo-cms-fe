@@ -8,6 +8,7 @@ import doctorPointerReducer from "../reducer/doctorReducer/DoctorReducer"
 import notificationReducer from "../reducer/notificationReducer/NotificationReducer";
 import agencyPocReducer from "../reducer/agencyPocReducer/AgencyPocReducer"
 import contnentApproverReducer from "../reducer/contentApproverReducer/ContentApproverReducer"
+import publisherReducer from "../reducer/publisherReducer/PublisherReducer"
 
 const authPersistConfig = {
   key: "auth",
@@ -29,6 +30,7 @@ const rootReducer = combineReducers({
   agencyPoc: agencyPocReducer,
   doctor_pointers: doctorPointerReducer,
   contentApprover: contnentApproverReducer,
+  publish: publisherReducer
 });
 
 export const store = configureStore({   

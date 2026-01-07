@@ -33,6 +33,10 @@ useEffect(() => {
   }
 }, [openMedicalTopicModal, dispatch]);
 
+useEffect(()=>{
+  dispatch(fetchUplodedTopcsList());
+},[])
+
   const handlePageChange = (page) => {
     dispatch(fetchUplodedTopcsList(page, LIMIT));
   };
