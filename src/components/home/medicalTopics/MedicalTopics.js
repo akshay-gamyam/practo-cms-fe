@@ -22,6 +22,7 @@ const MedicalTopics = () => {
   // const handleCardClick = (topicId) => {
   //   navigate(`${ROUTES.UPLOAD}/${topicId}`);
   // };
+
 useEffect(() => {
   if (isFirstRender.current) {
     isFirstRender.current = false;
@@ -32,10 +33,6 @@ useEffect(() => {
     dispatch(fetchUplodedTopcsList());
   }
 }, [openMedicalTopicModal, dispatch]);
-
-useEffect(()=>{
-  dispatch(fetchUplodedTopcsList());
-},[])
 
   const handlePageChange = (page) => {
     dispatch(fetchUplodedTopcsList(page, LIMIT));
@@ -127,7 +124,7 @@ useEffect(()=>{
                           </span>
 
                           <span className="px-3 py-1 rounded-full text-xs bg-gray-100 border border-gray-300 text-gray-700">
-                            {topic.assignedDoctor?.specialty}
+                            {topic.assignedDoctor?.specialty || "---"}
                           </span>
                         </div>
 

@@ -1,40 +1,36 @@
 import {
-  GET_NOTIFICATION_LIST,
+  GET_PUBLISHER_LIST,
 } from "../../../api/apiEndPoints";
 import api from "../../../api/interceptor";
+import { LIMIT } from "../../../utils/constants";
 import {
-  fetchNotificationStart,
-  fetchNotificationSuccess,
-  fetchNotificationFailure,
-} from "../../reducer/notificationReducer/NotificationReducer";
+  fetchPublisherStart,
+  fetchPublisherSuccess,
+  fetchPublisherFailure,
+} from "../../reducer/publisherReducer/PublisherReducer";
 
-let isFetchingNotification = false;
+let isFetchingPublisher = false;
 
 // ,....................... get notification listing ..................
 
-export const fetchNotificationList =
-  ({ unreadOnly = false, limit = 50, offset = 0 } = {}) =>
-  async (dispatch) => {
-    if (isFetchingNotification) return;
-
-    isFetchingNotification = true;
-    dispatch(fetchNotificationStart());
+  export const fetchPublisherList = (page = 1, limit = LIMIT) => async (dispatch) => {
+    if (isFetchingPublisher) return;
+    isFetchingPublisher = true;
+    dispatch(fetchPublisherStart());
 
     try {
-      const response = await api.get(GET_NOTIFICATION_LIST, {
-        params: { unreadOnly, limit, offset },
-      });
+      const response = await api.get(`${GET_PUBLISHER_LIST}?page=${page}&limit=${limit}`);
 
-      const { notifications, total, unreadCount } = response.data.data;
+    const { topics, page: currentPage, totalPages, totalCount } = response.data;
+      dispatch(fetchPublisherSuccess({ topics,  page: currentPage, totalPages, totalCount, }));
 
-      dispatch(fetchNotificationSuccess({ notifications, total, unreadCount }));
+      return response.data;
     } catch (error) {
-      dispatch(
-        fetchNotificationFailure(
-          error.response?.data?.message || "Failed to fetch notifications"
-        )
-      );
+      const errorMessage =
+        error.response?.data?.message || error.message || "Failed to fetch users";
+      dispatch(fetchPublisherFailure(errorMessage));
+      throw error;
     } finally {
-      isFetchingNotification = false;
+      isFetchingPublisher = false;
     }
   };

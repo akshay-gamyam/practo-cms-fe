@@ -49,3 +49,9 @@ export const CONTENT_APPROVER_REJECT_VIDEO = (script_id) => `/api/videos/${scrip
 export const CONTENT_APPROVER_CLAIM_VIDEO = (script_id) => `/api/videos/${script_id}/claim`;
 export const GET_ALL_SCRIPT_VERSION = "/api/scripts/my-reviews/topic";
 export const SEPRATE_CONTENT_APPROVER_VIDEOS = "/api/scripts/my-locks";
+
+
+export const GET_PUBLISHER_LIST = "/api/videos/queue";
+export const PUBLISHER_CLAIM_VIDEO = (id) => `/api/videos/${id}/claim`;
+export const PUBLISH_VIDEO = (id) => `/api/videos/${id}/publish`;
+export const PUBLISHED_VIDEO = "/api/videos/status";

@@ -192,8 +192,7 @@ export const claimScript = (scriptId) => async (dispatch) => {
 
 // ........................ approve script with comment .........................
 export const approveScript =
-  (scriptId, comments = "") =>
-  async (dispatch, getState) => {
+  (scriptId, comments) => async (dispatch, getState) => {
     dispatch(approveScriptStart());
 
     try {
@@ -209,10 +208,8 @@ export const approveScript =
         user.role === ROLE_VARIABLES_MAP.CONTENT_APPROVER
           ? CONTENT_APPROVER_APPROVE(scriptId)
           : MEDICAL_AFFAIRS_APPROVE(scriptId);
-
-      const response = await api.post(endpoint, {
-        comments,
-      });
+      const payload = comments ? { comments } : {};
+      const response = await api.post(endpoint, payload);
 
       dispatch(
         approveScriptSuccess({

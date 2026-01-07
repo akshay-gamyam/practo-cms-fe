@@ -12,6 +12,7 @@ import {
   fetchContentApproverScripts,
   claimScript,
   contentApproverScript,
+  approveScript,
 } from "../../../../redux/action/contentApproverAction/ContentApproverAction";
 import {
   formatDate,
@@ -77,8 +78,9 @@ const ContentApproverScript = () => {
 
   const handleApprove = async (id) => {
     try {
-      await dispatch(contentApproverScript(id));
-      refetchScripts();
+      dispatch(approveScript(id))
+      // refetchScripts();
+      dispatch(fetchContentApproverScripts(buildFetchParams()));
     } catch (error) {
       console.error("Failed to approve script:", error);
       toast.error("Failed to approve script");
