@@ -8,6 +8,7 @@ import {
   FiDownload,
   FiVideo,
 } from "react-icons/fi";
+import { TbVersions } from "react-icons/tb";
 import { IoClose } from "react-icons/io5";
 import ContentPreviewModal from "./ContentPreviewModal";
 import ContentDetailsModal from "../contentApproverScript/ContentDetailsScriptModal";
@@ -103,6 +104,7 @@ const ContentApproverVideos = () => {
         dispatch(approveVideos(selectedVideo?.id, comment))
           .then(() => {
             setShowCommentModal(false);
+            dispatch(fetchContentApproverVideos())
             setSelectedVideo(null);
             setCommentType("comment");
           })
@@ -113,6 +115,7 @@ const ContentApproverVideos = () => {
         dispatch(rejectVideos(selectedVideo.id, comment))
           .then(() => {
             setShowCommentModal(false);
+            dispatch(fetchContentApproverVideos())
             setSelectedVideo(null);
             setCommentType("comment");
           })
@@ -280,9 +283,9 @@ const ContentApproverVideos = () => {
                           {statusBadge.icon}
                           {statusBadge.text}
                         </span>
-                        <span className="text-xs text-gray-500 font-medium bg-white px-2 py-1 rounded-md">
+                        {/* <span className="text-xs text-gray-500 font-medium bg-white px-2 py-1 rounded-md">
                           Version {video.version}
-                        </span>
+                        </span> */}
                       </div>
                       
                       {!isFinalStatus && !isClaimed && (
@@ -351,11 +354,11 @@ const ContentApproverVideos = () => {
                         </div>
 
                         <div className="flex items-center gap-6 text-sm text-gray-500 mb-4">
-                          <span className="flex items-center gap-2">
-                            <FiDownload className="w-4 h-4" />
-                            {formatFileSize(video.fileSize)}
+                          <span className="flex items-center gap-2 border border-gray-500 px-2 py-1 rounded-xl">
+                            <TbVersions className="w-4 h-4" />
+                            Version {video.version}
                           </span>
-                          <span className="flex items-center gap-2">
+                          <span className="flex items-center gap-2 border border-gray-500 px-2 py-1 rounded-xl">
                             <FiClock className="w-4 h-4" />
                             {formatDate(video.createdAt)}
                           </span>

@@ -20,4 +20,5 @@ export const ROUTES = {
   CONTENT_APPROVER_SCRIPTS_NEW : "/content-approver-script-new",
   CONTENT_APPROVER_VIDEOS : "/content-approver-videos",
   PUBLISHER : "/publisher",
+  DOCTOR_PROFILE : "/doctor-profile",
 };

@@ -25,6 +25,7 @@ import ContentApproverScript from "../components/home/contentApprover/contentApp
 import ContentApproverVideos from "../components/home/contentApprover/contentApproverVideos/ContentApproverVideos";
 import Publish from "../components/home/publisher/Publish";
 import SeprateContentApproverScript from "../components/home/contentApprover/contentApproverScript/SeprateContentApprover";
+import DoctorProfile from "../components/home/doctorProfile/DoctorProfile";
 
 const AppRouter = () => {
   return (
@@ -84,6 +85,7 @@ const AppRouter = () => {
           <Route path={ROUTES.VIDEOS} element={<AgencyPocVideos />} />
           <Route path={ROUTES.NOCIFICATIONS} element={<Notifications />} />
           <Route path={ROUTES.PUBLISHER} element={<Publish />} />
+          <Route path={ROUTES.DOCTOR_PROFILE} element={<DoctorProfile />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

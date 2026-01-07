@@ -8,6 +8,7 @@ import { ROUTES } from "../routes/RouterConstant";
 import { FiCheckCircle, FiClock, FiUpload } from "react-icons/fi";
 import {
   FaClipboardList,
+  FaLock,
   FaRegChartBar,
   FaSpinner,
   FaUserMd,
@@ -30,6 +31,7 @@ import {
   HiOutlineEye,
   HiOutlineDocumentAdd,
 } from "react-icons/hi";
+import { FaUserDoctor } from "react-icons/fa6";
 
 // Google OAuth Client ID
 export const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -94,6 +96,11 @@ export const MENU_ITEMS = [
     label: "Publish",
     icon: <MdOutlinePublishedWithChanges size={20} />,
     path: ROUTES.PUBLISHER,
+  },
+  {
+    label: "Doctor Profile",
+    icon: <FaUserDoctor size={20} />,
+    path: ROUTES.DOCTOR_PROFILE,
   },
   {
     label: "Notifications",
@@ -450,7 +457,7 @@ export const getStatusBadge = (status) => {
     case "medical_review":
       return {
         icon: <FiClock className="w-3 h-3" />,
-        text: "PENDING REVIEW",
+        text: "MEDICAL REVIEW",
         class: "bg-yellow-50 text-yellow-700 border border-yellow-200",
       };
     case "claimed":
@@ -458,6 +465,13 @@ export const getStatusBadge = (status) => {
         icon: <FiClock className="w-3 h-3" />,
         text: "CLAIMED",
         class: "bg-blue-50 text-blue-700 border border-blue-200",
+      };
+
+    case "locked":
+      return {
+        icon: <FaLock className="w-3 h-3" />,
+        text: "LOCKED",
+        class: "bg-indigo-50 text-indigo-700 border border-indigo-200",
       };
     default:
       return {

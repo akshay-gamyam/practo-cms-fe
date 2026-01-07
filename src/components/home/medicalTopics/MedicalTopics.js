@@ -19,6 +19,8 @@ const MedicalTopics = () => {
     useSelector((state) => state.topics);
   const [openMedicalTopicModal, setOpenMedicalTopicModal] = useState(false);
 
+  console.log("topics", topics)
+
   // const handleCardClick = (topicId) => {
   //   navigate(`${ROUTES.UPLOAD}/${topicId}`);
   // };

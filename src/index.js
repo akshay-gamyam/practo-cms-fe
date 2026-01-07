@@ -37,8 +37,8 @@ if (rootElement) {
   console.error("Root element not found!");
 }
 
-if (window) {
-  window.console.log = () => {};
-  window.console.error = () => {};
-  window.console.warn = () => {};
-}
+// if (window) {
+//   window.console.log = () => {};
+//   window.console.error = () => {};
+//   window.console.warn = () => {};
+// }
