@@ -37,8 +37,6 @@ const ContentApproverScript = () => {
     isScriptActionLoading,
     error,
   } = useSelector((state) => state.contentApprover);
-  const user = useSelector((state) => state.auth.user);
-  const isContentApprover = user?.role === "CONTENT_APPROVER";
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");

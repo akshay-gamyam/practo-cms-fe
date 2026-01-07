@@ -36,6 +36,7 @@ export const CONTENT_APPROVER_GET_ALL_SCRIPTS= "/api/scripts/my-reviews";
 export const CONTENT_APPROVER_APPROVE = (script_id) => `/api/scripts/${script_id}/lock`;
 export const MEDICAL_AFFAIRS_APPROVE = (script_id) => `/api/scripts/${script_id}/approve`;
 export const CONTENT_APPROVER_REJECT = (script_id) => `/api/scripts/${script_id}/reject`;
+export const CONTENT_APPROVER_REJECT_NEW = (script_id) => `/api/scripts/${script_id}`;
 export const CONTENT_APPROVER_CLAIM = (script_id) => `/api/scripts/${script_id}/claim`;
 
 
@@ -47,3 +48,4 @@ export const MEDICAL_AFFAIRS_APPROVE_VIDEO = (script_id) => `/api/videos/${scrip
 export const CONTENT_APPROVER_REJECT_VIDEO = (script_id) => `/api/videos/${script_id}/reject`;
 export const CONTENT_APPROVER_CLAIM_VIDEO = (script_id) => `/api/videos/${script_id}/claim`;
 export const GET_ALL_SCRIPT_VERSION = "/api/scripts/my-reviews/topic";
+export const SEPRATE_CONTENT_APPROVER_VIDEOS = "/api/scripts/my-locks";

@@ -17,6 +17,7 @@ export const ROUTES = {
   SCRIPT : "/script",
   VIDEOS : "/videos",
   CONTENT_APPROVER_SCRIPTS : "/content-approver-script",
+  CONTENT_APPROVER_SCRIPTS_NEW : "/content-approver-script-new",
   CONTENT_APPROVER_VIDEOS : "/content-approver-videos",
   PUBLISHER : "/publisher",
 };

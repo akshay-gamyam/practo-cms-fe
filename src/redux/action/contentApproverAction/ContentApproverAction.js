@@ -12,6 +12,7 @@ import {
   CONTENT_APPROVER_REJECT_VIDEO,
   CONTENT_APPROVER_CLAIM_VIDEO,
   GET_ALL_SCRIPT_VERSION,
+  SEPRATE_CONTENT_APPROVER_VIDEOS,
 } from "../../../api/apiEndPoints";
 import api from "../../../api/interceptor";
 import {
@@ -190,7 +191,6 @@ export const claimScript = (scriptId) => async (dispatch) => {
 export const approveScript =
   (scriptId, comments = "") =>
   async (dispatch, getState) => {
-
     dispatch(approveScriptStart());
 
     try {
@@ -215,6 +215,33 @@ export const approveScript =
         approveScriptSuccess({
           scriptId,
           approvedBy: response.data?.approvedBy || user.name,
+          comment: comments,
+        })
+      );
+
+      return response.data;
+    } catch (error) {
+      dispatch(
+        approveScriptFailure(error?.response?.data?.message || error.message)
+      );
+      throw error;
+    }
+  };
+
+// ......................... approve in content approver .............................
+
+export const contentApproverScript =
+  (scriptId, comments = "") =>
+  async (dispatch) => {
+    dispatch(approveScriptStart());
+
+    try {
+      const response = await api.post(SEPRATE_CONTENT_APPROVER_VIDEOS);
+
+      dispatch(
+        approveScriptSuccess({
+          scriptId,
+          approvedBy: response.data?.approvedBy,
           comment: comments,
         })
       );
@@ -262,7 +289,6 @@ export const rejectScript = (scriptId, comment) => async (dispatch) => {
     isRejectingScript = false;
   }
 };
-
 
 // ........................ fetch scripts queue .........................
 export const fetchContentApproverVideos =
@@ -477,10 +503,7 @@ export const rejectVideos = (videoId, comment) => async (dispatch) => {
   }
 };
 
-
-
 // ........................ get all version data comments .........................
-
 
 export const fetchAllVersion = (topicId) => async (dispatch) => {
   if (isApprovingScriptVersion) return;

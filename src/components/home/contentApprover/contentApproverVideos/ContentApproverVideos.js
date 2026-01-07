@@ -242,12 +242,10 @@ const ContentApproverVideos = () => {
               // const isClaimed = video.lockedById !== null;
               const isClaimed = filterStatus === "my-claims" ? video.assignedReviewerId !== null : video.lockedById !== null;
               
-              // Check if status is APPROVED or REJECTED (final decision made)
               const isFinalStatus = 
                 video.decision?.toUpperCase() === "APPROVED" || 
                 video.decision?.toUpperCase() === "REJECTED";
               
-              // Can interact only if claimed and not in final status
               const canInteract = isClaimed && !isFinalStatus;
 
               const authorName = video.uploadedBy
@@ -271,7 +269,6 @@ const ContentApproverVideos = () => {
                   className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
                 >
                   <div className="flex flex-col lg:flex-row">
-                    {/* Video Thumbnail with Play Button Overlay */}
                     <div 
                       className="lg:w-2/5 relative bg-gradient-to-br from-blue-100 to-cyan-100 h-64 lg:h-auto group cursor-pointer"
                       onClick={() => handleThumbnailClick(video)}
@@ -288,7 +285,6 @@ const ContentApproverVideos = () => {
                         </span>
                       </div>
                       
-                      {/* Claim Button - Only show if not final status and not claimed */}
                       {!isFinalStatus && !isClaimed && (
                         <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
                           <button
@@ -301,7 +297,6 @@ const ContentApproverVideos = () => {
                         </div>
                       )}
                       
-                      {/* Claimed Badge - Only show if not final status and is claimed */}
                       {!isFinalStatus && isClaimed && (
                         <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
                           <span className="text-xs text-green-600 font-medium bg-green-50 px-3 py-1 rounded-full">
@@ -310,7 +305,6 @@ const ContentApproverVideos = () => {
                         </div>
                       )}
 
-                      {/* Play Button Overlay */}
                       <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
                         <div className="w-16 h-16 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-cyan-500 group-hover:scale-110 transition-all duration-300 shadow-lg pointer-events-auto">
                           <FiPlay className="w-8 h-8 text-gray-900 group-hover:text-white ml-1" />
@@ -321,7 +315,6 @@ const ContentApproverVideos = () => {
                         {formatDuration(video.duration)}
                       </div>
 
-                      {/* Hover Overlay */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
                       
                       {video.thumbnailUrl ? (
@@ -387,7 +380,6 @@ const ContentApproverVideos = () => {
                         )}
                       </div>
 
-                      {/* Show Approve/Reject buttons only if NOT in final status */}
                       {!isFinalStatus ? (
                         <div className="flex gap-3">
                           <button
@@ -415,7 +407,6 @@ const ContentApproverVideos = () => {
                           </button>
                         </div>
                       ) : (
-                        // Show only View Content button if in final status
                         <button
                           onClick={() => {
                             setSelectedVideo(video);

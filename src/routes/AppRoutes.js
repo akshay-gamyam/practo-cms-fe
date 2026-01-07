@@ -24,6 +24,7 @@ import AgencyPocVideos from "../components/home/agencyPoc/agencyPocVideos/Agency
 import ContentApproverScript from "../components/home/contentApprover/contentApproverScript/ContentApproverScript";
 import ContentApproverVideos from "../components/home/contentApprover/contentApproverVideos/ContentApproverVideos";
 import Publish from "../components/home/publisher/Publish";
+import SeprateContentApproverScript from "../components/home/contentApprover/contentApproverScript/SeprateContentApprover";
 
 const AppRouter = () => {
   return (
@@ -67,6 +68,7 @@ const AppRouter = () => {
         >
           <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
           <Route path={ROUTES.CONTENT_APPROVER_SCRIPTS} element={<ContentApproverScript />} />
+          <Route path={ROUTES.CONTENT_APPROVER_SCRIPTS_NEW} element={<SeprateContentApproverScript />} />
           <Route path={ROUTES.CONTENT_APPROVER_VIDEOS} element={<ContentApproverVideos />} />
           <Route path={ROUTES.REVIEW_QUEUE} element={<ReviewQueue />} />
           <Route path={ROUTES.UPLOAD} element={<Upload />} />

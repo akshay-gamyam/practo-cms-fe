@@ -21,7 +21,7 @@ const PublicRoutes = ({ children }) => {
     } else if (user?.role === ROLE_VARIABLES_MAP?.SUPER_ADMIN) {
       return <Navigate to={ROUTES.DASHBOARD} replace />;
     } else if (user?.role === ROLE_VARIABLES_MAP?.CONTENT_APPROVER) {
-      return <Navigate to={ROUTES.CONTENT_APPROVER_SCRIPTS} replace />;
+      return <Navigate to={ROUTES.CONTENT_APPROVER_SCRIPTS_NEW} replace />;
     }
     // return <Navigate to={ROUTES.DASHBOARD} replace />;
   }

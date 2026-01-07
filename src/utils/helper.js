@@ -74,6 +74,11 @@ export const MENU_ITEMS = [
     path: ROUTES.CONTENT_APPROVER_SCRIPTS,
   },
   {
+    label: "Assigned Scripts",
+    icon: <CgTranscript size={20} />,
+    path: ROUTES.CONTENT_APPROVER_SCRIPTS_NEW,
+  },
+  {
     label: "Assigned Videos",
     icon: <LiaFileVideoSolid size={20} />,
     path: ROUTES.CONTENT_APPROVER_VIDEOS,
