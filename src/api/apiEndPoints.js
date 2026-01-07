@@ -55,3 +55,4 @@ export const GET_PUBLISHER_LIST = "/api/videos/queue";
 export const PUBLISHER_CLAIM_VIDEO = (id) => `/api/videos/${id}/claim`;
 export const PUBLISH_VIDEO = (id) => `/api/videos/${id}/publish`;
 export const PUBLISHED_VIDEO = "/api/videos/status";
+export const SUBMIT_AGENCY_VIDEO = (id) => `/api/videos/${id}/submit`;

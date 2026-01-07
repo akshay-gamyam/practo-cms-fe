@@ -9,15 +9,19 @@ import { toast } from "react-toastify";
 import { FaCirclePlay } from "react-icons/fa6";
 import {
   fetchAllVideos,
+  submitVideo,
   // deleteVideo
 } from "../../../../redux/action/agencyPocAction/AgencyPocAction";
 import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
 
 const AgencyPocVideos = () => {
   const dispatch = useDispatch();
-  const { videos, isVideoListLoading, isDeleteVideoLoading } = useSelector(
-    (state) => state.agencyPoc
-  );
+  const {
+    videos,
+    isVideoListLoading,
+    isDeleteVideoLoading,
+    isSubmitVideoLoading,
+  } = useSelector((state) => state.agencyPoc);
 
   const [activeTab, setActiveTab] = useState("all");
   const [videoToDelete, setVideoToDelete] = useState(null);
@@ -72,7 +76,7 @@ const AgencyPocVideos = () => {
         text: "DOCTOR REVIEW",
         color: "text-indigo-700 bg-indigo-50 border-indigo-200",
       },
-       LOCKED: {
+      LOCKED: {
         icon: <IoMdTime className="h-4 w-4" />,
         text: "LOCKED",
         color: "text-red-700 bg-red-50 border-red-200",
@@ -159,6 +163,16 @@ const AgencyPocVideos = () => {
     toast.info("Video upload coming soon!");
   };
 
+  const handleSubmitVideo = async (video) => {
+    const response = await dispatch(submitVideo(video.id));
+
+    if (response?.success) {
+      toast.success("Video submitted for review");
+    } else {
+      toast.error(response?.error || "Failed to submit video");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -232,7 +246,7 @@ const AgencyPocVideos = () => {
             >
               Draft ({tabCounts.DRAFT})
             </button>
-             <button
+            <button
               onClick={() => setActiveTab("LOCKED")}
               className={`pb-4 px-1 font-medium whitespace-nowrap transition-colors ${
                 activeTab === "APPROVED"
@@ -250,7 +264,7 @@ const AgencyPocVideos = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredVideos.map((video) => {
-              console.log("video", video)
+              console.log("video", video);
               const badge = getStatusBadge(video?.status);
               return (
                 <div
@@ -273,7 +287,10 @@ const AgencyPocVideos = () => {
                     )}
 
                     <div className="absolute justify-center">
-                       <FaCirclePlay onClick={() => handleViewVideo(video)} className="w-12 h-12 cursor-pointer text-gray-700" />
+                      <FaCirclePlay
+                        onClick={() => handleViewVideo(video)}
+                        className="w-12 h-12 cursor-pointer text-gray-700"
+                      />
                     </div>
                     <div className="absolute bottom-3 right-3 bg-gray-800 bg-opacity-90 text-white text-sm px-2 py-1 rounded font-medium">
                       {formatDuration(video.duration)}
@@ -336,6 +353,18 @@ const AgencyPocVideos = () => {
                         <FaEye className="w-4 h-4" />
                         View
                       </button>
+                    </div>
+                    <div>
+                      {video.status === "DRAFT" && (
+                        <button
+                          disabled={isSubmitVideoLoading}
+                          onClick={() => handleSubmitVideo(video)}
+                          className="w-full mt-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                        >
+                          <FaCloudUploadAlt className="w-4 h-4" />
+                          {isSubmitVideoLoading ? "Submitting..." : "Submit"}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

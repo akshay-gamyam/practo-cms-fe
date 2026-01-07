@@ -12,12 +12,11 @@ const initialState = {
   selectedScript: null,
   selectedVideo: null,
 
-    // Upload state
+  // Upload state
   videoUploadUrl: null,
   videoFileUrl: null,
   thumbnailUploadUrl: null,
   thumbnailFileUrl: null,
-
 
   isPocListLoading: false,
   isViewPocLoading: false,
@@ -33,6 +32,7 @@ const initialState = {
   isDeleteVideoLoading: false,
   isGetVideoUploadUrlLoading: false,
   isGetThumbnailUploadUrlLoading: false,
+  isSubmitVideoLoading: false,
   error: null,
 };
 
@@ -205,7 +205,7 @@ const agencyPocSlice = createSlice({
       state.error = action.payload;
     },
 
-     // ................. fetch all videos ........................
+    // ................. fetch all videos ........................
     fetchVideosStart(state) {
       state.isVideoListLoading = true;
       state.error = null;
@@ -235,7 +235,7 @@ const agencyPocSlice = createSlice({
       state.error = action.payload;
     },
 
-       // ................. upload video ........................
+    // ................. upload video ........................
     uploadVideoStart(state) {
       state.isUploadVideoLoading = true;
       state.error = null;
@@ -255,7 +255,7 @@ const agencyPocSlice = createSlice({
       state.error = action.payload;
     },
 
-     // ................. get video upload URL ........................
+    // ................. get video upload URL ........................
     getVideoUploadUrlStart(state) {
       state.isGetVideoUploadUrlLoading = true;
       state.error = null;
@@ -271,7 +271,7 @@ const agencyPocSlice = createSlice({
       state.error = action.payload;
     },
 
-     // ................. get thumbnail upload URL ........................
+    // ................. get thumbnail upload URL ........................
     getThumbnailUploadUrlStart(state) {
       state.isGetThumbnailUploadUrlLoading = true;
       state.error = null;
@@ -287,6 +287,34 @@ const agencyPocSlice = createSlice({
       state.error = action.payload;
     },
 
+    // ...............submit the video .......................
+
+    submitVideoStart(state) {
+      state.isSubmitVideoLoading = true;
+      state.error = null;
+    },
+
+    submitVideoSuccess(state, action) {
+      state.isSubmitVideoLoading = false;
+
+      const updatedVideo = action.payload.video;
+
+      const index = state.videos.findIndex((v) => v.id === updatedVideo.id);
+      if (index !== -1) {
+        state.videos[index] = updatedVideo;
+      }
+
+      if (state.selectedVideo?.id === updatedVideo.id) {
+        state.selectedVideo = updatedVideo;
+      }
+
+      state.error = null;
+    },
+
+    submitVideoFailure(state, action) {
+      state.isSubmitVideoLoading = false;
+      state.error = action.payload;
+    },
 
     // ................. clear upload state ........................
     clearUploadState(state) {
@@ -353,7 +381,11 @@ export const {
   getThumbnailUploadUrlSuccess,
   getThumbnailUploadUrlFailure,
   clearUploadState,
-  
+
+  submitVideoStart,
+  submitVideoSuccess,
+  submitVideoFailure,
+
   clearSelectedPoc,
   clearSelectedScript,
 } = agencyPocSlice.actions;
