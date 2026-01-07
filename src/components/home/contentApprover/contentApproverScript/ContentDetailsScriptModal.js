@@ -26,9 +26,6 @@ const ContentDetailsModal = ({ isOpen, onClose, content, type = "script" }) => {
   const submittedDate = formatDate(content.createdAt || content.submittedDate);
   const updatedDate = formatDate(content.updatedAt);
 
-  const contentPreview = getContentPreview(content.content);
-   const contentPreviewRejected = getContentPreview(content.reviewComments);
-
   const statusBadge = getStatusBadge(content.status);
 
   return (
@@ -176,9 +173,10 @@ const ContentDetailsModal = ({ isOpen, onClose, content, type = "script" }) => {
               Content Preview
             </label>
             <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 max-h-60 overflow-y-auto">
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                {contentPreview}
-              </p>
+              <div
+                className="text-sm text-gray-700 space-y-3"
+                dangerouslySetInnerHTML={{ __html: content.content }}
+              />
             </div>
           </div>
         )}
@@ -210,9 +208,8 @@ const ContentDetailsModal = ({ isOpen, onClose, content, type = "script" }) => {
               : "text-gray-700"
           }
         `}
-              >
-                {contentPreviewRejected}
-              </p>
+                dangerouslySetInnerHTML={{ __html: content.reviewComments }}
+              />
             </div>
           </div>
         )}

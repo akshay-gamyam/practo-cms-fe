@@ -462,7 +462,7 @@ export const uploadVideoComplete = (videoFile, thumbnailFile, formData, onProgre
         description: formData.description,
         videoUrl: videoFileUrl,
         thumbnailUrl: thumbnailFileUrl,
-        duration: formData.duration,
+        duration: parseInt(formData.duration),
         doctorName: formData.doctorName,
         specialty: formData.specialty,
         language: formData.language,
