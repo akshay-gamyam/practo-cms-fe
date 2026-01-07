@@ -43,6 +43,9 @@ import {
   fetchScriptVersionStart,
   fetchScriptVersionSuccess,
   fetchScriptVersionFailure,
+  fetchMyLockedScriptsStart,
+  fetchMyLockedScriptsSuccess,
+  fetchMyLockedScriptsFailure,
 } from "../../reducer/contentApproverReducer/ContentApproverReducer";
 import { ROLE_VARIABLES_MAP } from "../../../utils/helper";
 
@@ -230,30 +233,32 @@ export const approveScript =
 
 // ......................... approve in content approver .............................
 
-export const contentApproverScript =
-  (scriptId, comments = "") =>
-  async (dispatch) => {
-    dispatch(approveScriptStart());
+export const contentApproverScript = () => async (dispatch) => {
+  dispatch(fetchMyLockedScriptsStart());
 
-    try {
-      const response = await api.post(SEPRATE_CONTENT_APPROVER_VIDEOS);
+  try {
+    const response = await api.get(SEPRATE_CONTENT_APPROVER_VIDEOS);
 
-      dispatch(
-        approveScriptSuccess({
-          scriptId,
-          approvedBy: response.data?.approvedBy,
-          comment: comments,
-        })
-      );
+    dispatch(
+      fetchMyLockedScriptsSuccess({
+        locks: response.data?.locks,
+        total: response.data?.total,
+        page: response.data?.page,
+        limit: response.data?.limit,
+        totalPages: response.data?.totalPages,
+      })
+    );
 
-      return response.data;
-    } catch (error) {
-      dispatch(
-        approveScriptFailure(error?.response?.data?.message || error.message)
-      );
-      throw error;
-    }
-  };
+    return response.data;
+  } catch (error) {
+    dispatch(
+      fetchMyLockedScriptsFailure(
+        error?.response?.data?.message || error.message
+      )
+    );
+    throw error;
+  }
+};
 
 // ........................ reject script with comment .........................
 export const rejectScript = (scriptId, comment) => async (dispatch) => {

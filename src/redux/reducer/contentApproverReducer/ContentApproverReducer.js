@@ -11,6 +11,14 @@ const initialState = {
   approvedVideos: [],
   rejectedVideos: [],
   scriptVersion: [],
+  myLockedScripts: [],
+  myLockedScriptsMeta: {
+    total: 0,
+    page: 1,
+    limit: 20,
+    totalPages: 1,
+  },
+  isMyLockedScriptsLoading: false,
   selectedScript: null,
   selectedVideo: null,
   isScriptsListLoading: false,
@@ -129,6 +137,34 @@ const contentApproverSlice = createSlice({
     },
     approveScriptFailure(state, action) {
       state.isScriptActionLoading = false;
+      state.error = action.payload;
+    },
+
+    // ................. content approver script ................
+
+    fetchMyLockedScriptsStart(state) {
+      state.isMyLockedScriptsLoading = true;
+      state.error = null;
+    },
+
+    fetchMyLockedScriptsSuccess(state, action) {
+      state.isMyLockedScriptsLoading = false;
+
+      const { locks, total, page, limit, totalPages } = action.payload;
+
+      state.myLockedScripts = locks || [];
+      state.myLockedScriptsMeta = {
+        total,
+        page,
+        limit,
+        totalPages,
+      };
+
+      state.error = null;
+    },
+
+    fetchMyLockedScriptsFailure(state, action) {
+      state.isMyLockedScriptsLoading = false;
       state.error = action.payload;
     },
 
@@ -386,6 +422,10 @@ export const {
   fetchScriptVersionStart,
   fetchScriptVersionSuccess,
   fetchScriptVersionFailure,
+
+  fetchMyLockedScriptsStart,
+  fetchMyLockedScriptsSuccess,
+  fetchMyLockedScriptsFailure,
 
   setSelectedScript,
   clearSelectedScript,
