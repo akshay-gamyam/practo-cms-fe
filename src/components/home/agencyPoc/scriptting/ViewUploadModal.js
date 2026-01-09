@@ -1,24 +1,19 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  FiUpload,
-  FiX,
-  FiVideo,
-  FiImage,
-  FiAlertCircle,
-} from "react-icons/fi";
+import { FiUpload, FiX, FiVideo, FiImage, FiAlertCircle } from "react-icons/fi";
 import { uploadVideoComplete } from "../../../../redux/action/agencyPocAction/AgencyPocAction";
+import CustomSelect from "../../../common/customSelect/CustomSelect";
 
 const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
   const dispatch = useDispatch();
-  
+
   // Get loading states from Redux
-  const { 
+  const {
     isUploadVideoLoading,
     isGetVideoUploadUrlLoading,
-    isGetThumbnailUploadUrlLoading 
+    isGetThumbnailUploadUrlLoading,
   } = useSelector((state) => state.agencyPoc);
-  
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -34,7 +29,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [videoPreview, setVideoPreview] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
-  
+
   const [uploadProgress, setUploadProgress] = useState({
     video: 0,
     thumbnail: 0,
@@ -43,7 +38,10 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
   const [error, setError] = useState(null);
 
   // Determine if any upload operation is in progress
-  const uploading = isUploadVideoLoading || isGetVideoUploadUrlLoading || isGetThumbnailUploadUrlLoading;
+  const uploading =
+    isUploadVideoLoading ||
+    isGetVideoUploadUrlLoading ||
+    isGetThumbnailUploadUrlLoading;
 
   const handleInputChange = (e) => {
     const { name, value } = e;
@@ -142,11 +140,11 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
 
   const handleClose = () => {
     if (uploading) return;
-    
+
     // Clean up
     if (videoPreview) URL.revokeObjectURL(videoPreview);
     if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
-    
+
     // Reset state
     setFormData({
       title: "",
@@ -164,7 +162,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
     setThumbnailPreview(null);
     setUploadProgress({ video: 0, thumbnail: 0, status: "" });
     setError(null);
-    
+
     onClose();
   };
 
@@ -180,7 +178,9 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
               Upload Video
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              {script?.topic?.title || script?.title || "Upload video for this script"}
+              {script?.topic?.title ||
+                script?.title ||
+                "Upload video for this script"}
             </p>
           </div>
           <button
@@ -197,7 +197,10 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
           {/* Error Alert */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-              <FiAlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={20} />
+              <FiAlertCircle
+                className="text-red-600 flex-shrink-0 mt-0.5"
+                size={20}
+              />
               <p className="text-sm text-red-800">{error}</p>
             </div>
           )}
@@ -211,7 +214,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
                   {uploadProgress.status || "Processing..."}
                 </p>
               </div>
-              
+
               {uploadProgress.video > 0 && (
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs text-blue-700">
@@ -226,7 +229,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
                   </div>
                 </div>
               )}
-              
+
               {uploadProgress.thumbnail > 0 && (
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs text-blue-700">
@@ -264,7 +267,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
                       setVideoPreview(null);
                     }}
                     disabled={uploading}
-                    className="text-sm text-red-600 hover:text-red-700 disabled:opacity-50"
+                    className="text-sm hover:shadow-lg text-black bg-red-100 hover:text-red-800 disabled:opacity-50 border hover:border-red-800 border-red-300 p-2 rounded-xl"
                   >
                     Remove Video
                   </button>
@@ -308,7 +311,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
                       setThumbnailPreview(null);
                     }}
                     disabled={uploading}
-                    className="text-sm text-red-600 hover:text-red-700 disabled:opacity-50"
+                    className="text-sm hover:shadow-lg text-black bg-red-100 hover:text-red-800 disabled:opacity-50 border hover:border-red-800 border-red-300 p-2 rounded-xl"
                   >
                     Remove Thumbnail
                   </button>
@@ -334,36 +337,6 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
 
           {/* Form Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2 space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Title <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={(e) => handleInputChange(e.target)}
-                disabled={uploading}
-                placeholder="Enter video title"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-              />
-            </div>
-
-            <div className="md:col-span-2 space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={(e) => handleInputChange(e.target)}
-                disabled={uploading}
-                placeholder="Enter video description"
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-              />
-            </div>
-
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 Doctor Name
@@ -403,7 +376,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
                 value={formData.language}
                 onChange={(e) => handleInputChange(e.target)}
                 disabled={uploading}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
               >
                 <option value="English">English</option>
                 <option value="Hindi">Hindi</option>
@@ -438,11 +411,12 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
                 value={formData.ctaType}
                 onChange={(e) => handleInputChange(e.target)}
                 disabled={uploading}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
               >
-                <option value="CONSULT">Consult</option>
+                <option value="BOOK_CONSULT">Book Consult</option>
                 <option value="QUIZ">Quiz</option>
-                <option value="VAULT">Vault</option>
+                <option value="HEALTH_VAULT">Health Vault</option>
+                <option value="LEARN_MORE">Learn More</option>
               </select>
             </div>
 
@@ -455,14 +429,57 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
                 name="duration"
                 value={formData.duration}
                 onChange={(e) => handleInputChange(e.target)}
-                disabled={uploading}
+                disabled
                 placeholder="240"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
               />
             </div>
+            <div className="md:col-span-2 space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Title <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={(e) => handleInputChange(e.target)}
+                disabled={uploading}
+                placeholder="Enter video title"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+              />
+            </div>
+
+            <div className="md:col-span-2 space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={(e) => handleInputChange(e.target)}
+                disabled={uploading}
+                placeholder="Enter video description"
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+              />
+            </div>
+
+            {/* <div className="md:col-span-2 space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Tags (comma seprated) <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={(e) => handleInputChange(e.target)}
+                disabled={uploading}
+                placeholder="diabetes, heath wellness"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+              />
+            </div> */}
           </div>
 
-          {/* Footer */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
             <button
               type="button"

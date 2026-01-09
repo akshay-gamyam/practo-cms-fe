@@ -23,9 +23,9 @@ import Script from "../components/home/agencyPoc/scriptting/Scripting";
 import AgencyPocVideos from "../components/home/agencyPoc/agencyPocVideos/AgencyPocVideos";
 import ContentApproverScript from "../components/home/contentApprover/contentApproverScript/ContentApproverScript";
 import ContentApproverVideos from "../components/home/contentApprover/contentApproverVideos/ContentApproverVideos";
-import Publish from "../components/home/publisher/Publish";
 import SeprateContentApproverScript from "../components/home/contentApprover/contentApproverScript/SeprateContentApprover";
 import DoctorProfile from "../components/home/doctorProfile/DoctorProfile";
+import Publisher from "../components/home/publisher/Publisher";
 
 const AppRouter = () => {
   return (
@@ -84,7 +84,7 @@ const AppRouter = () => {
           <Route path={ROUTES.SCRIPT} element={<Script />} />
           <Route path={ROUTES.VIDEOS} element={<AgencyPocVideos />} />
           <Route path={ROUTES.NOCIFICATIONS} element={<Notifications />} />
-          <Route path={ROUTES.PUBLISHER} element={<Publish />} />
+          <Route path={ROUTES.PUBLISHER} element={<Publisher />} />
           <Route path={ROUTES.DOCTOR_PROFILE} element={<DoctorProfile />} />
         </Route>
 

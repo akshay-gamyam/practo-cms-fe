@@ -110,7 +110,7 @@ const Dashboard = () => {
             </div>
           ) : (
             <div className="space-y-4 cursor-pointer">
-              {topics?.map((topic) => (
+              {topics?.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5).map((topic) => (
                 <div
                   key={topic?.id}
                   onClick={() => {

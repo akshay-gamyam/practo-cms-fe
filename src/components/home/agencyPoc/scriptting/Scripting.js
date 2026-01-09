@@ -12,17 +12,21 @@ import {
 } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { fetchAllScripts, 
+import {
+  fetchAllScripts,
   // deleteScript
- } from "../../../../redux/action/agencyPocAction/AgencyPocAction";
+} from "../../../../redux/action/agencyPocAction/AgencyPocAction";
 import EditScriptModal from "./EditScriptModal";
 import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
 import VideoUploadModal from "./ViewUploadModal";
+import { getWordCount } from "../../../../utils/helper";
 
 const Scriptting = () => {
   const dispatch = useDispatch();
-  const { scripts, isScriptListLoading, isDeleteScriptLoading } = useSelector((state) => state.agencyPoc);
-console.log("scripts", scripts)
+  const { scripts, isScriptListLoading, isDeleteScriptLoading } = useSelector(
+    (state) => state.agencyPoc
+  );
+  console.log("scripts", scripts);
   const [activeTab, setActiveTab] = useState("all");
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedScript, setSelectedScript] = useState(null);
@@ -46,7 +50,9 @@ console.log("scripts", scripts)
     {
       id: "DRAFT",
       label: "Drafts",
-      count: scripts.filter((s) => s.status === "DRAFT").length,
+      count: scripts.filter(
+        (s) => s.status === "DRAFT" && s.latestRejection === null
+      ).length,
     },
     {
       id: "IN_REVIEW",
@@ -55,8 +61,10 @@ console.log("scripts", scripts)
     },
     {
       id: "REJECTED",
-      label: "Rejected",
-      count: scripts.filter((s) => s.status === "REJECTED").length,
+      label: "Refix",
+      count:
+        scripts.filter((s) => s.status === "REJECTED").length ||
+        scripts.filter((s) => s.latestRejection !== null).length,
     },
     {
       id: "LOCKED",
@@ -66,14 +74,22 @@ console.log("scripts", scripts)
   ];
 
   const filteredScripts = scripts.filter((script) => {
-  if (activeTab === "all") return true;
+    if (activeTab === "all") return true;
 
-  if (activeTab === "IN_REVIEW") {
-    return REVIEW_STATUSES.includes(script.status);
-  }
+    if (activeTab === "IN_REVIEW") {
+      return REVIEW_STATUSES.includes(script.status);
+    }
 
-  return script.status === activeTab;
-});
+    if (activeTab === "REJECTED") {
+      return script.status === "REJECTED" || script.latestRejection !== null;
+    }
+
+    if (activeTab === "DRAFT") {
+      return script.status === "DRAFT" && script.latestRejection === null;
+    }
+
+    return script.status === activeTab;
+  });
 
   const getStatusBadge = (status) => {
     const badges = {
@@ -165,13 +181,11 @@ console.log("scripts", scripts)
   //   setScriptToDelete(null);
   // };
 
-
-   // New function to handle video upload modal
+  // New function to handle video upload modal
   const handleUploadVideo = (script) => {
     setScriptForUpload(script);
     setShowVideoUploadModal(true);
   };
-
 
   const handleCloseEditModal = useCallback(() => {
     setShowEditModal(false);
@@ -179,15 +193,18 @@ console.log("scripts", scripts)
     dispatch(fetchAllScripts());
   }, [dispatch]);
 
-   const handleCloseVideoUploadModal = useCallback(() => {
+  const handleCloseVideoUploadModal = useCallback(() => {
     setShowVideoUploadModal(false);
     setScriptForUpload(null);
   }, []);
 
-   const handleVideoUploadSuccess = useCallback((videoData) => {
-    toast.success("Video uploaded successfully!");
-    dispatch(fetchAllScripts());
-  }, [dispatch]);
+  const handleVideoUploadSuccess = useCallback(
+    (videoData) => {
+      toast.success("Video uploaded successfully!");
+      dispatch(fetchAllScripts());
+    },
+    [dispatch]
+  );
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -200,8 +217,11 @@ console.log("scripts", scripts)
   };
 
   const isScriptLocked = (status) =>
-    status === "LOCKED" || status === "IN_REVIEW" || status === "MEDICAL_REVIEW" || 
-    status === "BRAND_REVIEW" || status === "DOCTOR_REVIEW";
+    status === "LOCKED" ||
+    status === "IN_REVIEW" ||
+    status === "MEDICAL_REVIEW" ||
+    status === "BRAND_REVIEW" ||
+    status === "DOCTOR_REVIEW";
 
   return (
     <div className="h-screen bg-gray-100 flex flex-col">
@@ -240,107 +260,140 @@ console.log("scripts", scripts)
         ) : (
           <div className="max-w-7xl mx-auto py-4 mt-4">
             <div className="space-y-4">
-              {filteredScripts.map((script) => (
-                <div
-                  key={script.id}
-                  className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
-                >
-                  <div className="p-4 sm:p-6">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 break-words">
-                            {script.topic?.title || "Untitled Script"}
-                          </h3>
-                          {getStatusBadge(script.status)}
-                          {script.status === "LOCKED" && (
-                            <span className="inline-flex items-center gap-1 px-2 rounded-xl py-1 rounded text-xs font-medium border bg-teal-50 text-teal-700 border-teal-200">
-                              <FiCheckCircle size={12} />
-                              READY FOR VIDEO
-                            </span>
-                          )}
-                        </div>
+              {filteredScripts.map((script) => {
+                console.log("script", script);
+                return (
+                  <div
+                    key={script.id}
+                    className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
+                  >
+                    <div className="p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 break-words">
+                              {script.topic?.title || "Untitled Script"}
+                            </h3>
+                            {getStatusBadge(script.status)}
+                            {script.status === "LOCKED" && (
+                              <span className="inline-flex items-center gap-1 px-2 rounded-xl py-1 rounded text-xs font-medium border bg-teal-50 text-teal-700 border-teal-200">
+                                <FiCheckCircle size={12} />
+                                READY FOR VIDEO
+                              </span>
+                            )}
+                          </div>
 
-                        <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <FiClock size={14} className="flex-shrink-0" />
-                            Last updated: {formatDate(script.updatedAt)}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <FiFileText size={14} className="flex-shrink-0" />
-                            {script.wordCount || 0} words
-                          </span>
-                          {script.createdBy && (
+                          <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500">
                             <span className="flex items-center gap-1">
-                              <FiUser size={14} className="flex-shrink-0" />
-                              {script.createdBy.firstName}{" "}
-                              {script.createdBy.lastName}
+                              <FiClock size={14} className="flex-shrink-0" />
+                              Last updated: {formatDate(script.updatedAt)}
                             </span>
-                          )}
-                          {script.status === "LOCKED" && (
-                            <span className="flex items-center gap-1 text-purple-600">
-                              <FiLock size={14} className="flex-shrink-0" />
-                              Locked on: {formatDate(script.lockedAt)}
+                            <span className="flex items-center gap-1">
+                              <FiFileText size={14} className="flex-shrink-0" />
+                              {getWordCount(script.content) || 0} words
                             </span>
-                          )}
+                            {script.createdBy && (
+                              <span className="flex items-center gap-1">
+                                <FiUser size={14} className="flex-shrink-0" />
+                                {script.createdBy.firstName}{" "}
+                                {script.createdBy.lastName}
+                              </span>
+                            )}
+                            {script.status === "LOCKED" && (
+                              <span className="flex items-center gap-1 text-purple-600">
+                                <FiLock size={14} className="flex-shrink-0" />
+                                Locked on: {formatDate(script.lockedAt)}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        {script.videoUploaded && (
-                          <button className="flex items-center rounded-xl gap-1 px-3 py-1.5 text-sm text-green-700 bg-green-50 border border-green-200 hover:bg-green-100 transition-colors">
-                            <FiCheckCircle size={14} />
-                            <span className="hidden sm:inline">
-                              Video Uploaded
-                            </span>
-                          </button>
-                        )}
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {script.videoUploaded && (
+                            <button className="flex items-center rounded-xl gap-1 px-3 py-1.5 text-sm text-green-700 bg-green-50 border border-green-200 hover:bg-green-100 transition-colors">
+                              <FiCheckCircle size={14} />
+                              <span className="hidden sm:inline">
+                                Video Uploaded
+                              </span>
+                            </button>
+                          )}
 
-                        {script.status === "LOCKED" && (
-                          <button onClick={() => handleUploadVideo(script)} className="flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors">
-                            <FiUpload size={14} />
-                            <span className="hidden sm:inline">
-                              Upload Video
-                            </span>
-                            <span className="sm:hidden">Upload</span>
-                          </button>
-                        )}
+                          {script.status === "LOCKED" && (
+                            <button
+                              onClick={() => handleUploadVideo(script)}
+                              className="flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors"
+                            >
+                              <FiUpload size={14} />
+                              <span className="hidden sm:inline">
+                                Upload Video
+                              </span>
+                              <span className="sm:hidden">Upload</span>
+                            </button>
+                          )}
 
-                        {script.status === "REJECTED" && (
-                          <button
-                            onClick={() => handleEditScript(script)}
-                            className="flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors"
-                          >
-                            <FiEdit2 size={14} />
-                            <span className="hidden sm:inline">Fix Script</span>
-                            <span className="sm:hidden">Fix</span>
-                          </button>
-                        )}
+                          {script.status === "REJECTED" && (
+                            <button
+                              onClick={() => handleEditScript(script)}
+                              className="flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors"
+                            >
+                              <FiEdit2 size={14} />
+                              <span className="hidden sm:inline">
+                                Fix Script
+                              </span>
+                              <span className="sm:hidden">Fix</span>
+                            </button>
+                          )}
 
-                        {script.status === "DRAFT" && (
-                          <button
-                            onClick={() => handleEditScript(script)}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-xl sm:px-4 sm:py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-                          >
-                            <FiEdit2 size={14} />
-                            <span className="hidden sm:inline">Edit</span>
-                          </button>
-                        )}
+                          {/* {script.status === "DRAFT" && (
+                            <button
+                              onClick={() => handleEditScript(script)}
+                              className={`flex items-center gap-1 px-3 py-1.5 rounded-xl sm:px-4 sm:py-2 text-sm font-medium text-white ${
+                                scripts.latestRejection 
+                                  ? "bg-red-600 hover:bg-red-700"
+                                  : "bg-blue-600 hover:bg-blue-700"
+                              }  transition-colors`}
+                            >
+                              <FiEdit2 size={14} />
+                              <span className="hidden sm:inline">
+                                {scripts.latestRejection
+                                  ? "Fix Script"
+                                  : "Edit"}
+                              </span>
+                            </button>
+                          )} */}
+                          {script.status === "DRAFT" && (
+                            <button
+                              onClick={() => handleEditScript(script)}
+                              className={`flex items-center gap-1 px-3 py-1.5 rounded-xl sm:px-4 sm:py-2 text-sm font-medium text-white ${
+                                script.latestRejection
+                                  ? "bg-red-600 hover:bg-red-700"
+                                  : "bg-blue-600 hover:bg-blue-700"
+                              } transition-colors`}
+                            >
+                              <FiEdit2 size={14} />
+                              <span className="hidden sm:inline">
+                                {script.latestRejection ? "Fix Script" : "Edit"}
+                              </span>
+                              <span className="sm:hidden">
+                                {script.latestRejection ? "Fix" : "Edit"}
+                              </span>
+                            </button>
+                          )}
 
-                        {isScriptLocked(script.status) && (
-                          <button
-                            onClick={() => handleViewScript(script)}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
-                          >
-                            <FiEye size={14} />
-                            <span className="hidden sm:inline">
-                              View
-                              {script.status === "LOCKED" ? " Script" : ""}
-                            </span>
-                          </button>
-                        )}
+                          {isScriptLocked(script.status) && (
+                            <button
+                              onClick={() => handleViewScript(script)}
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+                            >
+                              <FiEye size={14} />
+                              <span className="hidden sm:inline">
+                                View
+                                {script.status === "LOCKED" ? " Script" : ""}
+                              </span>
+                            </button>
+                          )}
 
-                        {/* {script.status === "DRAFT" && (
+                          {/* {script.status === "DRAFT" && (
                           <button
                             onClick={() => handleDeleteScript(script.id)}
                             disabled={
@@ -352,52 +405,54 @@ console.log("scripts", scripts)
                             <FiTrash2 size={16} />
                           </button>
                         )} */}
+                        </div>
                       </div>
+
+                      {script.rejectionReason &&
+                        script.status === "REJECTED" && (
+                          <div className="mt-4 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
+                            <div className="flex items-start gap-2">
+                              <div className="mt-0.5 flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                                <FiXCircle size={16} className="text-red-600" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-red-900 mb-1">
+                                  Feedback:
+                                </p>
+                                <p className="text-sm text-red-800 break-words">
+                                  {script.rejectionReason}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                      {script.status === "LOCKED" && (
+                        <div className="mt-4 p-3 sm:p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                          <div className="flex items-start gap-2">
+                            <div className="mt-0.5 flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                              <FiCheckCircle
+                                size={16}
+                                className="text-purple-600"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-purple-900 mb-1">
+                                Script Approved & Locked!
+                              </p>
+                              <p className="text-sm text-purple-800 break-words">
+                                This script has been approved by all reviewers
+                                and is now locked. You can proceed to upload the
+                                video.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-
-                    {script.rejectionReason && script.status === "REJECTED" && (
-                      <div className="mt-4 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
-                        <div className="flex items-start gap-2">
-                          <div className="mt-0.5 flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                            <FiXCircle size={16} className="text-red-600" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-red-900 mb-1">
-                              Feedback:
-                            </p>
-                            <p className="text-sm text-red-800 break-words">
-                              {script.rejectionReason}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {script.status === "LOCKED" && (
-                      <div className="mt-4 p-3 sm:p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                        <div className="flex items-start gap-2">
-                          <div className="mt-0.5 flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                            <FiCheckCircle
-                              size={16}
-                              className="text-purple-600"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-purple-900 mb-1">
-                              Script Approved & Locked!
-                            </p>
-                            <p className="text-sm text-purple-800 break-words">
-                              This script has been approved by all reviewers and
-                              is now locked. You can proceed to upload the
-                              video.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               {filteredScripts.length === 0 && !isScriptListLoading && (
                 <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
@@ -419,7 +474,7 @@ console.log("scripts", scripts)
         />
       )}
 
-       {scriptForUpload && (
+      {scriptForUpload && (
         <VideoUploadModal
           open={showVideoUploadModal}
           onClose={handleCloseVideoUploadModal}

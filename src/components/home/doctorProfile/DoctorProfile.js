@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDoctorsList } from "../../../redux/action/topicAction/TopicAction";
 import SkeletonBlock from "../../common/skeletonBlock/SkeletonBlock";
-import { statusStyles } from "../../../utils/helper";
 
 const DoctorProfile = () => {
   const dispatch = useDispatch();

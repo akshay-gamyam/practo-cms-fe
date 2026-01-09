@@ -30,7 +30,7 @@ const rootReducer = combineReducers({
   agencyPoc: agencyPocReducer,
   doctor_pointers: doctorPointerReducer,
   contentApprover: contnentApproverReducer,
-  publish: publisherReducer
+  publisher: publisherReducer
 });
 
 export const store = configureStore({   

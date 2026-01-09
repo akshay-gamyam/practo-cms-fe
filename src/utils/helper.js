@@ -438,6 +438,28 @@ export const getWordCount = (htmlContent) => {
   return text.trim().split(/\s+/).length;
 };
 
+export const getPublishStatusBadge = (video) => {
+    if (video.status === "PUBLISHED") {
+      return {
+        class: "bg-green-100 text-green-700",
+        icon: <FiCheckCircle className="w-3 h-3" />,
+        text: "Published",
+      };
+    }
+    if (video.lockedById) {
+      return {
+        class: "bg-blue-100 text-blue-700",
+        icon: <FiClock className="w-3 h-3" />,
+        text: "Claimed",
+      };
+    }
+    return {
+      class: "bg-yellow-100 text-yellow-700",
+      icon: <FiClock className="w-3 h-3" />,
+      text: "Ready",
+    };
+  };
+
 export const getStatusBadge = (status) => {
   const statusLower = status?.toLowerCase();
   switch (statusLower) {

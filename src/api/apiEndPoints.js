@@ -51,8 +51,9 @@ export const GET_ALL_SCRIPT_VERSION = "/api/scripts/my-reviews/topic";
 export const SEPRATE_CONTENT_APPROVER_VIDEOS = "/api/scripts/my-locks";
 
 
-export const GET_PUBLISHER_LIST = "/api/videos/queue";
-export const PUBLISHER_CLAIM_VIDEO = (id) => `/api/videos/${id}/claim`;
-export const PUBLISH_VIDEO = (id) => `/api/videos/${id}/publish`;
+export const PUBLISHER_QUEUE = "/api/videos/queue";
+export const PUBLISHER_VIDEOS = "/api/videos";
+export const PUBLISHER_CLAIM = (id) => `/api/videos/${id}/claim`;
+export const PUBLISHER_PUBLISH = (id) => `/api/videos/${id}/publish`;
 export const PUBLISHED_VIDEO = "/api/videos/status";
 export const SUBMIT_AGENCY_VIDEO = (id) => `/api/videos/${id}/submit`;

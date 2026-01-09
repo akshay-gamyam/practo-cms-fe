@@ -1,122 +1,100 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+
+import React, { useEffect, useState } from "react";
 import {
   FiSearch,
-  FiClock,
   FiCheckCircle,
   FiEye,
   FiFileText,
+  FiVideo,
+  FiCalendar,
+  FiUpload,
 } from "react-icons/fi";
-import ContentDetailsModal from "./ContentDetailsScriptModal";
 import {
-  fetchContentApproverScripts,
-  claimScript,
-  contentApproverScript,
-  approveScript,
-} from "../../../../redux/action/contentApproverAction/ContentApproverAction";
-import {
-  formatDate,
-  getStatusBadge,
-  getWordCount,
-} from "../../../../utils/helper";
-import { toast } from "react-toastify";
-import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
+  fetchQueueVideos,
+  fetchPublishedVideos,
+  claimVideo,
+  publishVideo,
+} from "../../../redux/action/publisherAction/PublisherAction";
+import PublisherDetailModal from "./PublisherDetailModal";
+import PublishConfirmModal from "./PublishConfirmModal";
+import { getPublishStatusBadge, formatDate, getWordCount } from "../../../utils/helper";
+import { useDispatch, useSelector } from "react-redux";
+import SkeletonBlock from "../../common/skeletonBlock/SkeletonBlock";
 
-const ContentApproverScript = () => {
+const Publisher = () => {
   const dispatch = useDispatch();
   const {
-    contentApproverScripts,
-    myClaimsScripts,
-    myLockedScripts,
-    isScriptsListLoading,
-    isScriptActionLoading,
+    queueVideos,
+    publishedVideos,
+    publishedPage,
+    isQueueLoading,
+    isPublishedLoading,
+    isVideoActionLoading,
     error,
-  } = useSelector((state) => state.contentApprover);
+  } = useSelector((state) => state.publisher);
 
+  const user = useSelector((state) => state.auth.user);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
-  const [selectedScript, setSelectedScript] = useState(null);
+  const [activeTab, setActiveTab] = useState("ready-to-publish");
+  const [selectedVideo, setSelectedVideo] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-
-  const buildFetchParams = () => {
-    const params = {};
-    if (searchTerm) {
-      params.search = searchTerm;
-    }
-    return params;
-  };
-
-  const refetchScripts = () => {
-    dispatch(fetchContentApproverScripts(buildFetchParams()));
-  };
+  const [showPublishModal, setShowPublishModal] = useState(false);
+  const [videoToPublish, setVideoToPublish] = useState(null);
 
   useEffect(() => {
-    refetchScripts();
-  }, [filterStatus, searchTerm]);
-
-  const getCurrentTabData = () => {
-    switch (filterStatus) {
-      case "my-claims":
-        return myClaimsScripts;
-      case "approved":
-        return myLockedScripts;
-      case "all":
-      default:
-        return contentApproverScripts;
+    if (activeTab === "ready-to-publish") {
+      dispatch(fetchQueueVideos());
+    } else if (activeTab === "published") {
+      dispatch(fetchPublishedVideos({ page: publishedPage }));
     }
-  };
+  }, [dispatch, activeTab]);
 
-  const handleClaim = async (id) => {
+  const handleClaim = async (videoId) => {
     try {
-      await dispatch(claimScript(id));
-      await dispatch(fetchContentApproverScripts(buildFetchParams()));
+      await dispatch(claimVideo(videoId));
     } catch (error) {
-      toast.error("Failed to claim script:", error);
+      console.error("Failed to claim video:", error);
     }
   };
 
-  const handleApprove = async (id) => {
+  const handlePublishClick = (video) => {
+    setVideoToPublish(video);
+    setShowPublishModal(true);
+  };
+
+  const handlePublishConfirm = async () => {
+    if (!videoToPublish) return;
+    
     try {
-      dispatch(approveScript(id))
-      // refetchScripts();
-      dispatch(fetchContentApproverScripts(buildFetchParams()));
+      await dispatch(publishVideo(videoToPublish.id));
+      setShowPublishModal(false);
+      setVideoToPublish(null);
     } catch (error) {
-      console.error("Failed to approve script:", error);
-      toast.error("Failed to approve script");
+      console.error("Failed to publish video:", error);
     }
   };
 
-  const handleTabChange = async (tabKey) => {
-    setFilterStatus(tabKey);
-    if (tabKey === "approved") {
-      try {
-        await dispatch(contentApproverScript());
-        setFilterStatus('all')
-      } catch (error) {
-        console.error("Failed to fetch approved scripts:", error);
-      }
-    }
-  };
+  const currentVideos = activeTab === "ready-to-publish" ? queueVideos : publishedVideos;
+  const isLoading = activeTab === "ready-to-publish" ? isQueueLoading : isPublishedLoading;
 
-  const currentTabData = getCurrentTabData();
-
-  const filteredScripts = currentTabData.filter((script) => {
+  const filteredVideos = currentVideos.filter((video) => {
     const matchesSearch =
-      script.topic?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      script.uploadedBy?.firstName
+      video.topic?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      video.uploadedBy?.firstName
         ?.toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      script.uploadedBy?.lastName
+      video.uploadedBy?.lastName
         ?.toLowerCase()
         .includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
 
+
   if (error) {
     return (
       <div className="flex justify-center items-center py-10 text-red-500">
-        Failed to load scripts
+        Failed to load videos: {error}
       </div>
     );
   }
@@ -126,11 +104,10 @@ const ContentApproverScript = () => {
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
           <h1 className="text-2xl font-semibold text-gray-900 mb-1">
-            Script Approvals
+            Publisher Dashboard
           </h1>
           <p className="text-sm text-gray-600">
-            Final approval authority - Review all content before moving to
-            production
+            Manage and publish approved video content
           </p>
         </div>
 
@@ -140,8 +117,8 @@ const ContentApproverScript = () => {
               <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search by title or doctor name..."
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                placeholder="Search by title or creator name..."
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -166,15 +143,14 @@ const ContentApproverScript = () => {
 
           <div className="flex gap-6 mt-4 border-b border-gray-200">
             {[
-              { key: "all", label: "All" },
-              { key: "my-claims", label: "My Claims" },
-              { key: "approved", label: "Approved" },
+              { key: "ready-to-publish", label: "Ready to Publish" },
+              { key: "published", label: "Published" },
             ].map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => handleTabChange(tab.key)}
+                onClick={() => setActiveTab(tab.key)}
                 className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
-                  filterStatus === tab.key
+                  activeTab === tab.key
                     ? "border-cyan-500 text-cyan-600"
                     : "border-transparent text-gray-600 hover:text-gray-900"
                 }`}
@@ -185,52 +161,50 @@ const ContentApproverScript = () => {
           </div>
         </div>
 
-        {isScriptsListLoading ? (
+        {isLoading ? (
           <SkeletonBlock />
-        ) : filteredScripts.length === 0 ? (
+        ) : filteredVideos.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
-            <p className="text-gray-500">No scripts found</p>
+            <FiVideo className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg font-medium mb-2">
+              No videos found
+            </p>
+            <p className="text-gray-400 text-sm">
+              {activeTab === "ready-to-publish"
+                ? "There are no videos ready to publish at the moment"
+                : "No published videos yet"}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {filteredScripts.map((script) => {
-              const statusBadge = getStatusBadge(script.displayStatus);
-              const isClaimed =
-                filterStatus === "my-claims"
-                  ? script.assignedReviewerId !== null
-                  : script.lockedById !== null;
+            {filteredVideos.map((video) => {
+              const statusBadge = getPublishStatusBadge(video);
+              const isClaimed = video.lockedById !== null;
+              const isClaimedByMe = video.lockedById === user?.id;
+              const isPublished = video.status === "PUBLISHED";
+              const wordCount = getWordCount(video.content);
 
-              const isContentApprovalStatus =
-                script.status === "LOCKED" || script.displayStatus === "CONTENT_APPROVAL" ;
-
-              const canInteract =
-                isContentApprovalStatus && isClaimed && !isScriptActionLoading;
-
-              const canShowClaimButton = isContentApprovalStatus && !isClaimed;
-
-              const authorName = script.uploadedBy
-                ? `${script.uploadedBy.firstName} ${script.uploadedBy.lastName}`
+              const authorName = video.uploadedBy
+                ? `${video.uploadedBy.firstName} ${video.uploadedBy.lastName}`
                 : "Unknown Author";
 
               const getInitials = (firstName = "", lastName = "") => {
-                return `${firstName.charAt(0)}${lastName.charAt(
-                  0
-                )}`.toUpperCase();
+                return `${firstName?.charAt(0) || ""}${
+                  lastName?.charAt(0) || ""
+                }`.toUpperCase();
               };
 
-              const badge = script.uploadedBy
+              const badge = video.uploadedBy
                 ? getInitials(
-                    script.uploadedBy.firstName,
-                    script.uploadedBy.lastName
+                    video.uploadedBy.firstName,
+                    video.uploadedBy.lastName
                   )
                 : "NA";
 
-              const wordCount = getWordCount(script.content);
-
               return (
                 <div
-                  key={script.id}
-                  className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+                  key={video.id}
+                  className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
@@ -242,31 +216,30 @@ const ContentApproverScript = () => {
                           {statusBadge.text}
                         </span>
                         <span className="text-xs text-gray-500 font-medium">
-                          Version {script.version}
+                          Version {video.version}
                         </span>
                       </div>
 
                       <div>
-                        {canShowClaimButton && (
+                        {!isPublished && !isClaimed && (
                           <button
-                            onClick={() => handleClaim(script.id)}
-                            disabled={isScriptActionLoading}
+                            onClick={() => handleClaim(video.id)}
+                            disabled={isVideoActionLoading}
                             className="border border-gray-400 rounded-xl px-6 py-1 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            {isScriptActionLoading ? "Claiming..." : "Claim"}
+                            {isVideoActionLoading ? "Claiming..." : "Claim"}
                           </button>
                         )}
-                        {/* {!canShowClaimButton && isClaimed && ( */}
-                        {filterStatus !== "approved" && !canShowClaimButton && isClaimed && (
+                        {!isPublished && isClaimed && (
                           <span className="text-xs text-green-600 font-medium bg-green-50 px-3 py-1 rounded-full">
-                            Claimed
+                            {isClaimedByMe ? "Claimed by You" : "Claimed"}
                           </span>
                         )}
                       </div>
                     </div>
 
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                      {script.topic?.title || "Untitled Script"}
+                      {video.topic?.title || "Untitled Video"}
                     </h3>
 
                     <div className="flex items-center gap-3 mb-4">
@@ -281,23 +254,23 @@ const ContentApproverScript = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs text-gray-500 mb-6">
+                    <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
                       <span className="flex items-center gap-1">
                         <FiFileText className="w-3.5 h-3.5" />
                         {wordCount} words
                       </span>
                       <span className="flex items-center gap-1">
-                        <FiClock className="w-3.5 h-3.5" />
-                        {formatDate(script.createdAt)}
+                        <FiCalendar className="w-3.5 h-3.5" />
+                        {formatDate(video.createdAt)}
                       </span>
                     </div>
 
-                    {filterStatus === "approved" && script.reviewComments && (
+                    {isPublished && video.publishedAt && (
                       <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                         <div className="flex items-center gap-2 text-xs text-green-700">
                           <FiCheckCircle className="w-3.5 h-3.5" />
                           <span className="font-medium">
-                            {script?.reviewComments}
+                            Published on {formatDate(video.publishedAt)}
                           </span>
                         </div>
                       </div>
@@ -306,22 +279,22 @@ const ContentApproverScript = () => {
                     <div className="flex gap-2">
                       <button
                         onClick={() => {
-                          setSelectedScript(script);
+                          setSelectedVideo(video);
                           setShowDetailsModal(true);
                         }}
                         className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium flex items-center justify-center gap-2"
                       >
                         <FiEye className="w-4 h-4" />
-                        {filterStatus === "approved" ? "View Content" : "Preview"}
+                        Preview
                       </button>
-                      {filterStatus !== "approved" && (
+                      {!isPublished && isClaimedByMe && (
                         <button
-                          onClick={() => handleApprove(script.id)}
-                          disabled={!canInteract || isScriptActionLoading}
-                          className="flex-1 px-4 py-2.5 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          onClick={() => handlePublishClick(video)}
+                          disabled={isVideoActionLoading}
+                          className="flex-1 px-4 py-2.5 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <FiCheckCircle className="w-4 h-4" />
-                          {isScriptActionLoading ? "Locking..." : "Lock"}
+                          <FiUpload className="w-4 h-4" />
+                          Publish
                         </button>
                       )}
                     </div>
@@ -333,17 +306,27 @@ const ContentApproverScript = () => {
         )}
       </div>
 
-      <ContentDetailsModal
+      <PublisherDetailModal
         isOpen={showDetailsModal}
         onClose={() => {
           setShowDetailsModal(false);
-          setSelectedScript(null);
+          setSelectedVideo(null);
         }}
-        content={selectedScript}
-        type="script"
+        video={selectedVideo}
+      />
+
+      <PublishConfirmModal
+        isOpen={showPublishModal}
+        onClose={() => {
+          setShowPublishModal(false);
+          setVideoToPublish(null);
+        }}
+        onConfirm={handlePublishConfirm}
+        video={videoToPublish}
+        isLoading={isVideoActionLoading}
       />
     </div>
   );
 };
 
-export default ContentApproverScript;
+export default Publisher;
