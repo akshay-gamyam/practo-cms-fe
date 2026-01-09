@@ -33,7 +33,6 @@ const ContentApproverScript = () => {
     error,
   } = useSelector((state) => state.contentApprover);
 
-
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedScript, setSelectedScript] = useState(null);
@@ -78,9 +77,12 @@ const ContentApproverScript = () => {
 
   const handleApprove = async (id) => {
     try {
-      dispatch(approveScript(id))
-      // refetchScripts();
-      dispatch(fetchContentApproverScripts(buildFetchParams()));
+      dispatch(approveScript(id));
+      toast.success("Script locked successfully");
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
+      // dispatch(fetchContentApproverScripts(buildFetchParams()));
     } catch (error) {
       console.error("Failed to approve script:", error);
       toast.error("Failed to approve script");
@@ -92,7 +94,6 @@ const ContentApproverScript = () => {
     if (tabKey === "approved") {
       try {
         await dispatch(contentApproverScript());
-        setFilterStatus('all')
       } catch (error) {
         console.error("Failed to fetch approved scripts:", error);
       }
@@ -201,7 +202,8 @@ const ContentApproverScript = () => {
                   : script.lockedById !== null;
 
               const isContentApprovalStatus =
-                script.status === "LOCKED" || script.displayStatus === "CONTENT_APPROVAL" ;
+                script.status === "LOCKED" ||
+                script.displayStatus === "CONTENT_APPROVAL";
 
               const canInteract =
                 isContentApprovalStatus && isClaimed && !isScriptActionLoading;
@@ -257,11 +259,13 @@ const ContentApproverScript = () => {
                           </button>
                         )}
                         {/* {!canShowClaimButton && isClaimed && ( */}
-                        {filterStatus !== "approved" && !canShowClaimButton && isClaimed && (
-                          <span className="text-xs text-green-600 font-medium bg-green-50 px-3 py-1 rounded-full">
-                            Claimed
-                          </span>
-                        )}
+                        {filterStatus !== "approved" &&
+                          !canShowClaimButton &&
+                          isClaimed && (
+                            <span className="text-xs text-green-600 font-medium bg-green-50 px-3 py-1 rounded-full">
+                              Claimed
+                            </span>
+                          )}
                       </div>
                     </div>
 
@@ -312,7 +316,9 @@ const ContentApproverScript = () => {
                         className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium flex items-center justify-center gap-2"
                       >
                         <FiEye className="w-4 h-4" />
-                        {filterStatus === "approved" ? "View Content" : "Preview"}
+                        {filterStatus === "approved"
+                          ? "View Content"
+                          : "Preview"}
                       </button>
                       {filterStatus !== "approved" && (
                         <button

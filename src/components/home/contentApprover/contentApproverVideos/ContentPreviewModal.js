@@ -8,7 +8,6 @@ const ContentPreviewModal = ({ isOpen, onClose, video }) => {
 
   useEffect(() => {
     if (isOpen && videoRef.current) {
-      // Auto-play when modal opens
       videoRef.current.play().catch(error => {
         console.error('Error auto-playing video:', error);
       });
@@ -16,7 +15,6 @@ const ContentPreviewModal = ({ isOpen, onClose, video }) => {
   }, [isOpen]);
 
   useEffect(() => {
-    // Pause video when modal closes
     return () => {
       if (videoRef.current) {
         videoRef.current.pause();
@@ -51,7 +49,6 @@ const ContentPreviewModal = ({ isOpen, onClose, video }) => {
     }
   };
 
-  // Get video URL - check multiple possible field names
   const videoUrl = video.videoUrl || video.url || video.fileUrl || video.video_url;
 
   return (
@@ -60,7 +57,6 @@ const ContentPreviewModal = ({ isOpen, onClose, video }) => {
       onClick={handleBackdropClick}
     >
       <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden">
-        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <div>
             <h2 className="text-xl font-bold text-gray-900">
@@ -78,7 +74,6 @@ const ContentPreviewModal = ({ isOpen, onClose, video }) => {
           </button>
         </div>
 
-        {/* Video Player */}
         <div className="relative bg-black">
           {videoUrl ? (
             <div className="relative">
@@ -98,7 +93,6 @@ const ContentPreviewModal = ({ isOpen, onClose, video }) => {
                 Your browser does not support the video tag.
               </video>
 
-              {/* Custom Controls Overlay */}
               <div className="absolute bottom-4 right-4 flex gap-2">
                 <button
                   onClick={toggleMute}
@@ -129,7 +123,6 @@ const ContentPreviewModal = ({ isOpen, onClose, video }) => {
           )}
         </div>
 
-        {/* Video Info */}
         <div className="p-4 border-t border-gray-200">
           <div className="flex items-center justify-between text-sm text-gray-600">
             <span>Version {video.version}</span>

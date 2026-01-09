@@ -57,3 +57,6 @@ export const PUBLISHER_CLAIM = (id) => `/api/videos/${id}/claim`;
 export const PUBLISHER_PUBLISH = (id) => `/api/videos/${id}/publish`;
 export const PUBLISHED_VIDEO = "/api/videos/status";
 export const SUBMIT_AGENCY_VIDEO = (id) => `/api/videos/${id}/submit`;
+
+export const CONTENT_LIBRARY_STATUS_LIST = "/api/videos/statuses";
+export const CONTENT_LIBRARY_SPECIALITY_LIST = "/api/specialties";

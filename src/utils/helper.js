@@ -512,3 +512,25 @@ export const getContentPreview = (htmlContent, maxLength = 500) => {
     .trim();
   return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
+
+
+export const getStatusColor = (statusValue) => {
+    const statusColorMap = {
+      DRAFT: "bg-gray-100 text-gray-600",
+      BRAND_REVIEW: "bg-purple-100 text-purple-600",
+      MEDICAL_REVIEW: "bg-orange-100 text-orange-600",
+      DOCTOR_REVIEW: "bg-yellow-100 text-yellow-600",
+      APPROVED: "bg-green-100 text-green-600",
+      LOCKED: "bg-cyan-100 text-cyan-600",
+      PUBLISHED: "bg-green-500 text-white",
+      ARCHIVED: "bg-red-100 text-red-600",
+    };
+    return statusColorMap[statusValue] || "bg-gray-100 text-gray-600";
+  };
+
+export const formatDuration = (seconds) => {
+    if (!seconds) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };

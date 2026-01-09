@@ -21,4 +21,5 @@ export const ROUTES = {
   CONTENT_APPROVER_VIDEOS : "/content-approver-videos",
   PUBLISHER : "/publisher",
   DOCTOR_PROFILE : "/doctor-profile",
+  CONTENT_LIBRARY : "/content-library",
 };

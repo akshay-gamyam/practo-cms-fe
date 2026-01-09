@@ -61,7 +61,7 @@ const Scriptting = () => {
     },
     {
       id: "REJECTED",
-      label: "Refix",
+      label: "Rejected",
       count:
         scripts.filter((s) => s.status === "REJECTED").length ||
         scripts.filter((s) => s.latestRejection !== null).length,
