@@ -26,7 +26,6 @@ const Scriptting = () => {
   const { scripts, isScriptListLoading, isDeleteScriptLoading } = useSelector(
     (state) => state.agencyPoc
   );
-  console.log("scripts", scripts);
   const [activeTab, setActiveTab] = useState("all");
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedScript, setSelectedScript] = useState(null);
@@ -261,7 +260,6 @@ const Scriptting = () => {
           <div className="max-w-7xl mx-auto py-4 mt-4">
             <div className="space-y-4">
               {filteredScripts.map((script) => {
-                console.log("script", script);
                 return (
                   <div
                     key={script.id}

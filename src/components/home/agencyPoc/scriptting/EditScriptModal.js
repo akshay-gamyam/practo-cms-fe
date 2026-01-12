@@ -269,7 +269,7 @@ const EditScriptModal = ({ open, onClose, topic, mode = "create" }) => {
       <div className="space-y-4">
         <div>
           <p className="text-gray-600 text-2xl font-semibold">{topic?.title}</p>
-          <p className="text-gray-600 text-md">{topic?.description}</p>
+          <p className="text-gray-600 text-md"  dangerouslySetInnerHTML={{ __html: topic?.description }}/>
         </div>
 
         {modalConfig.mode === "update" &&

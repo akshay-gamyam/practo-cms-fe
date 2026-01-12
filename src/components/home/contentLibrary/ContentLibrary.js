@@ -216,10 +216,10 @@ const ContentLibrary = () => {
                     >
                       <td className="px-6 py-4 max-w-xs relative group">
                         <div className="font-medium text-gray-900 truncate">
-                          {item.title}
+                          {item?.topic?.title}
                         </div>
                         <div className="absolute left-6 mt-1 z-50 hidden group-hover:block max-w-md rounded-md bg-gray-900 px-3 py-2 text-xs text-white shadow-lg whitespace-normal">
-                          {item.title}
+                          {item?.topic?.title}
                         </div>
                       </td>
 

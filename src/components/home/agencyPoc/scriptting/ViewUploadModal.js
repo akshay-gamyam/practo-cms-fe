@@ -1,18 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FiUpload, FiX, FiVideo, FiImage, FiAlertCircle } from "react-icons/fi";
 import { uploadVideoComplete } from "../../../../redux/action/agencyPocAction/AgencyPocAction";
-import CustomSelect from "../../../common/customSelect/CustomSelect";
+import { fetchContentLibrarySpecialityList } from "../../../../redux/action/contentLibraryAction/ContentLibraryAction";
 
 const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
   const dispatch = useDispatch();
 
-  // Get loading states from Redux
   const {
     isUploadVideoLoading,
     isGetVideoUploadUrlLoading,
     isGetThumbnailUploadUrlLoading,
   } = useSelector((state) => state.agencyPoc);
+
+  const { contentLibrarySpeciality } = useSelector(
+    (state) => state.content_library
+  );
 
   const [formData, setFormData] = useState({
     title: "",
@@ -24,6 +27,9 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
     ctaType: "CONSULT",
     duration: 0,
   });
+
+
+  console.log("formData", formData)
 
   const [videoFile, setVideoFile] = useState(null);
   const [thumbnailFile, setThumbnailFile] = useState(null);
@@ -112,6 +118,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
           {
             ...formData,
             topicId: script.topicId,
+            scriptId: script?.id
           },
           (progress) => {
             setUploadProgress(progress);
@@ -137,6 +144,14 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
       setError(err.message || "Failed to upload video. Please try again.");
     }
   };
+
+  const specialtyOptions = Array.isArray(contentLibrarySpeciality?.specialties)
+    ? contentLibrarySpeciality.specialties
+    : [];
+
+  useEffect(() => {
+    dispatch(fetchContentLibrarySpecialityList());
+  }, [dispatch]);
 
   const handleClose = () => {
     if (uploading) return;
@@ -356,7 +371,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
               <label className="block text-sm font-medium text-gray-700">
                 Specialty
               </label>
-              <input
+              {/* <input
                 type="text"
                 name="specialty"
                 value={formData.specialty}
@@ -364,7 +379,34 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
                 disabled={uploading}
                 placeholder="Cardiology"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-              />
+              /> */}
+
+              <select
+                name="specialty"
+                value={formData.specialty}
+                onChange={(e) => handleInputChange(e.target)}
+                disabled={uploading}
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+              >
+                <option value="">Select Specialty</option>
+
+                {specialtyOptions.map((option) => (
+                  <option key={option.id} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              {/* <CustomSelect
+                options={specialtyOptions}
+                value={formData.specialty}
+                onChange={handleSpecialtyChange}
+                placeholder="All Specialties"
+                renderValue={(option) => (
+                  <span className="text-gray-700 text-sm sm:text-base">
+                    {option?.label || "All Specialties"}
+                  </span>
+                )}
+              /> */}
             </div>
 
             <div className="space-y-2">

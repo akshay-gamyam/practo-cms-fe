@@ -465,6 +465,7 @@ export const uploadVideoComplete =
       const createVideoResult = await dispatch(
         createVideoRecord({
           topicId: formData.topicId,
+          scriptId: formData.scriptId,
           title: formData.title,
           description: formData.description,
           videoUrl: videoFileUrl,
