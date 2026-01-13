@@ -1,16 +1,14 @@
-import React, { useRef, useEffect } from 'react';
-import { IoClose } from 'react-icons/io5';
-import { FiMaximize2, FiVolume2, FiVolumeX } from 'react-icons/fi';
+import React, { useRef, useEffect } from "react";
+import CustomModal from "../../../common/Modal/CustomModal";
+
 
 const ContentPreviewModal = ({ isOpen, onClose, video }) => {
+    console.log("video", video)
   const videoRef = useRef(null);
-  const [isMuted, setIsMuted] = React.useState(false);
 
   useEffect(() => {
     if (isOpen && videoRef.current) {
-      videoRef.current.play().catch(error => {
-        console.error('Error auto-playing video:', error);
-      });
+      videoRef.current.play().catch(() => {});
     }
   }, [isOpen]);
 
@@ -22,122 +20,117 @@ const ContentPreviewModal = ({ isOpen, onClose, video }) => {
     };
   }, []);
 
-  if (!isOpen || !video) return null;
-
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setIsMuted(!isMuted);
-    }
-  };
-
-  const toggleFullscreen = () => {
-    if (videoRef.current) {
-      if (videoRef.current.requestFullscreen) {
-        videoRef.current.requestFullscreen();
-      } else if (videoRef.current.webkitRequestFullscreen) {
-        videoRef.current.webkitRequestFullscreen();
-      } else if (videoRef.current.msRequestFullscreen) {
-        videoRef.current.msRequestFullscreen();
-      }
-    }
-  };
-
-  const videoUrl = video.videoUrl || video.url || video.fileUrl || video.video_url;
+  if (!video) return null;
 
   return (
-    <div
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-      onClick={handleBackdropClick}
+    <CustomModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={video.title || video.topic?.title || "Video Preview"}
+      maxWidth="max-w-6xl"
     >
-      <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden">
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="border rounded-xl shadow-sm p-5 space-y-5">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">
-              {video.topic?.title || 'Video Preview'}
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {video.uploadedBy?.firstName} {video.uploadedBy?.lastName}
+            <h3 className="text-lg font-bold text-gray-900">
+              {video.title || video.topic?.title}
+            </h3>
+            <p className="text-sm mt-1 text-gray-600">
+              {video.description}
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-cyan-500 text-white flex items-center justify-center font-semibold">
+              {video.doctorName?.charAt(0) || "D"}
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-900">
+                {video.doctorName ||
+                  `${video.uploadedBy?.firstName} ${video.uploadedBy?.lastName}`}
+              </p>
+              <p className="text-xs text-gray-500">Content Doctor</p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {video.specialty && (
+              <span className="px-3 py-1 text-xs rounded-full bg-cyan-100 text-cyan-700">
+                {video.specialty}
+              </span>
+            )}
+            {video.language && (
+              <span className="px-3 py-1 text-xs rounded-full bg-purple-100 text-purple-700">
+                {video.language}
+              </span>
+            )}
+            {video.city && (
+              <span className="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-700">
+                {video.city}
+              </span>
+            )}
+          </div>
+
+          <div className="border-t pt-4 grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-gray-400">Duration</p>
+              <p className="font-medium">
+                {Math.floor(video.duration / 60)}:
+                {(video.duration % 60).toString().padStart(2, "0")} mins
+              </p>
+            </div>
+
+            <div>
+              <p className="text-gray-400">Version</p>
+              <p className="font-medium">v{video.version}</p>
+            </div>
+
+            <div>
+              <p className="text-gray-400">CTA</p>
+              <p className="font-medium">{video.ctaType}</p>
+            </div>
+
+            <div>
+              <p className="text-gray-400">Created</p>
+              <p className="font-medium">
+                {new Date(video.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+
+          <span
+            className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold
+              ${
+                video.status === "PUBLISHED"
+                  ? "bg-green-100 text-green-700"
+                  : video.status === "LOCKED"
+                  ? "bg-yellow-100 text-yellow-700"
+                  : "bg-gray-100 text-gray-600"
+              }`}
           >
-            <IoClose className="w-6 h-6 text-gray-600" />
-          </button>
+            {video.status}
+          </span>
         </div>
 
-        <div className="relative bg-black">
-          {videoUrl ? (
-            <div className="relative">
-              <video
-                ref={videoRef}
-                className="w-full max-h-[70vh] object-contain"
-                controls
-                controlsList="nodownload"
-                onError={(e) => {
-                  console.error('Video error:', e);
-                  console.error('Video URL that failed:', videoUrl);
-                }}
-              >
-                <source src={videoUrl} type="video/mp4" />
-                <source src={videoUrl} type="video/webm" />
-                <source src={videoUrl} type="video/ogg" />
-                Your browser does not support the video tag.
-              </video>
-
-              <div className="absolute bottom-4 right-4 flex gap-2">
-                <button
-                  onClick={toggleMute}
-                  className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-lg transition-colors backdrop-blur-sm"
-                  title={isMuted ? 'Unmute' : 'Mute'}
-                >
-                  {isMuted ? <FiVolumeX className="w-5 h-5" /> : <FiVolume2 className="w-5 h-5" />}
-                </button>
-                <button
-                  onClick={toggleFullscreen}
-                  className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-lg transition-colors backdrop-blur-sm"
-                  title="Fullscreen"
-                >
-                  <FiMaximize2 className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
+        <div className="lg:col-span-2 bg-black rounded-xl overflow-hidden">
+          {video.videoUrl ? (
+            <video
+              ref={videoRef}
+              className="w-full h-[420px] object-contain bg-black"
+              controls
+              controlsList="nodownload"
+            >
+              <source src={video.videoUrl} type="video/mp4" />
+              <source src={video.videoUrl} type="video/webm" />
+            </video>
           ) : (
-            <div className="flex items-center justify-center h-96 text-white">
-              <div className="text-center">
-                <FiVolume2 className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium">Video URL not available</p>
-                <p className="text-sm text-gray-400 mt-2">
-                  Please check the video source
-                </p>
-              </div>
+            <div className="flex items-center justify-center h-[420px] text-white">
+              Video not available
             </div>
           )}
         </div>
-
-        <div className="p-4 border-t border-gray-200">
-          <div className="flex items-center justify-between text-sm text-gray-600">
-            <span>Version {video.version}</span>
-            <span className="flex items-center gap-4">
-              {video.duration && (
-                <span>Duration: {Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}</span>
-              )}
-              {video.fileSize && (
-                <span>Size: {(video.fileSize / (1024 * 1024)).toFixed(2)} MB</span>
-              )}
-            </span>
-          </div>
-        </div>
       </div>
-    </div>
+    </CustomModal>
   );
 };
 

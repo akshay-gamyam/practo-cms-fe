@@ -13,6 +13,7 @@ import {
   // deleteVideo
 } from "../../../../redux/action/agencyPocAction/AgencyPocAction";
 import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
+import ContentPreviewModal from "../../contentApprover/contentApproverVideos/ContentPreviewModal";
 
 const AgencyPocVideos = () => {
   const dispatch = useDispatch();
@@ -27,6 +28,7 @@ const AgencyPocVideos = () => {
   const [videoToDelete, setVideoToDelete] = useState(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  console.log("selectedVideo", selectedVideo);
 
   const REVIEW_STATUSES = [
     "IN_REVIEW",
@@ -82,10 +84,10 @@ const AgencyPocVideos = () => {
         color: "text-red-700 bg-red-50 border-red-200",
       },
       PUBLISHED: {
-         icon: <IoMdTime className="h-4 w-4" />,
+        icon: <IoMdTime className="h-4 w-4" />,
         text: "PUBLISHED",
         color: "text-cyan-700 bg-cyan-50 border-cyan-200",
-      }
+      },
     };
     return badges[status];
   };
@@ -387,47 +389,14 @@ const AgencyPocVideos = () => {
         )}
       </div>
 
-      {isVideoModalOpen && selectedVideo && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60"
-          onClick={() => setIsVideoModalOpen(false)}
-        >
-          <div
-            className="relative bg-white rounded-xl w-full max-w-4xl mx-4 p-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close Button */}
-            <button
-              onClick={() => setIsVideoModalOpen(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
-            >
-              ✕
-            </button>
-
-            {/* Title */}
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              {selectedVideo.title || "Video Preview"}
-            </h3>
-
-            {/* Video Player */}
-            <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
-              <video
-                src={selectedVideo.videoUrl}
-                controls
-                autoPlay
-                className="w-full h-full object-contain"
-              />
-            </div>
-
-            {/* Optional Description */}
-            {selectedVideo.description && (
-              <p className="text-sm text-gray-600 mt-3">
-                {selectedVideo.description}
-              </p>
-            )}
-          </div>
-        </div>
-      )}
+      <ContentPreviewModal
+        isOpen={isVideoModalOpen}
+        onClose={() => {
+          setIsVideoModalOpen(false);
+          setSelectedVideo(null);
+        }}
+        video={selectedVideo}
+      />
     </div>
   );
 };
