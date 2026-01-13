@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   FiSearch,
@@ -12,7 +11,6 @@ import {
 import {
   fetchQueueVideos,
   fetchPublishedVideos,
-  claimVideo,
   publishVideo,
 } from "../../../redux/action/publisherAction/PublisherAction";
 import PublisherDetailModal from "./PublisherDetailModal";
@@ -49,14 +47,6 @@ const Publisher = () => {
       dispatch(fetchPublishedVideos({ page: publishedPage }));
     }
   }, [dispatch, activeTab]);
-
-  const handleClaim = async (videoId) => {
-    try {
-      await dispatch(claimVideo(videoId));
-    } catch (error) {
-      console.error("Failed to claim video:", error);
-    }
-  };
 
   const handlePublishClick = (video) => {
     setVideoToPublish(video);
@@ -179,8 +169,6 @@ const Publisher = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filteredVideos.map((video) => {
               const statusBadge = getPublishStatusBadge(video);
-              const isClaimed = video.lockedById !== null;
-              const isClaimedByMe = video.lockedById === user?.id;
               const isPublished = video.status === "PUBLISHED";
               const wordCount = getWordCount(video.content);
 
@@ -218,23 +206,6 @@ const Publisher = () => {
                         <span className="text-xs text-gray-500 font-medium">
                           Version {video.version}
                         </span>
-                      </div>
-
-                      <div>
-                        {!isPublished && !isClaimed && (
-                          <button
-                            onClick={() => handleClaim(video.id)}
-                            disabled={isVideoActionLoading}
-                            className="border border-gray-400 rounded-xl px-6 py-1 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {isVideoActionLoading ? "Claiming..." : "Claim"}
-                          </button>
-                        )}
-                        {!isPublished && isClaimed && (
-                          <span className="text-xs text-green-600 font-medium bg-green-50 px-3 py-1 rounded-full">
-                            {isClaimedByMe ? "Claimed by You" : "Claimed"}
-                          </span>
-                        )}
                       </div>
                     </div>
 
@@ -287,7 +258,7 @@ const Publisher = () => {
                         <FiEye className="w-4 h-4" />
                         Preview
                       </button>
-                      {!isPublished && isClaimedByMe && (
+                      {!isPublished && (
                         <button
                           onClick={() => handlePublishClick(video)}
                           disabled={isVideoActionLoading}

@@ -81,6 +81,11 @@ const AgencyPocVideos = () => {
         text: "LOCKED",
         color: "text-red-700 bg-red-50 border-red-200",
       },
+      PUBLISHED: {
+         icon: <IoMdTime className="h-4 w-4" />,
+        text: "PUBLISHED",
+        color: "text-cyan-700 bg-cyan-50 border-cyan-200",
+      }
     };
     return badges[status];
   };
