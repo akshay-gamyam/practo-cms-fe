@@ -5,7 +5,6 @@ import {
   FiClock,
   FiCheckCircle,
   FiPlay,
-  FiDownload,
   FiVideo,
 } from "react-icons/fi";
 import { TbVersions } from "react-icons/tb";
@@ -15,19 +14,16 @@ import ContentDetailsModal from "../contentApproverScript/ContentDetailsScriptMo
 import ContentCommentModal from "./ContentCommentModal";
 import {
   fetchContentApproverVideos,
-  claimVideos,
   approveVideos,
   rejectVideos,
 } from "../../../../redux/action/contentApproverAction/ContentApproverAction";
 import { formatDate, getStatusBadge } from "../../../../utils/helper";
-import { toast } from "react-toastify";
 import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
 
 const ContentApproverVideos = () => {
   const dispatch = useDispatch();
   const {
     contentApproverVideos,
-    myClaimsVideos,
     approvedVideos,
     rejectedVideos,
     isVideosListLoading,
@@ -61,8 +57,6 @@ const ContentApproverVideos = () => {
 
   const getCurrentTabData = () => {
     switch (filterStatus) {
-      case "my-claims":
-        return myClaimsVideos;
       case "approved":
         return approvedVideos;
       case "rejected":
@@ -70,15 +64,6 @@ const ContentApproverVideos = () => {
       case "all":
       default:
         return contentApproverVideos;
-    }
-  };
-
-  const handleClaim = async (id, e) => {
-    if (e) e.stopPropagation();
-    try {
-      await dispatch(claimVideos(id));
-    } catch (error) {
-      toast.error("Failed to claim video");
     }
   };
 
@@ -145,12 +130,6 @@ const ContentApproverVideos = () => {
     return matchesSearch;
   });
 
-  const formatFileSize = (bytes) => {
-    if (!bytes) return "N/A";
-    const mb = bytes / (1024 * 1024);
-    return `${mb.toFixed(2)} MB`;
-  };
-
   const formatDuration = (seconds) => {
     if (!seconds) return "N/A";
     const mins = Math.floor(seconds / 60);
@@ -213,7 +192,6 @@ const ContentApproverVideos = () => {
           <div className="flex gap-6 mt-4 border-b border-gray-200">
             {[
               { key: "all", label: "All" },
-              { key: "my-claims", label: "My Claims" },
               { key: "approved", label: "Approved" },
               { key: "rejected", label: "Rejected" },
             ].map((tab) => (
@@ -242,14 +220,12 @@ const ContentApproverVideos = () => {
           <div className="space-y-6">
             {filteredVideos.map((video) => {
               const statusBadge = getStatusBadge(video.status);
-              // const isClaimed = video.lockedById !== null;
-              const isClaimed = filterStatus === "my-claims" ? video.assignedReviewerId !== null : video.lockedById !== null;
               
               const isFinalStatus = 
                 video.decision?.toUpperCase() === "APPROVED" || 
                 video.decision?.toUpperCase() === "REJECTED";
               
-              const canInteract = isClaimed && !isFinalStatus;
+              const canInteract = !isFinalStatus;
 
               const authorName = video.uploadedBy
                 ? `${video.uploadedBy.firstName} ${video.uploadedBy.lastName}`
@@ -283,30 +259,7 @@ const ContentApproverVideos = () => {
                           {statusBadge.icon}
                           {statusBadge.text}
                         </span>
-                        {/* <span className="text-xs text-gray-500 font-medium bg-white px-2 py-1 rounded-md">
-                          Version {video.version}
-                        </span> */}
                       </div>
-                      
-                      {!isFinalStatus && !isClaimed && (
-                        <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
-                          <button
-                            onClick={(e) => handleClaim(video.id, e)}
-                            disabled={isVideosActionLoading}
-                            className="bg-white border border-gray-400 rounded-xl px-4 py-1 hover:bg-gray-50 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {isVideosActionLoading ? "Claiming..." : "Claim"}
-                          </button>
-                        </div>
-                      )}
-                      
-                      {!isFinalStatus && isClaimed && (
-                        <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
-                          <span className="text-xs text-green-600 font-medium bg-green-50 px-3 py-1 rounded-full">
-                            Claimed
-                          </span>
-                        </div>
-                      )}
 
                       <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
                         <div className="w-16 h-16 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-cyan-500 group-hover:scale-110 transition-all duration-300 shadow-lg pointer-events-auto">

@@ -10,7 +10,6 @@ import {
 import ContentDetailsModal from "./ContentDetailsScriptModal";
 import {
   fetchContentApproverScripts,
-  claimScript,
   contentApproverScript,
   approveScript,
 } from "../../../../redux/action/contentApproverAction/ContentApproverAction";
@@ -26,7 +25,6 @@ const ContentApproverScript = () => {
   const dispatch = useDispatch();
   const {
     contentApproverScripts,
-    myClaimsScripts,
     myLockedScripts,
     isScriptsListLoading,
     isScriptActionLoading,
@@ -56,22 +54,11 @@ const ContentApproverScript = () => {
 
   const getCurrentTabData = () => {
     switch (filterStatus) {
-      case "my-claims":
-        return myClaimsScripts;
       case "approved":
         return myLockedScripts;
       case "all":
       default:
         return contentApproverScripts;
-    }
-  };
-
-  const handleClaim = async (id) => {
-    try {
-      await dispatch(claimScript(id));
-      await dispatch(fetchContentApproverScripts(buildFetchParams()));
-    } catch (error) {
-      toast.error("Failed to claim script:", error);
     }
   };
 
@@ -82,7 +69,6 @@ const ContentApproverScript = () => {
       setTimeout(() => {
         window.location.reload();
       }, 300);
-      // dispatch(fetchContentApproverScripts(buildFetchParams()));
     } catch (error) {
       console.error("Failed to approve script:", error);
       toast.error("Failed to approve script");
@@ -168,7 +154,6 @@ const ContentApproverScript = () => {
           <div className="flex gap-6 mt-4 border-b border-gray-200">
             {[
               { key: "all", label: "All" },
-              { key: "my-claims", label: "My Claims" },
               { key: "approved", label: "Approved" },
             ].map((tab) => (
               <button
@@ -196,19 +181,12 @@ const ContentApproverScript = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filteredScripts.map((script) => {
               const statusBadge = getStatusBadge(script.displayStatus);
-              const isClaimed =
-                filterStatus === "my-claims"
-                  ? script.assignedReviewerId !== null
-                  : script.lockedById !== null;
 
               const isContentApprovalStatus =
                 script.status === "LOCKED" ||
                 script.displayStatus === "CONTENT_APPROVAL";
 
-              const canInteract =
-                isContentApprovalStatus && isClaimed && !isScriptActionLoading;
-
-              const canShowClaimButton = isContentApprovalStatus && !isClaimed;
+              const canInteract = isContentApprovalStatus && !isScriptActionLoading;
 
               const authorName = script.uploadedBy
                 ? `${script.uploadedBy.firstName} ${script.uploadedBy.lastName}`
@@ -246,26 +224,6 @@ const ContentApproverScript = () => {
                         <span className="text-xs text-gray-500 font-medium">
                           Version {script.version}
                         </span>
-                      </div>
-
-                      <div>
-                        {canShowClaimButton && (
-                          <button
-                            onClick={() => handleClaim(script.id)}
-                            disabled={isScriptActionLoading}
-                            className="border border-gray-400 rounded-xl px-6 py-1 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {isScriptActionLoading ? "Claiming..." : "Claim"}
-                          </button>
-                        )}
-                        {/* {!canShowClaimButton && isClaimed && ( */}
-                        {filterStatus !== "approved" &&
-                          !canShowClaimButton &&
-                          isClaimed && (
-                            <span className="text-xs text-green-600 font-medium bg-green-50 px-3 py-1 rounded-full">
-                              Claimed
-                            </span>
-                          )}
                       </div>
                     </div>
 

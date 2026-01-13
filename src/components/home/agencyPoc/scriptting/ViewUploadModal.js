@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FiUpload, FiX, FiVideo, FiImage, FiAlertCircle } from "react-icons/fi";
+import { FiUpload, FiX, FiImage, FiAlertCircle } from "react-icons/fi";
+import { BsUpload } from "react-icons/bs";
 import { uploadVideoComplete } from "../../../../redux/action/agencyPocAction/AgencyPocAction";
 import { fetchContentLibrarySpecialityList } from "../../../../redux/action/contentLibraryAction/ContentLibraryAction";
 
@@ -17,6 +18,20 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
     (state) => state.content_library
   );
 
+  const fileInputRef = useRef(null);
+  const thumbnailInputRef = useRef(null);
+
+  const openFilePicker = () => {
+    if (!uploading) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const openThumbnailPicker = () => {
+    if (!uploading) {
+      thumbnailInputRef.current?.click();
+    }
+  };
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -27,9 +42,6 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
     ctaType: "CONSULT",
     duration: 0,
   });
-
-
-  console.log("formData", formData)
 
   const [videoFile, setVideoFile] = useState(null);
   const [thumbnailFile, setThumbnailFile] = useState(null);
@@ -118,7 +130,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
           {
             ...formData,
             topicId: script.topicId,
-            scriptId: script?.id
+            scriptId: script?.id,
           },
           (progress) => {
             setUploadProgress(progress);
@@ -288,20 +300,69 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
                   </button>
                 </div>
               ) : (
-                <label className="cursor-pointer">
-                  <FiVideo className="mx-auto text-gray-400 mb-2" size={48} />
-                  <p className="text-sm text-gray-600 mb-1">
-                    Click to upload video or drag and drop
+                // <label className="cursor-pointer">
+                //   <FiVideo className="mx-auto text-gray-400 mb-2" size={48} />
+                //   <p className="text-sm text-gray-600 mb-1">
+                //     Click to upload video or drag and drop
+                //   </p>
+                //   <p className="text-xs text-gray-500">MP4, WebM (max 500MB)</p>
+                //   <input
+                //     type="file"
+                //     accept="video/*"
+                //     onChange={handleVideoSelect}
+                //     disabled={uploading}
+                //     className="hidden"
+                //   />
+                // </label>
+
+                <div
+                  className={`flex flex-col items-center justify-center gap-4 text-center ${
+                    uploading ? "opacity-70 pointer-events-none" : ""
+                  }`}
+                >
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-teal-400">
+                    {uploading ? (
+                      <div className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    ) : (
+                      <BsUpload size={32} className="text-white" />
+                    )}
+                  </div>
+
+                  <div>
+                    <p className="text-lg font-semibold text-gray-900">
+                      {uploading
+                        ? "Uploading video…"
+                        : "Drop your video file here"}
+                    </p>
+                    {!uploading && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        or click to browse
+                      </p>
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={openFilePicker}
+                    disabled={uploading}
+                    className="rounded-xl border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-900 shadow-sm transition hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed "
+                  >
+                    Select File
+                  </button>
+
+                  <p className="text-sm text-gray-500">
+                    Supported: MP4, MOV (Max 200MB)
                   </p>
-                  <p className="text-xs text-gray-500">MP4, WebM (max 500MB)</p>
+
                   <input
+                    ref={fileInputRef}
                     type="file"
-                    accept="video/*"
+                    accept="video/mp4,video/quicktime"
                     onChange={handleVideoSelect}
                     disabled={uploading}
                     className="hidden"
                   />
-                </label>
+                </div>
               )}
             </div>
           </div>
@@ -332,20 +393,62 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
                   </button>
                 </div>
               ) : (
-                <label className="cursor-pointer">
-                  <FiImage className="mx-auto text-gray-400 mb-2" size={48} />
-                  <p className="text-sm text-gray-600 mb-1">
-                    Click to upload thumbnail or drag and drop
-                  </p>
-                  <p className="text-xs text-gray-500">JPG, PNG (max 5MB)</p>
+                // <label className="cursor-pointer">
+                //   <FiImage className="mx-auto text-gray-400 mb-2" size={48} />
+                //   <p className="text-sm text-gray-600 mb-1">
+                //     Click to upload thumbnail or drag and drop
+                //   </p>
+                //   <p className="text-xs text-gray-500">JPG, PNG (max 5MB)</p>
+                //   <input
+                //     type="file"
+                //     accept="image/*"
+                //     onChange={handleThumbnailSelect}
+                //     disabled={uploading}
+                //     className="hidden"
+                //   />
+                // </label>
+                <div
+                  className={` flex flex-col items-center justify-center gap-3 text-center rounded-2xl  border-gray-300 px-6 py-8 transition hover:border-blue-500 ${
+                    uploading ? "opacity-70 pointer-events-none" : ""
+                  }`}
+                >
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-teal-400">
+                    {uploading ? (
+                      <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+                    ) : (
+                      <FiImage size={28} className="text-white" />
+                    )}
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">
+                      Click to upload thumbnail
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      or drag and drop
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={openThumbnailPicker}
+                    disabled={uploading}
+                    className=" mt-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 shadow-sm transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Select Image
+                  </button>
+
+                  <p className="text-xs text-gray-500">JPG, PNG (Max 5MB)</p>
+
                   <input
+                    ref={thumbnailInputRef}
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png"
                     onChange={handleThumbnailSelect}
                     disabled={uploading}
                     className="hidden"
                   />
-                </label>
+                </div>
               )}
             </div>
           </div>
@@ -354,7 +457,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                Doctor Name
+                Doctor Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -369,7 +472,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
 
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                Specialty
+                Specialty <span className="text-red-500">*</span>
               </label>
               {/* <input
                 type="text"
@@ -411,7 +514,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
 
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                Language
+                Language <span className="text-red-500">*</span>
               </label>
               <select
                 name="language"
@@ -431,7 +534,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
 
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                City
+                City <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -446,7 +549,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
 
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                CTA Type
+                CTA Type <span className="text-red-500">*</span>
               </label>
               <select
                 name="ctaType"
@@ -493,7 +596,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
 
             <div className="md:col-span-2 space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                Description
+                Description <span className="text-red-500">*</span>
               </label>
               <textarea
                 name="description"
@@ -506,20 +609,20 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
               />
             </div>
 
-            {/* <div className="md:col-span-2 space-y-2">
+            <div className="md:col-span-2 space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                Tags (comma seprated) <span className="text-red-500">*</span>
+                Tags (comma-separated)
               </label>
               <input
                 type="text"
-                name="title"
-                value={formData.title}
-                onChange={(e) => handleInputChange(e.target)}
-                disabled={uploading}
+                // name="title"
+                // value={formData.title}
+                // onChange={(e) => handleInputChange(e.target)}
+                // disabled={uploading}
                 placeholder="diabetes, heath wellness"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
               />
-            </div> */}
+            </div>
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
@@ -527,7 +630,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
               type="button"
               onClick={handleClose}
               disabled={uploading}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
@@ -535,7 +638,7 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
               type="button"
               onClick={handleSubmit}
               disabled={uploading || !videoFile || !thumbnailFile}
-              className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white rounded-lg bg-gradient-to-r from-blue-600 to-teal-400 transition-all hover:brightness-110 active:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {uploading ? (
                 <>

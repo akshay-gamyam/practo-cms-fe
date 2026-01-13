@@ -24,13 +24,11 @@ import {
 } from "../../../../utils/helper";
 import { toast } from "react-toastify";
 import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
-import CustomSelect from "../../../common/customSelect/CustomSelect";
 
 const ContentApproverScript = () => {
   const dispatch = useDispatch();
   const {
     contentApproverScripts,
-    myClaimsScripts,
     approvedScripts,
     rejectedScripts,
     isScriptsListLoading,
@@ -65,18 +63,12 @@ const ContentApproverScript = () => {
     dispatch(fetchContentApproverScripts(buildFetchParams()));
   };
 
-  // useEffect(() => {
-  //   dispatch(fetchAllVersion("d20c603e-0f0f-4ccd-87d3-52bf22160f3b"));
-  // }, [dispatch]);
-
   useEffect(() => {
     refetchScripts();
   }, [filterStatus, searchTerm]);
 
   const getCurrentTabData = () => {
     switch (filterStatus) {
-      case "my-claims":
-        return myClaimsScripts;
       case "approved":
         return approvedScripts;
       case "rejected":
@@ -219,7 +211,6 @@ const ContentApproverScript = () => {
           <div className="flex gap-6 mt-4 border-b border-gray-200">
             {[
               { key: "all", label: "All" },
-              { key: "my-claims", label: "My Claims" },
               { key: "approved", label: "Approved" },
               { key: "rejected", label: "Rejected" },
             ].map((tab) => (
@@ -248,25 +239,19 @@ const ContentApproverScript = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filteredScripts.map((script) => {
               const statusBadge = getStatusBadge(script.status);
-              // const isClaimed = script.lockedById !== null;
-              const isClaimed =
-                filterStatus === "my-claims"
-                  ? script.assignedReviewerId !== null
-                  : script.lockedById !== null;
 
               const scriptStatus = getScriptStatus(script);
               const isFinalized = isFinalStatus(script);
 
               const canInteract =
-                isClaimed &&
                 !isFinalized &&
-                  (scriptStatus === "pending" ||
-                    scriptStatus === "claimed" ||
-                    scriptStatus === "doctor_review" ||
-                    scriptStatus === "content_review" ||
-                    scriptStatus === "content_approval" ||
-                    scriptStatus === "brand_review" ||
-                    scriptStatus === "medical_review");
+                (scriptStatus === "pending" ||
+                  scriptStatus === "claimed" ||
+                  scriptStatus === "doctor_review" ||
+                  scriptStatus === "content_review" ||
+                  scriptStatus === "content_approval" ||
+                  scriptStatus === "brand_review" ||
+                  scriptStatus === "medical_review");
 
               const authorName = script.uploadedBy
                 ? `${script.uploadedBy.firstName} ${script.uploadedBy.lastName}`
@@ -291,7 +276,6 @@ const ContentApproverScript = () => {
                 <div
                   key={script.id}
                   className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
-                  // className={`${script?.latestRejection?.decision === "REJECTED" ?"border-red-600" : "border-gray-200"} bg-white border shadow-sm rounded-xl border border-gray-200  overflow-hidden`}
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
@@ -305,47 +289,6 @@ const ContentApproverScript = () => {
                         <span className="text-xs text-gray-500 font-medium">
                           Version {script.version}
                         </span>
-                      </div>
-
-                      {/* {filterStatus === "my-claims" && script?.version >= 1 && (
-                        <CustomSelect
-                          className="ml-auto w-44"
-                          placeholder="Version History"
-                          value=""
-                          options={[
-                            { value: 1, label: "Version 1" },
-                            { value: 2, label: "Version 2" },
-                            { value: 3, label: "Version 3" },
-                          ]}
-                          onChange={(value) => {
-                            console.log("gjh");
-                          }}
-                        />
-                      )} */}
-
-                      <div>
-                        {!isFinalized &&
-                          !isClaimed &&
-                            (scriptStatus === "pending" ||
-                              scriptStatus === "claimed" ||
-                              scriptStatus === "doctor_review" ||
-                              scriptStatus === "content_review" ||
-                              scriptStatus === "content_approval" ||
-                              scriptStatus === "brand_review" ||
-                              scriptStatus === "medical_review") && (
-                              <button
-                                onClick={() => handleClaim(script.id)}
-                                disabled={isScriptActionLoading}
-                                className="border border-gray-400 rounded-xl px-6 py-1 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                              {isScriptActionLoading ? "Claiming..." : "Claim"}
-                              </button>
-                            )}
-                        {!isFinalized && isClaimed && (
-                          <span className="text-xs text-green-600 font-medium bg-green-50 px-3 py-1 rounded-full">
-                            Claimed
-                          </span>
-                        )}
                       </div>
                     </div>
 
@@ -375,19 +318,7 @@ const ContentApproverScript = () => {
                         {formatDate(script.createdAt)}
                       </span>
                     </div>
-                    <div className="py-1 mb-2">
-                      {/* {script?.latestRejection?.decision && (
-                      <div
-                        className={`text-sm rounded-xl p-1 px-2 ${
-                          script.latestRejection.decision === "REJECTED"
-                            ? "bg-red-50 text-red-700"
-                            : " bg-green-300 text-green-600"
-                        }`}
-                      >
-                        {script.latestRejection.comments}
-                      </div>
-                    )} */}
-                    </div>
+                    <div className="py-1 mb-2"></div>
 
                     {scriptStatus === "approved" && (
                       <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
@@ -431,7 +362,6 @@ const ContentApproverScript = () => {
                           <FiCheckCircle className="w-4 h-4" />
                           Approve
                         </button>
-                        {/* {script?.latestRejection?.decision !== "REJECTED" && ( */}
                         <button
                           onClick={() => handleReject(script.id)}
                           disabled={!canInteract || isScriptActionLoading}
@@ -440,7 +370,6 @@ const ContentApproverScript = () => {
                           <IoClose className="w-4 h-4" />
                           Reject
                         </button>
-                        {/* )} */}
                       </div>
                     ) : (
                       <button
