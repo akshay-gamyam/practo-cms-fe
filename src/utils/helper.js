@@ -439,26 +439,27 @@ export const getWordCount = (htmlContent) => {
 };
 
 export const getPublishStatusBadge = (video) => {
-    if (video.status === "PUBLISHED") {
-      return {
-        class: "bg-green-100 text-green-700",
-        icon: <FiCheckCircle className="w-3 h-3" />,
-        text: "Published",
-      };
-    }
-    if (video.lockedById) {
-      return {
-        class: "bg-blue-100 text-blue-700",
-        icon: <FiClock className="w-3 h-3" />,
-        text: "Claimed",
-      };
-    }
+  if (video.status === "PUBLISHED") {
     return {
-      class: "bg-yellow-100 text-yellow-700",
-      icon: <FiClock className="w-3 h-3" />,
-      text: "Ready",
+      class: "bg-green-100 text-green-700",
+      icon: <FiCheckCircle className="w-3 h-3" />,
+      text: "Published",
     };
+  }
+  if (video.status === "LOCKED") {
+    return {
+      class: "bg-indigo-100 text-indigo-700",
+      icon: <FaLock className="w-3 h-3" />,
+      text: "Locked",
+    };
+  }
+
+  return {
+    class: "bg-yellow-100 text-yellow-700",
+    icon: <FiClock className="w-3 h-3" />,
+    text: "Ready",
   };
+};
 
 export const getStatusBadge = (status) => {
   const statusLower = status?.toLowerCase();
@@ -513,24 +514,23 @@ export const getContentPreview = (htmlContent, maxLength = 500) => {
   return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
 
-
 export const getStatusColor = (statusValue) => {
-    const statusColorMap = {
-      DRAFT: "bg-gray-100 text-gray-600",
-      BRAND_REVIEW: "bg-purple-100 text-purple-600",
-      MEDICAL_REVIEW: "bg-orange-100 text-orange-600",
-      DOCTOR_REVIEW: "bg-yellow-100 text-yellow-600",
-      APPROVED: "bg-green-100 text-green-600",
-      LOCKED: "bg-cyan-100 text-cyan-600",
-      PUBLISHED: "bg-green-500 text-white",
-      ARCHIVED: "bg-red-100 text-red-600",
-    };
-    return statusColorMap[statusValue] || "bg-gray-100 text-gray-600";
+  const statusColorMap = {
+    DRAFT: "bg-gray-100 text-gray-600",
+    BRAND_REVIEW: "bg-purple-100 text-purple-600",
+    MEDICAL_REVIEW: "bg-orange-100 text-orange-600",
+    DOCTOR_REVIEW: "bg-yellow-100 text-yellow-600",
+    APPROVED: "bg-green-100 text-green-600",
+    LOCKED: "bg-cyan-100 text-cyan-600",
+    PUBLISHED: "bg-green-500 text-white",
+    ARCHIVED: "bg-red-100 text-red-600",
   };
+  return statusColorMap[statusValue] || "bg-gray-100 text-gray-600";
+};
 
 export const formatDuration = (seconds) => {
-    if (!seconds) return "0:00";
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
+  if (!seconds) return "0:00";
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+};

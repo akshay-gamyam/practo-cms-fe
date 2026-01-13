@@ -13,11 +13,11 @@ import {
   fetchPublishedVideos,
   publishVideo,
 } from "../../../redux/action/publisherAction/PublisherAction";
-import PublisherDetailModal from "./PublisherDetailModal";
 import PublishConfirmModal from "./PublishConfirmModal";
 import { getPublishStatusBadge, formatDate, getWordCount } from "../../../utils/helper";
 import { useDispatch, useSelector } from "react-redux";
 import SkeletonBlock from "../../common/skeletonBlock/SkeletonBlock";
+import ContentPreviewModal from "../contentApprover/contentApproverVideos/ContentPreviewModal";
 
 const Publisher = () => {
   const dispatch = useDispatch();
@@ -276,8 +276,8 @@ const Publisher = () => {
           </div>
         )}
       </div>
-
-      <PublisherDetailModal
+      
+      <ContentPreviewModal
         isOpen={showDetailsModal}
         onClose={() => {
           setShowDetailsModal(false);
