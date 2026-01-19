@@ -1,11 +1,25 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FiUpload, FiX, FiImage, FiAlertCircle } from "react-icons/fi";
+import {
+  FiUpload,
+  FiX,
+  FiImage,
+  FiAlertCircle,
+  FiSend,
+  FiSave,
+} from "react-icons/fi";
 import { BsUpload } from "react-icons/bs";
 import { uploadVideoComplete } from "../../../../redux/action/agencyPocAction/AgencyPocAction";
 import { fetchContentLibrarySpecialityList } from "../../../../redux/action/contentLibraryAction/ContentLibraryAction";
 
-const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
+const VideoUploadModal = ({
+  open,
+  onClose,
+  script,
+  existingVideoData,
+  onUploadSuccess,
+  isNewUpload,
+}) => {
   const dispatch = useDispatch();
 
   const {
@@ -54,12 +68,59 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
     status: "",
   });
   const [error, setError] = useState(null);
+  const isEditMode = !!existingVideoData;
 
   // Determine if any upload operation is in progress
   const uploading =
     isUploadVideoLoading ||
     isGetVideoUploadUrlLoading ||
     isGetThumbnailUploadUrlLoading;
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    if (isNewUpload || !existingVideoData || !existingVideoData.id) {
+      setFormData({
+        title: "",
+        description: "",
+        doctorName: "",
+        specialty: "",
+        language: "English",
+        city: "",
+        ctaType: "CONSULT",
+        duration: 0,
+      });
+      setVideoFile(null);
+      setThumbnailFile(null);
+      setVideoPreview(null);
+      setThumbnailPreview(null);
+      setError(null);
+      return;
+    }
+
+    try {
+      setFormData({
+        title: existingVideoData.title || "",
+        description: existingVideoData.description || "",
+        doctorName: existingVideoData.doctorName || "",
+        specialty: existingVideoData.specialty || "",
+        language: existingVideoData.language || "English",
+        city: existingVideoData.city || "",
+        ctaType: existingVideoData.ctaType || "CONSULT",
+        duration: existingVideoData.duration || 0,
+      });
+
+      setVideoFile(null);
+      setThumbnailFile(null);
+      setVideoPreview(existingVideoData.videoUrl || null);
+      setThumbnailPreview(existingVideoData.thumbnailUrl || null);
+    } catch (err) {
+      console.error("Error prefilling form:", err);
+      setError("Failed to load video data");
+    }
+  }, [existingVideoData, open, isNewUpload]);
 
   const handleInputChange = (e) => {
     const { name, value } = e;
@@ -107,31 +168,95 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (saveAsDraft = false) => {
     // Validation
-    if (!videoFile || !thumbnailFile) {
-      setError("Please select both video and thumbnail files");
+    // if (!videoFile || !thumbnailFile) {
+    //   setError("Please select both video and thumbnail files");
+    //   return;
+    // }
+
+    // if (!formData.title) {
+    //   setError("Please enter a video title");
+    //   return;
+    // }
+
+    if (!isEditMode) {
+      // New upload requires both files
+      if (!videoFile || !thumbnailFile) {
+        setError("Please select both video and thumbnail files");
+        return;
+      }
+    } else {
+      // Edit mode: if re-uploading, need both files
+      if ((videoFile && !thumbnailFile) || (!videoFile && thumbnailFile)) {
+        setError(
+          "Please select both video and thumbnail files when re-uploading"
+        );
+        return;
+      }
+    }
+
+    if (!formData.title || !formData.title.trim()) {
+      setError("Please enter a video title");
       return;
     }
 
-    if (!formData.title) {
-      setError("Please enter a video title");
+    if (!formData.doctorName || !formData.specialty || !formData.city) {
+      setError("Please fill in all required fields");
       return;
     }
 
     setError(null);
 
     try {
+      const submitData = {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        doctorName: formData.doctorName.trim(),
+        specialty: formData.specialty,
+        language: formData.language,
+        city: formData.city.trim(),
+        ctaType: formData.ctaType,
+        duration: formData.duration,
+        topicId: script.topicId,
+        scriptId: script?.id,
+      };
+
+      // If editing, include video ID
+      if (isEditMode && existingVideoData?.id) {
+        submitData.videoId = existingVideoData.id;
+      }
+
+      console.log("Submitting with:", {
+        hasVideo: !!videoFile,
+        hasThumbnail: !!thumbnailFile,
+        isEditMode,
+        videoId: submitData.videoId,
+      });
+
+      // For edit mode, only pass files if new ones were selected
+      // const videoToUpload = isEditMode && !videoFile ? null : videoFile;
+      // const thumbnailToUpload =
+      //   isEditMode && !thumbnailFile ? null : thumbnailFile;
+
+      console.log("Submitting with:", {
+        hasVideo: !!videoFile,
+        hasThumbnail: !!thumbnailFile,
+        isEditMode,
+        videoId: submitData.videoId,
+      });
+
       // Call the complete upload action
       const result = await dispatch(
         uploadVideoComplete(
           videoFile,
           thumbnailFile,
-          {
-            ...formData,
-            topicId: script.topicId,
-            scriptId: script?.id,
-          },
+          submitData,
+          // {
+          //   ...formData,
+          //   topicId: script.topicId,
+          //   scriptId: script?.id,
+          // },
           (progress) => {
             setUploadProgress(progress);
           }
@@ -168,9 +293,23 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
   const handleClose = () => {
     if (uploading) return;
 
-    // Clean up
-    if (videoPreview) URL.revokeObjectURL(videoPreview);
-    if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+    try {
+      if (videoPreview && videoFile && videoFile instanceof File) {
+        URL.revokeObjectURL(videoPreview);
+      }
+      if (thumbnailPreview && thumbnailFile && thumbnailFile instanceof File) {
+        URL.revokeObjectURL(thumbnailPreview);
+      }
+    } catch (err) {
+      console.error("Error revoking URLs:", err);
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    if (thumbnailInputRef.current) {
+      thumbnailInputRef.current.value = "";
+    }
 
     // Reset state
     setFormData({
@@ -195,6 +334,11 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
 
   if (!open) return null;
 
+  const showBothButtons =
+    script.status === "LOCKED" && !script.videoUploaded && !isEditMode;
+  const showSubmitOnly =
+    script.status === "LOCKED" && (script.videoUploaded || isEditMode);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -202,7 +346,8 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold text-gray-900">
-              Upload Video
+              {/* Upload Video */}
+              {isEditMode ? "Submit Video for Review" : "Upload Video"}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
               {script?.topic?.title ||
@@ -277,7 +422,14 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
           {/* Video Upload */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
-              Video File <span className="text-red-500">*</span>
+              {/* Video File <span className="text-red-500">*</span> */}
+              Video File{" "}
+              {!isEditMode && <span className="text-red-500">*</span>}
+              {isEditMode && (
+                <span className="text-sm text-gray-500 ml-2">
+                  (Optional - upload to replace)
+                </span>
+              )}
             </label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
               {videoPreview ? (
@@ -287,17 +439,37 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
                     controls
                     className="w-full max-h-64 rounded-lg mx-auto"
                   />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setVideoFile(null);
-                      setVideoPreview(null);
-                    }}
-                    disabled={uploading}
-                    className="text-sm hover:shadow-lg text-black bg-red-100 hover:text-red-800 disabled:opacity-50 border hover:border-red-800 border-red-300 p-2 rounded-xl"
-                  >
-                    Remove Video
-                  </button>
+                  {!isEditMode && (
+                    <button
+                      type="button"
+                      // onClick={() => {
+                      //   setVideoFile(null);
+                      //   setVideoPreview(null);
+                      // }}
+                      onClick={() => {
+                        if (
+                          videoFile &&
+                          videoPreview &&
+                          videoFile instanceof File
+                        ) {
+                          URL.revokeObjectURL(videoPreview);
+                        }
+                        // setVideoFile(null);
+                        // setVideoPreview(null);
+                        setVideoFile(null);
+                        setVideoPreview(
+                          isEditMode && existingVideoData?.videoUrl
+                            ? existingVideoData.videoUrl
+                            : null
+                        );
+                      }}
+                      disabled={uploading}
+                      className="text-sm hover:shadow-lg text-black bg-red-100 hover:text-red-800 disabled:opacity-50 border hover:border-red-800 border-red-300 p-2 rounded-xl"
+                    >
+                      {/* Remove Video */}
+                      {isEditMode ? "Cancel Replace" : "Remove Video"}
+                    </button>
+                  )}
                 </div>
               ) : (
                 // <label className="cursor-pointer">
@@ -371,6 +543,12 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               Thumbnail <span className="text-red-500">*</span>
+              {/* Thumbnail {!isEditMode && <span className="text-red-500">*</span>} */}
+              {isEditMode && (
+                <span className="text-sm text-gray-500 ml-2">
+                  (Optional - upload to replace)
+                </span>
+              )}
             </label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
               {thumbnailPreview ? (
@@ -380,17 +558,32 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
                     alt="Thumbnail preview"
                     className="w-full max-h-48 object-contain rounded-lg mx-auto"
                   />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setThumbnailFile(null);
-                      setThumbnailPreview(null);
-                    }}
-                    disabled={uploading}
-                    className="text-sm hover:shadow-lg text-black bg-red-100 hover:text-red-800 disabled:opacity-50 border hover:border-red-800 border-red-300 p-2 rounded-xl"
-                  >
-                    Remove Thumbnail
-                  </button>
+                  {!isEditMode && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (
+                          thumbnailFile &&
+                          thumbnailPreview &&
+                          thumbnailFile instanceof File
+                        ) {
+                          URL.revokeObjectURL(thumbnailPreview);
+                        }
+                        setThumbnailFile(null);
+                        // setThumbnailPreview(null);
+                        setThumbnailPreview(
+                          isEditMode && existingVideoData?.thumbnailUrl
+                            ? existingVideoData.thumbnailUrl
+                            : null
+                        );
+                      }}
+                      disabled={uploading}
+                      className="text-sm hover:shadow-lg text-black bg-red-100 hover:text-red-800 disabled:opacity-50 border hover:border-red-800 border-red-300 p-2 rounded-xl"
+                    >
+                      {/* Remove Thumbnail */}
+                      {isEditMode ? "Cancel Replace" : "Remove Thumbnail"}
+                    </button>
+                  )}
                 </div>
               ) : (
                 // <label className="cursor-pointer">
@@ -492,7 +685,6 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
               >
                 <option value="">Select Specialty</option>
-
                 {specialtyOptions.map((option) => (
                   <option key={option.id} value={option.value}>
                     {option.label}
@@ -634,7 +826,9 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
             >
               Cancel
             </button>
-            <button
+            {showBothButtons && (
+              <>
+                {/* <button
               type="button"
               onClick={handleSubmit}
               disabled={uploading || !videoFile || !thumbnailFile}
@@ -651,7 +845,94 @@ const VideoUploadModal = ({ open, onClose, script, onUploadSuccess }) => {
                   Upload Video
                 </>
               )}
-            </button>
+            </button> */}
+                <button
+                  type="button"
+                  onClick={() => handleSubmit(true)}
+                  disabled={
+                    uploading || !videoFile || !thumbnailFile || !formData.title
+                  }
+                  className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {uploading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-600 border-t-transparent" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <FiSave size={16} />
+                      Save as Draft
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleSubmit(false)}
+                  disabled={
+                    uploading || !videoFile || !thumbnailFile || !formData.title
+                  }
+                  className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white rounded-lg bg-gradient-to-r from-blue-600 to-teal-400 transition-all hover:brightness-110 active:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {uploading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <FiSend size={16} />
+                      Submit for Review
+                    </>
+                  )}
+                </button>
+              </>
+            )}
+
+            {showSubmitOnly && (
+              <button
+                type="button"
+                onClick={() => handleSubmit(false)}
+                disabled={uploading || !formData.title}
+                className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white rounded-lg bg-gradient-to-r from-blue-600 to-teal-400 transition-all hover:brightness-110 active:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {uploading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <FiSend size={16} />
+                    Submit for Review
+                  </>
+                )}
+              </button>
+            )}
+
+            {!showBothButtons && !showSubmitOnly && (
+              <button
+                type="button"
+                onClick={() => handleSubmit(false)}
+                disabled={
+                  uploading || !videoFile || !thumbnailFile || !formData.title
+                }
+                className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white rounded-lg bg-gradient-to-r from-blue-600 to-teal-400 transition-all hover:brightness-110 active:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {uploading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <FiUpload size={16} />
+                    Upload Video
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>

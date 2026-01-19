@@ -5,6 +5,7 @@ const initialState = {
   agencyPoc: [],
   scripts: [],
   videos: [],
+  allVideosId: [],
   totalPages: 1,
   totalCount: 0,
   currentPage: 1,
@@ -12,6 +13,7 @@ const initialState = {
   selectedScript: null,
   selectedVideo: null,
 
+  selectedVideoIdData: null,
   // Upload state
   videoUploadUrl: null,
   videoFileUrl: null,
@@ -56,6 +58,22 @@ const agencyPocSlice = createSlice({
     },
     fetchAgencyPocFailure(state, action) {
       state.isPocListLoading = false;
+      state.error = action.payload;
+    },
+
+    // ................. fetch all scripts ........................
+
+    fetchallVideosIdStart(state) {
+      state.isScriptListLoading = true;
+      state.error = null;
+    },
+    fetchallVideosIdSuccess(state, action) {
+      state.isScriptListLoading = false;
+      state.allVideosId = action.payload.uploadedVideoIds;
+      state.error = null;
+    },
+    fetchallVideosIdFailure(state, action) {
+      state.isScriptListLoading = false;
       state.error = action.payload;
     },
 
@@ -173,8 +191,14 @@ const agencyPocSlice = createSlice({
       state.error = null;
     },
     fetchScriptsSuccess(state, action) {
+      // state.isScriptListLoading = false;
+      // state.scripts = action.payload.scripts;
+      // state.error = null;
       state.isScriptListLoading = false;
       state.scripts = action.payload.scripts;
+      state.totalPages = action.payload.totalPages;
+      state.totalCount = action.payload.totalCount;
+      state.currentPage = action.payload.currentPage;
       state.error = null;
     },
     fetchScriptsFailure(state, action) {
@@ -233,6 +257,27 @@ const agencyPocSlice = createSlice({
     fetchVideoFailure(state, action) {
       state.isVideoLoading = false;
       state.error = action.payload;
+    },
+
+    // ................. fetch video by ID ........................
+    fetchVideoSelectedIdDataStart(state) {
+      state.isVideoLoading = true;
+      state.error = null;
+    },
+    fetchVideoSelectedIdDataSuccess(state, action) {
+      state.isVideoLoading = false;
+      state.selectedVideoIdData = action.payload.video;
+      state.error = null;
+    },
+    fetchVideoSelectedIdDataFailure(state, action) {
+      state.isVideoLoading = false;
+      state.error = action.payload;
+    },
+
+    clearSelectedVideoData(state) {
+      state.selectedVideoIdData = null;
+      state.isVideoLoading = false;
+      state.error = null;
     },
 
     // ................. upload video ........................
@@ -371,6 +416,13 @@ export const {
   fetchVideoSuccess,
   fetchVideoFailure,
 
+  fetchallVideosIdStart,
+  fetchallVideosIdSuccess,
+  fetchallVideosIdFailure,
+  fetchVideoSelectedIdDataStart,
+  fetchVideoSelectedIdDataSuccess,
+  fetchVideoSelectedIdDataFailure,
+
   uploadVideoStart,
   uploadVideoSuccess,
   uploadVideoFailure,
@@ -388,6 +440,7 @@ export const {
 
   clearSelectedPoc,
   clearSelectedScript,
+  clearSelectedVideoData,
 } = agencyPocSlice.actions;
 
 export default agencyPocSlice.reducer;

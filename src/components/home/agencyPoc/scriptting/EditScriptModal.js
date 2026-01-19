@@ -288,17 +288,22 @@ const EditScriptModal = ({ open, onClose, topic, mode = "create" }) => {
             <label className="block text-sm font-medium mb-2">
               Script Content {!modalConfig.isReadOnly && "*"}
             </label>
-            <div
+            {/* <div
               className="border rounded-lg overflow-hidden"
               onClick={() => editor?.chain().focus().run()}
+            > */}
+             <div
+              className={`border-2 rounded-2xl overflow-hidden bg-white shadow-sm transition-all duration-200 ${
+                modalConfig.isReadOnly 
+                  ? "border-purple-200 bg-gradient-to-br from-purple-50/30 to-white pointer-events-none" 
+                  : "border-gray-200 hover:border-blue-300 cursor-text"
+              }`}
+              onClick={() => !modalConfig.isReadOnly && editor?.chain().focus().run()}
             >
               {!modalConfig.isReadOnly && (
                 <TipTopRichTextEditor editor={editor} />
               )}
               <EditorContent
-                // className={`p-4 ${
-                //   modalConfig.isReadOnly ? "min-h-[400px]" : "min-h-[300px]"
-                // } ${isScriptLoading ? "opacity-50" : ""}`}
                 className={`tiptap-editor ${
                   modalConfig.isReadOnly ? "read-only" : ""
                 } ${isScriptLoading ? "opacity-50" : ""}`}

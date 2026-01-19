@@ -9,32 +9,52 @@ import {
   FiLock,
   FiFileText,
   FiUser,
+  FiSend,
 } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import {
   fetchAllScripts,
+  fetchAllVideosID,
+  fetchVideoDataByID,
   // deleteScript
 } from "../../../../redux/action/agencyPocAction/AgencyPocAction";
 import EditScriptModal from "./EditScriptModal";
 import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
 import VideoUploadModal from "./ViewUploadModal";
 import { getWordCount } from "../../../../utils/helper";
+import { LIMIT } from "../../../../utils/constants";
+import Pagination from "../../../common/pagination/Pagination";
+import { clearSelectedVideoData } from "../../../../redux/reducer/agencyPocReducer/AgencyPocReducer";
 
 const Scriptting = () => {
   const dispatch = useDispatch();
-  const { scripts, isScriptListLoading, isDeleteScriptLoading } = useSelector(
-    (state) => state.agencyPoc
-  );
+  const {
+    scripts,
+    isScriptListLoading,
+    totalPages,
+    allVideosId,
+    selectedVideoIdData,
+  } = useSelector((state) => state.agencyPoc);
+
   const [activeTab, setActiveTab] = useState("all");
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedScript, setSelectedScript] = useState(null);
   const [scriptForUpload, setScriptForUpload] = useState(null);
   const [showVideoUploadModal, setShowVideoUploadModal] = useState(false);
   // const [scriptToDelete, setScriptToDelete] = useState(null);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    dispatch(fetchAllScripts());
+    setPage(1);
+  }, [activeTab]);
+
+  useEffect(() => {
+    dispatch(fetchAllScripts({ page, size: LIMIT }));
+  }, [dispatch, page]);
+
+  useEffect(() => {
+    dispatch(fetchAllVideosID());
   }, [dispatch]);
 
   const REVIEW_STATUSES = [
@@ -89,6 +109,29 @@ const Scriptting = () => {
 
     return script.status === activeTab;
   });
+
+  // Helper function to check if script has uploaded video
+  const hasUploadedVideo = (script) => {
+    // Check if script has any videos at all
+    if (!script.videos || script.videos.length === 0) return false;
+    
+    // If allVideosId is available, check if any video is in the uploaded list
+    if (allVideosId && allVideosId.length > 0) {
+      return script.videos.some(video => allVideosId.includes(video.id));
+    }
+    
+    // Fallback: if videos array exists and has items, consider it as having video
+    return script.videos.length > 0;
+  };
+
+  // Helper function to get video ID for script
+ const getScriptVideoId = (script) => {
+    if (!script.videos || script.videos.length === 0) return null;
+    const uploadedVideo = script.videos.find(video => 
+      allVideosId && allVideosId.includes(video.id)
+    );
+    return uploadedVideo ? uploadedVideo.id : null;
+  };
 
   const getStatusBadge = (status) => {
     const badges = {
@@ -182,14 +225,38 @@ const Scriptting = () => {
 
   // New function to handle video upload modal
   const handleUploadVideo = (script) => {
+     dispatch(clearSelectedVideoData());
     setScriptForUpload(script);
     setShowVideoUploadModal(true);
+  };
+
+  const handleSubmitForReview = async (script) => {
+    const videoId = getScriptVideoId(script);
+      if (!videoId && script.videos && script.videos.length > 0) {
+      // Use the first video from the videos array (most recent)
+      videoId = script.videos[0].id;
+    }
+
+    if (videoId) {
+      try {
+        await dispatch(fetchVideoDataByID(videoId));
+        // Video data will be available in selectedVideoIdData from Redux
+        setScriptForUpload(script);
+        setShowVideoUploadModal(true);
+      } catch (error) {
+        toast.error("Error loading video data");
+        console.error("Error fetching video:", error);
+      }
+    } else {
+      setScriptForUpload(script);
+      setShowVideoUploadModal(true);
+    }
   };
 
   const handleCloseEditModal = useCallback(() => {
     setShowEditModal(false);
     setSelectedScript(null);
-    dispatch(fetchAllScripts());
+    dispatch(fetchAllScripts({ page, size: LIMIT }));
   }, [dispatch]);
 
   const handleCloseVideoUploadModal = useCallback(() => {
@@ -200,9 +267,10 @@ const Scriptting = () => {
   const handleVideoUploadSuccess = useCallback(
     (videoData) => {
       toast.success("Video uploaded successfully!");
-      dispatch(fetchAllScripts());
+      dispatch(fetchAllScripts({ page, size: LIMIT }));
+      dispatch(fetchAllVideosID());
     },
-    [dispatch]
+    [dispatch, page]
   );
 
   const formatDate = (dateString) => {
@@ -260,6 +328,7 @@ const Scriptting = () => {
           <div className="max-w-7xl mx-auto py-4 mt-4">
             <div className="space-y-4">
               {filteredScripts.map((script) => {
+                 const hasVideo = hasUploadedVideo(script);
                 return (
                   <div
                     key={script.id}
@@ -307,16 +376,30 @@ const Scriptting = () => {
                         </div>
 
                         <div className="flex items-center gap-2 flex-shrink-0">
-                          {script.videoUploaded && (
+                          {/* {script.videoUploaded && (
                             <button className="flex items-center rounded-xl gap-1 px-3 py-1.5 text-sm text-green-700 bg-green-50 border border-green-200 hover:bg-green-100 transition-colors">
                               <FiCheckCircle size={14} />
                               <span className="hidden sm:inline">
                                 Video Uploaded
                               </span>
                             </button>
+                          )} */}
+
+                          {script.status === "LOCKED" && hasVideo && (
+                            <button
+                              onClick={() => handleSubmitForReview(script)}
+                              className="flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-teal-400 rounded-xl hover:brightness-110 transition-all"
+                            >
+                              <FiSend size={14} />
+                              <span className="hidden sm:inline">
+                                Submit for Review
+                              </span>
+                              <span className="sm:hidden">Submit</span>
+                            </button>
                           )}
 
-                          {script.status === "LOCKED" && script?.videoUploaded === false && (
+                          {/* Show Upload Video button when video is not uploaded */}
+                          {script.status === "LOCKED" && !hasVideo && (
                             <button
                               onClick={() => handleUploadVideo(script)}
                               className="flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors"
@@ -328,6 +411,20 @@ const Scriptting = () => {
                               <span className="sm:hidden">Upload</span>
                             </button>
                           )}
+
+                          {/* {script.status === "LOCKED" &&
+                            script?.videoUploaded === false && (
+                              <button
+                                onClick={() => handleUploadVideo(script)}
+                                className="flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors"
+                              >
+                                <FiUpload size={14} />
+                                <span className="hidden sm:inline">
+                                  Upload Video
+                                </span>
+                                <span className="sm:hidden">Upload</span>
+                              </button>
+                            )} */}
 
                           {script.status === "REJECTED" && (
                             <button
@@ -464,6 +561,21 @@ const Scriptting = () => {
         )}
       </div>
 
+      {/* <div className="sticky bg-yellow-300 bottom-0 backdrop-blur-xl bg-white/30 border-t">
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={(newPage) => setPage(newPage)}
+        />
+      </div> */}
+
+  <div className="sticky bottom-0 bg-white border-t border-gray-200 shadow-lg">
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={(newPage) => setPage(newPage)}
+        />
+      </div>
       {selectedScript && (
         <EditScriptModal
           open={showEditModal}
@@ -477,6 +589,8 @@ const Scriptting = () => {
           open={showVideoUploadModal}
           onClose={handleCloseVideoUploadModal}
           script={scriptForUpload}
+          existingVideoData={selectedVideoIdData}
+          isNewUpload={!selectedVideoIdData}
           onUploadSuccess={handleVideoUploadSuccess}
         />
       )}
