@@ -22,7 +22,7 @@ import {
 import EditScriptModal from "./EditScriptModal";
 import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
 import VideoUploadModal from "./ViewUploadModal";
-import { getWordCount } from "../../../../utils/helper";
+import { getVideoButtonState, getWordCount } from "../../../../utils/helper";
 import { LIMIT } from "../../../../utils/constants";
 import Pagination from "../../../common/pagination/Pagination";
 import { clearSelectedVideoData } from "../../../../redux/reducer/agencyPocReducer/AgencyPocReducer";
@@ -114,18 +114,18 @@ const Scriptting = () => {
   const hasUploadedVideo = (script) => {
     // Check if script has any videos at all
     if (!script.videos || script.videos.length === 0) return false;
-    
+
     // If allVideosId is available, check if any video is in the uploaded list
     if (allVideosId && allVideosId.length > 0) {
       return script.videos.some(video => allVideosId.includes(video.id));
     }
-    
+
     // Fallback: if videos array exists and has items, consider it as having video
     return script.videos.length > 0;
   };
 
   // Helper function to get video ID for script
- const getScriptVideoId = (script) => {
+  const getScriptVideoId = (script) => {
     if (!script.videos || script.videos.length === 0) return null;
     const uploadedVideo = script.videos.find(video => 
       allVideosId && allVideosId.includes(video.id)
@@ -225,14 +225,14 @@ const Scriptting = () => {
 
   // New function to handle video upload modal
   const handleUploadVideo = (script) => {
-     dispatch(clearSelectedVideoData());
+    dispatch(clearSelectedVideoData());
     setScriptForUpload(script);
     setShowVideoUploadModal(true);
   };
 
   const handleSubmitForReview = async (script) => {
     const videoId = getScriptVideoId(script);
-      if (!videoId && script.videos && script.videos.length > 0) {
+    if (!videoId && script.videos && script.videos.length > 0) {
       // Use the first video from the videos array (most recent)
       videoId = script.videos[0].id;
     }
@@ -328,7 +328,8 @@ const Scriptting = () => {
           <div className="max-w-7xl mx-auto py-4 mt-4">
             <div className="space-y-4">
               {filteredScripts.map((script) => {
-                 const hasVideo = hasUploadedVideo(script);
+                const hasVideo = hasUploadedVideo(script);
+                 const buttonState = getVideoButtonState(script);
                 return (
                   <div
                     key={script.id}
@@ -376,55 +377,48 @@ const Scriptting = () => {
                         </div>
 
                         <div className="flex items-center gap-2 flex-shrink-0">
-                          {/* {script.videoUploaded && (
-                            <button className="flex items-center rounded-xl gap-1 px-3 py-1.5 text-sm text-green-700 bg-green-50 border border-green-200 hover:bg-green-100 transition-colors">
-                              <FiCheckCircle size={14} />
-                              <span className="hidden sm:inline">
-                                Video Uploaded
-                              </span>
-                            </button>
-                          )} */}
+                           {script.status === "LOCKED" && (
+                            <>
+                              {buttonState.buttonType === "upload" && (
+                                <button
+                                  onClick={() => handleUploadVideo(script)}
+                                  className="flex items-center gap-1 px-3 py-1.5 sm:px-4 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors"
+                                >
+                                  <FiUpload size={14} />
+                                  <span className="hidden sm:inline">
+                                    Upload Video
+                                  </span>
+                                  <span className="sm:hidden">Upload</span>
+                                </button>
+                              )}
 
-                          {script.status === "LOCKED" && hasVideo && (
-                            <button
-                              onClick={() => handleSubmitForReview(script)}
-                              className="flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-teal-400 rounded-xl hover:brightness-110 transition-all"
-                            >
-                              <FiSend size={14} />
-                              <span className="hidden sm:inline">
-                                Submit for Review
-                              </span>
-                              <span className="sm:hidden">Submit</span>
-                            </button>
+                              {buttonState.buttonType === "submit" && (
+                                <button
+                                  onClick={() => handleSubmitForReview(script)}
+                                  className="flex items-center gap-1 px-3 py-1.5 sm:px-4 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-teal-400 rounded-xl hover:brightness-110 transition-all"
+                                >
+                                  <FiSend size={14} />
+                                  <span className="hidden sm:inline">
+                                    Submit for Review
+                                  </span>
+                                  <span className="sm:hidden">Submit</span>
+                                </button>
+                              )}
+
+                              {buttonState.buttonType === "uploaded" && (
+                                <button
+                                  disabled
+                                  className="flex items-center gap-1 px-3 py-1.5 sm:px-4  text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-xl cursor-not-allowed opacity-75"
+                                >
+                                  <FiCheckCircle size={14} />
+                                  <span className="hidden sm:inline">
+                                    Video Uploaded
+                                  </span>
+                                  <span className="sm:hidden">Uploaded</span>
+                                </button>
+                              )}
+                            </>
                           )}
-
-                          {/* Show Upload Video button when video is not uploaded */}
-                          {script.status === "LOCKED" && !hasVideo && (
-                            <button
-                              onClick={() => handleUploadVideo(script)}
-                              className="flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors"
-                            >
-                              <FiUpload size={14} />
-                              <span className="hidden sm:inline">
-                                Upload Video
-                              </span>
-                              <span className="sm:hidden">Upload</span>
-                            </button>
-                          )}
-
-                          {/* {script.status === "LOCKED" &&
-                            script?.videoUploaded === false && (
-                              <button
-                                onClick={() => handleUploadVideo(script)}
-                                className="flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors"
-                              >
-                                <FiUpload size={14} />
-                                <span className="hidden sm:inline">
-                                  Upload Video
-                                </span>
-                                <span className="sm:hidden">Upload</span>
-                              </button>
-                            )} */}
 
                           {script.status === "REJECTED" && (
                             <button
@@ -561,15 +555,7 @@ const Scriptting = () => {
         )}
       </div>
 
-      {/* <div className="sticky bg-yellow-300 bottom-0 backdrop-blur-xl bg-white/30 border-t">
-        <Pagination
-          currentPage={page}
-          totalPages={totalPages}
-          onPageChange={(newPage) => setPage(newPage)}
-        />
-      </div> */}
-
-  <div className="sticky bottom-0 bg-white border-t border-gray-200 shadow-lg">
+      <div className="sticky bottom-0 bg-white border-t border-gray-200 shadow-lg">
         <Pagination
           currentPage={page}
           totalPages={totalPages}

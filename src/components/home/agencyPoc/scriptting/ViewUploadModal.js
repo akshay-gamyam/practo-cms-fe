@@ -9,7 +9,10 @@ import {
   FiSave,
 } from "react-icons/fi";
 import { BsUpload } from "react-icons/bs";
-import { uploadVideoComplete } from "../../../../redux/action/agencyPocAction/AgencyPocAction";
+import {
+  uploadVideoComplete,
+  submitVideo,
+} from "../../../../redux/action/agencyPocAction/AgencyPocAction";
 import { fetchContentLibrarySpecialityList } from "../../../../redux/action/contentLibraryAction/ContentLibraryAction";
 
 const VideoUploadModal = ({
@@ -170,16 +173,6 @@ const VideoUploadModal = ({
 
   const handleSubmit = async (saveAsDraft = false) => {
     // Validation
-    // if (!videoFile || !thumbnailFile) {
-    //   setError("Please select both video and thumbnail files");
-    //   return;
-    // }
-
-    // if (!formData.title) {
-    //   setError("Please enter a video title");
-    //   return;
-    // }
-
     if (!isEditMode) {
       // New upload requires both files
       if (!videoFile || !thumbnailFile) {
@@ -195,19 +188,15 @@ const VideoUploadModal = ({
         return;
       }
     }
-
     if (!formData.title || !formData.title.trim()) {
       setError("Please enter a video title");
       return;
     }
-
     if (!formData.doctorName || !formData.specialty || !formData.city) {
       setError("Please fill in all required fields");
       return;
     }
-
     setError(null);
-
     try {
       const submitData = {
         title: formData.title.trim(),
@@ -221,67 +210,135 @@ const VideoUploadModal = ({
         topicId: script.topicId,
         scriptId: script?.id,
       };
-
       // If editing, include video ID
       if (isEditMode && existingVideoData?.id) {
         submitData.videoId = existingVideoData.id;
       }
-
-      console.log("Submitting with:", {
-        hasVideo: !!videoFile,
-        hasThumbnail: !!thumbnailFile,
-        isEditMode,
-        videoId: submitData.videoId,
-      });
-
-      // For edit mode, only pass files if new ones were selected
-      // const videoToUpload = isEditMode && !videoFile ? null : videoFile;
-      // const thumbnailToUpload =
-      //   isEditMode && !thumbnailFile ? null : thumbnailFile;
-
-      console.log("Submitting with:", {
-        hasVideo: !!videoFile,
-        hasThumbnail: !!thumbnailFile,
-        isEditMode,
-        videoId: submitData.videoId,
-      });
-
-      // Call the complete upload action
-      const result = await dispatch(
-        uploadVideoComplete(
-          videoFile,
-          thumbnailFile,
-          submitData,
-          // {
-          //   ...formData,
-          //   topicId: script.topicId,
-          //   scriptId: script?.id,
-          // },
-          (progress) => {
-            setUploadProgress(progress);
+      const hasFileChanges = !!(videoFile || thumbnailFile);
+      const videoId = isEditMode ? existingVideoData?.id : null;
+      if (saveAsDraft) {
+        const result = await dispatch(
+          uploadVideoComplete(
+            videoFile,
+            thumbnailFile,
+            submitData,
+            (progress) => {
+              setUploadProgress(progress);
+            }
+          )
+        );
+        if (result.success) {
+          if (onUploadSuccess) {
+            onUploadSuccess(result.data);
           }
-        )
-      );
-
-      if (result.success) {
-        // Call success callback
-        if (onUploadSuccess) {
-          onUploadSuccess(result.data);
+          setTimeout(() => {
+            handleClose();
+          }, 1500);
+        } else {
+          setError(result.error);
         }
-
-        // Close modal after a short delay
-        setTimeout(() => {
-          handleClose();
-        }, 1500);
+        return;
+      }
+      if (isEditMode && hasFileChanges) {
+        const updateResult = await dispatch(
+          uploadVideoComplete(
+            videoFile,
+            thumbnailFile,
+            submitData,
+            (progress) => {
+              setUploadProgress(progress);
+            }
+          )
+        );
+        if (!updateResult.success) {
+          setError(updateResult.error);
+          return;
+        }
+        // Step 2: Get the updated video ID
+        const updatedVideoId = updateResult.data?.video?.id || videoId;
+        if (!updatedVideoId) {
+          setError("Failed to get video ID after update");
+          return;
+        }
+        // Step 3: Submit for review
+        const submitResult = await dispatch(submitVideo(updatedVideoId));
+        if (submitResult.success) {
+          if (onUploadSuccess) {
+            onUploadSuccess(submitResult.data);
+          }
+          setTimeout(() => {
+            handleClose();
+          }, 1500);
+        } else {
+          setError(submitResult.error);
+        }
+      } else if (isEditMode && !hasFileChanges) {
+        if (!videoId) {
+          setError("Video ID is required to submit");
+          return;
+        }
+        const updateResult = await dispatch(
+          uploadVideoComplete(
+            null,
+            null,
+            submitData,
+            (progress) => {
+              setUploadProgress(progress);
+            }
+          )
+        );
+        if (!updateResult.success) {
+          setError(updateResult.error);
+          return;
+        }
+        const submitResult = await dispatch(submitVideo(videoId));
+        if (submitResult.success) {
+          if (onUploadSuccess) {
+            onUploadSuccess(submitResult.data);
+          }
+          setTimeout(() => {
+            handleClose();
+          }, 1500);
+        } else {
+          setError(submitResult.error);
+        }
       } else {
-        setError(result.error);
+        const createResult = await dispatch(
+          uploadVideoComplete(
+            videoFile,
+            thumbnailFile,
+            submitData,
+            (progress) => {
+              setUploadProgress(progress);
+            }
+          )
+        );
+        if (!createResult.success) {
+          setError(createResult.error);
+          return;
+        }
+        const newVideoId = createResult.data?.video?.id;
+        if (!newVideoId) {
+          setError("Failed to get video ID after creation");
+          return;
+        }
+        const submitResult = await dispatch(submitVideo(newVideoId));
+        if (submitResult.success) {
+          if (onUploadSuccess) {
+            onUploadSuccess(submitResult.data);
+          }
+          setTimeout(() => {
+            handleClose();
+          }, 1500);
+        } else {
+          setError(submitResult.error);
+        }
       }
     } catch (err) {
       console.error("Upload error:", err);
       setError(err.message || "Failed to upload video. Please try again.");
     }
   };
-
   const specialtyOptions = Array.isArray(contentLibrarySpeciality?.specialties)
     ? contentLibrarySpeciality.specialties
     : [];
@@ -311,7 +368,6 @@ const VideoUploadModal = ({
       thumbnailInputRef.current.value = "";
     }
 
-    // Reset state
     setFormData({
       title: "",
       description: "",
@@ -364,9 +420,7 @@ const VideoUploadModal = ({
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Error Alert */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
               <FiAlertCircle
@@ -377,7 +431,6 @@ const VideoUploadModal = ({
             </div>
           )}
 
-          {/* Upload Progress */}
           {uploading && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
               <div className="flex items-center gap-2">
@@ -419,10 +472,8 @@ const VideoUploadModal = ({
             </div>
           )}
 
-          {/* Video Upload */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
-              {/* Video File <span className="text-red-500">*</span> */}
               Video File{" "}
               {!isEditMode && <span className="text-red-500">*</span>}
               {isEditMode && (
@@ -442,10 +493,6 @@ const VideoUploadModal = ({
                   {!isEditMode && (
                     <button
                       type="button"
-                      // onClick={() => {
-                      //   setVideoFile(null);
-                      //   setVideoPreview(null);
-                      // }}
                       onClick={() => {
                         if (
                           videoFile &&
@@ -454,8 +501,6 @@ const VideoUploadModal = ({
                         ) {
                           URL.revokeObjectURL(videoPreview);
                         }
-                        // setVideoFile(null);
-                        // setVideoPreview(null);
                         setVideoFile(null);
                         setVideoPreview(
                           isEditMode && existingVideoData?.videoUrl
@@ -466,27 +511,11 @@ const VideoUploadModal = ({
                       disabled={uploading}
                       className="text-sm hover:shadow-lg text-black bg-red-100 hover:text-red-800 disabled:opacity-50 border hover:border-red-800 border-red-300 p-2 rounded-xl"
                     >
-                      {/* Remove Video */}
                       {isEditMode ? "Cancel Replace" : "Remove Video"}
                     </button>
                   )}
                 </div>
               ) : (
-                // <label className="cursor-pointer">
-                //   <FiVideo className="mx-auto text-gray-400 mb-2" size={48} />
-                //   <p className="text-sm text-gray-600 mb-1">
-                //     Click to upload video or drag and drop
-                //   </p>
-                //   <p className="text-xs text-gray-500">MP4, WebM (max 500MB)</p>
-                //   <input
-                //     type="file"
-                //     accept="video/*"
-                //     onChange={handleVideoSelect}
-                //     disabled={uploading}
-                //     className="hidden"
-                //   />
-                // </label>
-
                 <div
                   className={`flex flex-col items-center justify-center gap-4 text-center ${
                     uploading ? "opacity-70 pointer-events-none" : ""
@@ -539,11 +568,9 @@ const VideoUploadModal = ({
             </div>
           </div>
 
-          {/* Thumbnail Upload */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               Thumbnail <span className="text-red-500">*</span>
-              {/* Thumbnail {!isEditMode && <span className="text-red-500">*</span>} */}
               {isEditMode && (
                 <span className="text-sm text-gray-500 ml-2">
                   (Optional - upload to replace)
@@ -580,26 +607,11 @@ const VideoUploadModal = ({
                       disabled={uploading}
                       className="text-sm hover:shadow-lg text-black bg-red-100 hover:text-red-800 disabled:opacity-50 border hover:border-red-800 border-red-300 p-2 rounded-xl"
                     >
-                      {/* Remove Thumbnail */}
                       {isEditMode ? "Cancel Replace" : "Remove Thumbnail"}
                     </button>
                   )}
                 </div>
               ) : (
-                // <label className="cursor-pointer">
-                //   <FiImage className="mx-auto text-gray-400 mb-2" size={48} />
-                //   <p className="text-sm text-gray-600 mb-1">
-                //     Click to upload thumbnail or drag and drop
-                //   </p>
-                //   <p className="text-xs text-gray-500">JPG, PNG (max 5MB)</p>
-                //   <input
-                //     type="file"
-                //     accept="image/*"
-                //     onChange={handleThumbnailSelect}
-                //     disabled={uploading}
-                //     className="hidden"
-                //   />
-                // </label>
                 <div
                   className={` flex flex-col items-center justify-center gap-3 text-center rounded-2xl  border-gray-300 px-6 py-8 transition hover:border-blue-500 ${
                     uploading ? "opacity-70 pointer-events-none" : ""
@@ -646,7 +658,6 @@ const VideoUploadModal = ({
             </div>
           </div>
 
-          {/* Form Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
@@ -667,16 +678,6 @@ const VideoUploadModal = ({
               <label className="block text-sm font-medium text-gray-700">
                 Specialty <span className="text-red-500">*</span>
               </label>
-              {/* <input
-                type="text"
-                name="specialty"
-                value={formData.specialty}
-                onChange={(e) => handleInputChange(e.target)}
-                disabled={uploading}
-                placeholder="Cardiology"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-              /> */}
-
               <select
                 name="specialty"
                 value={formData.specialty}
@@ -691,17 +692,6 @@ const VideoUploadModal = ({
                   </option>
                 ))}
               </select>
-              {/* <CustomSelect
-                options={specialtyOptions}
-                value={formData.specialty}
-                onChange={handleSpecialtyChange}
-                placeholder="All Specialties"
-                renderValue={(option) => (
-                  <span className="text-gray-700 text-sm sm:text-base">
-                    {option?.label || "All Specialties"}
-                  </span>
-                )}
-              /> */}
             </div>
 
             <div className="space-y-2">
@@ -750,10 +740,9 @@ const VideoUploadModal = ({
                 disabled={uploading}
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
               >
-                <option value="BOOK_CONSULT">Book Consult</option>
+                <option value="CONSULT">Book Consult</option>
                 <option value="QUIZ">Quiz</option>
-                <option value="HEALTH_VAULT">Health Vault</option>
-                <option value="LEARN_MORE">Learn More</option>
+                <option value="VAULT">Health Vault</option>
               </select>
             </div>
 
@@ -807,10 +796,6 @@ const VideoUploadModal = ({
               </label>
               <input
                 type="text"
-                // name="title"
-                // value={formData.title}
-                // onChange={(e) => handleInputChange(e.target)}
-                // disabled={uploading}
                 placeholder="diabetes, heath wellness"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
               />
@@ -828,24 +813,6 @@ const VideoUploadModal = ({
             </button>
             {showBothButtons && (
               <>
-                {/* <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={uploading || !videoFile || !thumbnailFile}
-              className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white rounded-lg bg-gradient-to-r from-blue-600 to-teal-400 transition-all hover:brightness-110 active:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {uploading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <FiUpload size={16} />
-                  Upload Video
-                </>
-              )}
-            </button> */}
                 <button
                   type="button"
                   onClick={() => handleSubmit(true)}

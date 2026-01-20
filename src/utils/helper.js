@@ -534,3 +534,34 @@ export const formatDuration = (seconds) => {
   const secs = seconds % 60;
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 };
+
+
+export const getVideoButtonState = (script) => {
+  const hasVideos = script.videos && script.videos.length > 0;
+  
+  if (!hasVideos) {
+    return {
+      showButton: true,
+      buttonText: "Upload Video",
+      buttonType: "upload",
+      isDisabled: false
+    };
+  }
+  
+  const hasDraftVideo = script.videos.some(video => video.status === "DRAFT");
+  
+  if (hasDraftVideo) {
+    return {
+      showButton: true,
+      buttonText: "Submit for Review",
+      buttonType: "submit",
+      isDisabled: false
+    };
+  }
+  return {
+    showButton: true,
+    buttonText: "Video Uploaded",
+    buttonType: "uploaded",
+    isDisabled: true
+  };
+};
