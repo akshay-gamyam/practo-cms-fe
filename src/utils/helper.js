@@ -36,7 +36,81 @@ import { FaUserDoctor } from "react-icons/fa6";
 // Google OAuth Client ID
 export const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
-export const MENU_ITEMS = [
+// export const MENU_ITEMS = [
+//   { label: "Dashboard", icon: <IoHome size={20} />, path: ROUTES.DASHBOARD },
+//   { label: "Users", icon: <PiUsers size={20} />, path: ROUTES.USERS },
+//   {
+//     label: "Content Library",
+//     icon: <IoDocumentTextOutline size={20} />,
+//     path: ROUTES.CONTENT_LIBRARY,
+//   },
+//   { label: "Upload", icon: <FiUpload size={20} />, path: ROUTES.UPLOAD },
+//   {
+//     label: "Assigned Topics",
+//     icon: <MdOutlineTopic size={20} />,
+//     path: ROUTES.MY_TOPICS,
+//   },
+//   {
+//     label: "Doctor Notes",
+//     icon: <MdOutlineMedicalInformation size={20} />,
+//     path: ROUTES.MY_DOCTOR_NOTES,
+//   },
+//   {
+//     label: "Medical Topics",
+//     icon: <MdOutlineMedicalInformation size={20} />,
+//     path: ROUTES.MEDICAL_TOPICS,
+//   },
+//   {
+//     label: "Agency POC",
+//     icon: <MdOutlineMediation size={20} />,
+//     path: ROUTES.AGENCY_POC,
+//   },
+//   {
+//     label: "Script",
+//     icon: <MdOutlineDescription size={20} />,
+//     path: ROUTES.SCRIPT,
+//   },
+//   {
+//     label: "Assigned Scripts",
+//     icon: <CgTranscript size={20} />,
+//     path: ROUTES.CONTENT_APPROVER_SCRIPTS,
+//   },
+//   {
+//     label: "Assigned Scripts",
+//     icon: <CgTranscript size={20} />,
+//     path: ROUTES.CONTENT_APPROVER_SCRIPTS_NEW,
+//   },
+//   {
+//     label: "Assigned Videos",
+//     icon: <LiaFileVideoSolid size={20} />,
+//     path: ROUTES.CONTENT_APPROVER_VIDEOS,
+//   },
+//   { label: "Videos", icon: <IoVideocam size={20} />, path: ROUTES.VIDEOS },
+//   {
+//     label: "Review Queue",
+//     icon: <FaRegChartBar size={20} />,
+//     path: ROUTES.REVIEW_QUEUE,
+//   },
+//   { label: "Settings", icon: <CiSettings size={20} />, path: ROUTES.SETTINGS },
+//   {
+//     label: "Publish",
+//     icon: <MdOutlinePublishedWithChanges size={20} />,
+//     path: ROUTES.PUBLISHER,
+//   },
+//   {
+//     label: "Doctor Profile",
+//     icon: <FaUserDoctor size={20} />,
+//     path: ROUTES.DOCTOR_PROFILE,
+//   },
+//   {
+//     label: "Notifications",
+//     icon: <IoIosNotifications size={20} />,
+//     path: ROUTES.NOCIFICATIONS,
+//   },
+// ];
+
+
+export const MENU_ITEMS = (role) => [
   { label: "Dashboard", icon: <IoHome size={20} />, path: ROUTES.DASHBOARD },
   { label: "Users", icon: <PiUsers size={20} />, path: ROUTES.USERS },
   {
@@ -81,7 +155,7 @@ export const MENU_ITEMS = [
     path: ROUTES.CONTENT_APPROVER_SCRIPTS_NEW,
   },
   {
-    label: "Assigned Videos",
+    label: role === "SUPER_ADMIN" ? "Review Queue" : "Assigned Videos",
     icon: <LiaFileVideoSolid size={20} />,
     path: ROUTES.CONTENT_APPROVER_VIDEOS,
   },

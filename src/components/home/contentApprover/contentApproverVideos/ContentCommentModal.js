@@ -7,15 +7,20 @@ const ContentCommentModal = ({
   video,
   onSubmit,
   commentType = "comment",
+  showSelect = false,
+  selectOptions = [],
+  onSelectChange,
 }) => {
   const [comment, setComment] = useState("");
+  const [selectedOption, setSelectedOption] = useState("");
 
   if (!isOpen || !video) return null;
 
-    const handleSubmit = () => {
+  const handleSubmit = () => {
     if (comment.trim()) {
-      onSubmit(comment);
+      onSubmit(comment, selectedOption);
       setComment("");
+      setSelectedOption("");
     }
   };
 
@@ -23,29 +28,51 @@ const ContentCommentModal = ({
 
   const getModalTitle = () => {
     switch (commentType) {
-      case 'approve':
-        return 'Approve Comment';
-      case 'reject':
-        return 'Reject Comment';
+      case "approve":
+        return "Approve Comment";
+      case "reject":
+        return "Reject Comment";
       default:
-        return 'Add Comment';
+        return "Add Comment";
     }
   };
 
   const getSubmitButtonText = () => {
     switch (commentType) {
-      case 'approve':
-        return 'Approve Comment';
-      case 'reject':
-        return 'Reject Comment';
+      case "approve":
+        return "Approve Comment";
+      case "reject":
+        return "Reject Comment";
       default:
-        return 'Submit Comment';
+        return "Submit Comment";
     }
   };
 
   return (
     <CustomModal isOpen={isOpen} onClose={onClose} title={getModalTitle()}>
       <div className="space-y-4">
+        {showSelect && (
+          <div>
+            <label className="text-sm font-medium text-gray-700 block mb-2">
+              Select Reason (optional)
+            </label>
+            <select
+              value={selectedOption}
+              onChange={(e) => {
+                setSelectedOption(e.target.value);
+                onSelectChange?.(e.target.value);
+              }}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">-- Select an option --</option>
+              {selectOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <div>
           <label className="text-sm font-medium text-gray-700 block mb-2">
             Comment for:{" "}
@@ -64,6 +91,7 @@ const ContentCommentModal = ({
             onClick={() => {
               onClose();
               setComment("");
+               setSelectedOption("");
             }}
             className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
           >

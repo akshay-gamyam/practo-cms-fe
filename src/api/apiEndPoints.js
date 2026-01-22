@@ -62,3 +62,5 @@ export const CONTENT_LIBRARY_STATUS_LIST = "/api/videos/statuses";
 export const CONTENT_LIBRARY_SPECIALITY_LIST = "/api/specialties";
 export const GET_ALL_UPLOADED_VIDEOS_ID = "/api/videos/uploadedVideoIds";
 export const GET_SELECTED_VIDEO_DATA_BY_ID = (video_id) => `/api/videos/${video_id}`
+
+export const GET_REVIEWER_ASSIGNEE_LIST = "/api/videos/assignment-roles"

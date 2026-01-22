@@ -1,7 +1,9 @@
 import {
   CONTENT_LIBRARY_SPECIALITY_LIST,
   CONTENT_LIBRARY_STATUS_LIST,
+  GET_REVIEWER_ASSIGNEE_LIST,
   PUBLISHER_VIDEOS,
+  USER_MANAGEMENT_LIST,
 } from "../../../api/apiEndPoints";
 import api from "../../../api/interceptor";
 import {
@@ -14,11 +16,15 @@ import {
   fetchContentLibrarySpecialtyStart,
   fetchContentLibrarySpecialtySuccess,
   fetchContentLibrarySpecialtyFailure,
+  fetchAssigneeReviewerStart,
+  fetchAssigneeReviewerSuccess,
+  fetchAssigneeReviewerFailure,
 } from "../../reducer/contentLibraryReducer/ContentLibraryReducer";
 
 let isFetchContentLibraryList = false;
 let isFetchContentLibraryStatusList = false;
 let isFetchContentLibrarySpecialtyList = false;
+let isFetchAssigneeList = false;
 
 // .................. fetch content library listing ..............
 
@@ -55,12 +61,7 @@ export const fetchContentLibraryList =
         params: queryParams,
       });
 
-      const {
-        videos,
-        currentPage,
-        totalPages,
-        total,
-      } = response.data;
+      const { videos, currentPage, totalPages, total } = response.data;
 
       dispatch(
         fetchContentLibraryListSuccess({
@@ -83,7 +84,6 @@ export const fetchContentLibraryList =
       isFetchContentLibraryList = false;
     }
   };
-
 
 // .................. fetch content library status listing ..............
 
@@ -134,5 +134,32 @@ export const fetchContentLibrarySpecialityList = () => async (dispatch) => {
     return { success: false, error: errorMessage };
   } finally {
     isFetchContentLibrarySpecialtyList = false;
+  }
+};
+
+
+// .................. get all assign to list ................
+
+export const fetchAssigneeList = (role) => async (dispatch) => {
+  if (isFetchAssigneeList) return;
+  isFetchAssigneeList = true;
+  dispatch(fetchAssigneeReviewerStart());
+
+  try {
+    const response = await api.get(GET_REVIEWER_ASSIGNEE_LIST);
+    const { users } = response.data;
+
+    dispatch(fetchAssigneeReviewerSuccess({ users }));
+
+    return { success: true, data: response.data };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to fetch scripts";
+    dispatch(fetchAssigneeReviewerFailure(errorMessage));
+    return { success: false, error: errorMessage };
+  } finally {
+    isFetchAssigneeList = false;
   }
 };

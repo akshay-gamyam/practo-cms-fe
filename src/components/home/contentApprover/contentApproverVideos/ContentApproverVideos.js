@@ -220,11 +220,11 @@ const ContentApproverVideos = () => {
           <div className="space-y-6">
             {filteredVideos.map((video) => {
               const statusBadge = getStatusBadge(video.status);
-              
-              const isFinalStatus = 
-                video.decision?.toUpperCase() === "APPROVED" || 
+
+              const isFinalStatus =
+                video.decision?.toUpperCase() === "APPROVED" ||
                 video.decision?.toUpperCase() === "REJECTED";
-              
+
               const canInteract = !isFinalStatus;
 
               const authorName = video.uploadedBy
@@ -248,7 +248,7 @@ const ContentApproverVideos = () => {
                   className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
                 >
                   <div className="flex flex-col lg:flex-row">
-                    <div 
+                    <div
                       className="lg:w-2/5 relative bg-gradient-to-br from-blue-100 to-cyan-100 h-64 lg:h-auto group cursor-pointer"
                       onClick={() => handleThumbnailClick(video)}
                     >
@@ -266,13 +266,13 @@ const ContentApproverVideos = () => {
                           <FiPlay className="w-8 h-8 text-gray-900 group-hover:text-white ml-1" />
                         </div>
                       </div>
-                      
+
                       <div className="absolute bottom-4 right-4 bg-gray-900/80 backdrop-blur-sm text-white text-sm font-bold px-3 py-1.5 rounded-lg z-10">
                         {formatDuration(video.duration)}
                       </div>
 
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
-                      
+
                       {video.thumbnailUrl ? (
                         <img
                           src={video.thumbnailUrl}
@@ -402,6 +402,17 @@ const ContentApproverVideos = () => {
         type="video"
       />
 
+      {/* <ContentCommentModal
+        isOpen={showCommentModal}
+        onClose={() => {
+          setShowCommentModal(false);
+          setCommentType("comment");
+        }}
+        video={selectedVideo}
+        onSubmit={handleAddComment}
+        commentType={commentType}
+      /> */}
+
       <ContentCommentModal
         isOpen={showCommentModal}
         onClose={() => {
@@ -411,6 +422,12 @@ const ContentApproverVideos = () => {
         video={selectedVideo}
         onSubmit={handleAddComment}
         commentType={commentType}
+        showSelect
+        selectOptions={[
+          { label: "Spam", value: "spam" },
+          { label: "Inappropriate", value: "inappropriate" },
+          { label: "Other", value: "other" },
+        ]}
       />
     </div>
   );

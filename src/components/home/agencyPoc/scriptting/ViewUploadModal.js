@@ -13,7 +13,10 @@ import {
   uploadVideoComplete,
   submitVideo,
 } from "../../../../redux/action/agencyPocAction/AgencyPocAction";
-import { fetchContentLibrarySpecialityList } from "../../../../redux/action/contentLibraryAction/ContentLibraryAction";
+import {
+  fetchAssigneeList,
+  fetchContentLibrarySpecialityList,
+} from "../../../../redux/action/contentLibraryAction/ContentLibraryAction";
 
 const VideoUploadModal = ({
   open,
@@ -31,7 +34,7 @@ const VideoUploadModal = ({
     isGetThumbnailUploadUrlLoading,
   } = useSelector((state) => state.agencyPoc);
 
-  const { contentLibrarySpeciality } = useSelector(
+  const { contentLibrarySpeciality, assigneeReviewer } = useSelector(
     (state) => state.content_library
   );
 
@@ -58,6 +61,7 @@ const VideoUploadModal = ({
     city: "",
     ctaType: "CONSULT",
     duration: 0,
+    assignTo: null,
   });
 
   const [videoFile, setVideoFile] = useState(null);
@@ -94,6 +98,7 @@ const VideoUploadModal = ({
         city: "",
         ctaType: "CONSULT",
         duration: 0,
+        assignTo: null,
       });
       setVideoFile(null);
       setThumbnailFile(null);
@@ -113,6 +118,7 @@ const VideoUploadModal = ({
         city: existingVideoData.city || "",
         ctaType: existingVideoData.ctaType || "CONSULT",
         duration: existingVideoData.duration || 0,
+        assignTo: existingVideoData.assignTo || 0,
       });
 
       setVideoFile(null);
@@ -278,14 +284,9 @@ const VideoUploadModal = ({
           return;
         }
         const updateResult = await dispatch(
-          uploadVideoComplete(
-            null,
-            null,
-            submitData,
-            (progress) => {
-              setUploadProgress(progress);
-            }
-          )
+          uploadVideoComplete(null, null, submitData, (progress) => {
+            setUploadProgress(progress);
+          })
         );
         if (!updateResult.success) {
           setError(updateResult.error);
@@ -339,6 +340,11 @@ const VideoUploadModal = ({
       setError(err.message || "Failed to upload video. Please try again.");
     }
   };
+
+  useEffect(() => {
+    dispatch(fetchAssigneeList());
+  },[dispatch]);
+
   const specialtyOptions = Array.isArray(contentLibrarySpeciality?.specialties)
     ? contentLibrarySpeciality.specialties
     : [];
@@ -577,7 +583,7 @@ const VideoUploadModal = ({
                 </span>
               )}
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg text-center hover:border-blue-400 transition-colors">
               {thumbnailPreview ? (
                 <div className="space-y-3">
                   <img
@@ -760,6 +766,31 @@ const VideoUploadModal = ({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
               />
             </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Assign To:
+                {/* <span className="text-red-500">*</span> */}
+              </label>
+              <select
+                name="assignTo"
+                value={formData.assignTo}
+                onChange={(e) => handleInputChange(e.target)}
+                disabled={uploading}
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+              >
+                <option value="">Select Assignee</option>
+                 <option value="CONSULT">Medical Reviewer</option>
+                <option value="QUIZ">Brand Reviewer</option>
+                <option value="VAULT">Super Admin</option>
+                {/* {specialtyOptions.map((option) => (
+                  <option key={option.id} value={option.value}>
+                    {option.label}
+                  </option>
+                ))} */}
+              </select>
+            </div>
+
             <div className="md:col-span-2 space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 Title <span className="text-red-500">*</span>

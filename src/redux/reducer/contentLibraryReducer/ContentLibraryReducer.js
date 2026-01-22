@@ -14,10 +14,13 @@ const initialState = {
   contentLibrarySpeciality: {
     specialties: [],
   },
+
+  assigneeReviewer: [],
   selectedContentLibrary: null,
   isContentLibraryListLoading: false,
   isContentLibraryStatusLoading: false,
   isContentLibrarySpecialtyLoading: false,
+  isAssigneeReviewerLoading: false,
   pagination: {
     currentPage: 1,
     totalPages: 1,
@@ -38,20 +41,20 @@ const contentLibrarySlice = createSlice({
     },
     fetchContentLibraryListSuccess(state, action) {
       state.isContentLibraryListLoading = false;
-      
+
       state.contentLibrary = {
         videos: action.payload.videos || [],
         currentPage: action.payload.currentPage || 1,
         totalPages: action.payload.totalPages || 1,
         total: action.payload.total || 0,
       };
-      
+
       state.pagination = {
         currentPage: action.payload.currentPage || 1,
         totalPages: action.payload.totalPages || 1,
         totalCount: action.payload.total || 0,
       };
-      
+
       state.error = null;
     },
     fetchContentLibraryListFailure(state, action) {
@@ -105,6 +108,20 @@ const contentLibrarySlice = createSlice({
       };
     },
 
+    // ..................... fetch all assignee reviwer list .................
+    fetchAssigneeReviewerStart(state) {
+      state.isAssigneeReviewerLoading = true;
+      state.error = null;
+    },
+    fetchAssigneeReviewerSuccess(state, action) {
+      state.isDoctorPointerListLoading = false;
+      state.assigneeReviewer = action.payload.users;
+    },
+    fetchAssigneeReviewerFailure(state, action) {
+      state.isAssigneeReviewerLoading = false;
+      state.error = action.payload;
+    },
+
     // ................. select Content Library item ........................
     selectContentLibrary(state, action) {
       state.selectedContentLibrary = action.payload;
@@ -127,6 +144,9 @@ export const {
   fetchContentLibrarySpecialtyStart,
   fetchContentLibrarySpecialtySuccess,
   fetchContentLibrarySpecialtyFailure,
+  fetchAssigneeReviewerStart,
+  fetchAssigneeReviewerSuccess,
+  fetchAssigneeReviewerFailure,
   selectContentLibrary,
   clearSelectedContentLibrary,
 } = contentLibrarySlice.actions;
