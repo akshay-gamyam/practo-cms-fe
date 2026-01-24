@@ -551,9 +551,17 @@ export const uploadVideoComplete =
         doctorName: formData.doctorName,
         specialty: formData.specialty,
         language: formData.language,
-        city: formData.city,
+        // city: formData.city,
         ctaType: formData.ctaType,
       };
+
+      if (formData.assignedReviewerId && formData.assignedReviewerId.trim()) {
+        videoData.assignedReviewerId = formData.assignedReviewerId;
+      }
+
+      if (formData.tags && formData.tags.trim()) {
+        videoData.tags = formData.tags;
+      }
 
       if (videoFileUrl) {
         videoData.videoUrl = videoFileUrl;
@@ -592,7 +600,7 @@ export const uploadVideoComplete =
 export const updateVideoRecord = (videoId, videoData) => async (dispatch) => {
   dispatch(uploadVideoStart());
 
- try {
+  try {
     const { status, ...dataWithoutStatus } = videoData;
     const response = await api.patch(
       `${AGENCY_POC_VIDEOS}/${videoId}`,

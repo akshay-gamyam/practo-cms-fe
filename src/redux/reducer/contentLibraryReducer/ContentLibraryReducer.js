@@ -115,7 +115,7 @@ const contentLibrarySlice = createSlice({
     },
     fetchAssigneeReviewerSuccess(state, action) {
       state.isDoctorPointerListLoading = false;
-      state.assigneeReviewer = action.payload.users;
+      state.assigneeReviewer = action.payload.roles;
     },
     fetchAssigneeReviewerFailure(state, action) {
       state.isAssigneeReviewerLoading = false;

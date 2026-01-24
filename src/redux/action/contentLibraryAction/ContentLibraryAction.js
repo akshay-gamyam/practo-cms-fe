@@ -147,9 +147,9 @@ export const fetchAssigneeList = (role) => async (dispatch) => {
 
   try {
     const response = await api.get(GET_REVIEWER_ASSIGNEE_LIST);
-    const { users } = response.data;
+    const { roles } = response.data;
 
-    dispatch(fetchAssigneeReviewerSuccess({ users }));
+    dispatch(fetchAssigneeReviewerSuccess({ roles }));
 
     return { success: true, data: response.data };
   } catch (error) {

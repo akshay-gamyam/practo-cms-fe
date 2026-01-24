@@ -58,11 +58,14 @@ const VideoUploadModal = ({
     doctorName: "",
     specialty: "",
     language: "English",
-    city: "",
+    // city: "",
     ctaType: "CONSULT",
     duration: 0,
-    assignTo: null,
+    assignedReviewerId: "",
+    tags: "",
   });
+
+  console.log("formData", formData)
 
   const [videoFile, setVideoFile] = useState(null);
   const [thumbnailFile, setThumbnailFile] = useState(null);
@@ -95,10 +98,11 @@ const VideoUploadModal = ({
         doctorName: "",
         specialty: "",
         language: "English",
-        city: "",
+        // city: "",
         ctaType: "CONSULT",
         duration: 0,
-        assignTo: null,
+        assignedReviewerId: "",
+        tags: "",
       });
       setVideoFile(null);
       setThumbnailFile(null);
@@ -115,10 +119,11 @@ const VideoUploadModal = ({
         doctorName: existingVideoData.doctorName || "",
         specialty: existingVideoData.specialty || "",
         language: existingVideoData.language || "English",
-        city: existingVideoData.city || "",
+        // city: existingVideoData.city || "",
         ctaType: existingVideoData.ctaType || "CONSULT",
         duration: existingVideoData.duration || 0,
-        assignTo: existingVideoData.assignTo || 0,
+        assignedReviewerId: existingVideoData.assignedReviewerId || "",
+        tags: existingVideoData.tags || "",
       });
 
       setVideoFile(null);
@@ -198,10 +203,18 @@ const VideoUploadModal = ({
       setError("Please enter a video title");
       return;
     }
-    if (!formData.doctorName || !formData.specialty || !formData.city) {
+    if (!formData.doctorName || !formData.specialty ) {
       setError("Please fill in all required fields");
       return;
     }
+
+    if (!saveAsDraft) {
+      if (!formData.assignedReviewerId || !formData.assignedReviewerId.trim()) {
+        setError("Please select a reviewer to assign before submitting");
+        return;
+      }
+    }
+
     setError(null);
     try {
       const submitData = {
@@ -210,12 +223,21 @@ const VideoUploadModal = ({
         doctorName: formData.doctorName.trim(),
         specialty: formData.specialty,
         language: formData.language,
-        city: formData.city.trim(),
+        // city: formData.city.trim(),
         ctaType: formData.ctaType,
         duration: formData.duration,
         topicId: script.topicId,
         scriptId: script?.id,
       };
+
+      if (formData.assignedReviewerId && formData.assignedReviewerId.trim()) {
+        submitData.assignedReviewerId = formData.assignedReviewerId;
+      }
+
+      // Add tags if they exist and are not empty
+      if (formData.tags && formData.tags.trim()) {
+        submitData.tags = formData.tags.trim();
+      }
       // If editing, include video ID
       if (isEditMode && existingVideoData?.id) {
         submitData.videoId = existingVideoData.id;
@@ -343,7 +365,7 @@ const VideoUploadModal = ({
 
   useEffect(() => {
     dispatch(fetchAssigneeList());
-  },[dispatch]);
+  }, [dispatch]);
 
   const specialtyOptions = Array.isArray(contentLibrarySpeciality?.specialties)
     ? contentLibrarySpeciality.specialties
@@ -380,9 +402,11 @@ const VideoUploadModal = ({
       doctorName: "",
       specialty: "",
       language: "English",
-      city: "",
+      // city: "",
       ctaType: "CONSULT",
       duration: 0,
+      assignedReviewerId: "",
+      tags: "",
     });
     setVideoFile(null);
     setThumbnailFile(null);
@@ -720,7 +744,7 @@ const VideoUploadModal = ({
               </select>
             </div>
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 City <span className="text-red-500">*</span>
               </label>
@@ -733,7 +757,7 @@ const VideoUploadModal = ({
                 placeholder="Chennai"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
               />
-            </div>
+            </div> */}
 
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
@@ -767,29 +791,27 @@ const VideoUploadModal = ({
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Assign To:
-                {/* <span className="text-red-500">*</span> */}
-              </label>
-              <select
-                name="assignTo"
-                value={formData.assignTo}
-                onChange={(e) => handleInputChange(e.target)}
-                disabled={uploading}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-              >
-                <option value="">Select Assignee</option>
-                 <option value="CONSULT">Medical Reviewer</option>
-                <option value="QUIZ">Brand Reviewer</option>
-                <option value="VAULT">Super Admin</option>
-                {/* {specialtyOptions.map((option) => (
-                  <option key={option.id} value={option.value}>
-                    {option.label}
-                  </option>
-                ))} */}
-              </select>
-            </div>
+            {showSubmitOnly && (
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Assign To: <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="assignTo"
+                  value={formData.assignedReviewerId}
+                  onChange={(e) => handleInputChange(e.target)}
+                  disabled={uploading}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                >
+                  <option value="">Select Assignee</option>
+                  {assigneeReviewer.map((option) => (
+                    <option key={option?.id} value={option.id}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="md:col-span-2 space-y-2">
               <label className="block text-sm font-medium text-gray-700">
@@ -827,6 +849,10 @@ const VideoUploadModal = ({
               </label>
               <input
                 type="text"
+                name="tags"
+                value={formData.tags}
+                onChange={(e) => handleInputChange(e.target)}
+                disabled={uploading}
                 placeholder="diabetes, heath wellness"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
               />
@@ -868,8 +894,18 @@ const VideoUploadModal = ({
                 <button
                   type="button"
                   onClick={() => handleSubmit(false)}
+                  // disabled={
+                  //   uploading || !videoFile || !thumbnailFile || !formData.title
+                  // }
                   disabled={
-                    uploading || !videoFile || !thumbnailFile || !formData.title
+                    uploading ||
+                    !videoFile ||
+                    !thumbnailFile ||
+                    !formData.title.trim() ||
+                    !formData.doctorName.trim() ||
+                    !formData.specialty ||
+                    // !formData.city.trim() ||
+                    !formData.assignedReviewerId.trim() 
                   }
                   className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white rounded-lg bg-gradient-to-r from-blue-600 to-teal-400 transition-all hover:brightness-110 active:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -892,7 +928,18 @@ const VideoUploadModal = ({
               <button
                 type="button"
                 onClick={() => handleSubmit(false)}
-                disabled={uploading || !formData.title}
+                // disabled={uploading || !formData.title}
+
+                disabled={
+                  uploading ||
+                  !videoFile ||
+                  !thumbnailFile ||
+                  !formData.title.trim() ||
+                  !formData.doctorName.trim() ||
+                  !formData.specialty ||
+                  // !formData.city.trim() ||
+                  !formData.assignedReviewerId.trim()
+                }
                 className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white rounded-lg bg-gradient-to-r from-blue-600 to-teal-400 transition-all hover:brightness-110 active:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {uploading ? (
