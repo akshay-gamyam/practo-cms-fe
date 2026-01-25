@@ -426,7 +426,7 @@ export const claimVideos = (videoId) => async (dispatch) => {
 
 // ........................ approve script with comment .........................
 export const approveVideos =
-  (videoId, comments = "") =>
+  (videoId, comments = "", assignedReviewerId) =>
   async (dispatch, getState) => {
     if (isApprovingVideos) return;
     isApprovingVideos = true;
@@ -442,14 +442,21 @@ export const approveVideos =
         throw new Error("User not authenticated");
       }
 
+      const payload = { comments };
+
+      if (assignedReviewerId) {
+        payload.assignedReviewerId = assignedReviewerId;
+      }
+
       const endpoint =
         user.role === ROLE_VARIABLES_MAP.CONTENT_APPROVER
           ? CONTENT_APPROVER_APPROVE_VIDEO(videoId)
           : MEDICAL_AFFAIRS_APPROVE_VIDEO(videoId);
 
-      const response = await api.post(endpoint, {
-        comments,
-      });
+      // const response = await api.post(endpoint, {
+      //   comments,
+      // });
+      const response = await api.post(endpoint, payload);
 
       dispatch(
         approveVideoSuccess({
@@ -471,15 +478,23 @@ export const approveVideos =
   };
 
 // ........................ reject script with comment .........................
-export const rejectVideos = (videoId, comment) => async (dispatch) => {
+export const rejectVideos = (videoId, comment, assignedReviewerId) => async (dispatch) => {
   if (isRejectingVideos) return;
   isRejectingVideos = true;
   dispatch(rejectVideoStart());
 
   try {
-    const response = await api.post(CONTENT_APPROVER_REJECT_VIDEO(videoId), {
-      comments: comment || "",
-    });
+      const payload = {
+        comments: comment || "",
+      };
+
+      if (assignedReviewerId) {
+        payload.assignedReviewerId = assignedReviewerId;
+      }
+    // const response = await api.post(CONTENT_APPROVER_REJECT_VIDEO(videoId), {
+    //   comments: comment || "",
+    // });
+     const response = await api.post(CONTENT_APPROVER_REJECT_VIDEO(videoId), payload);
 
     const { rejectedBy } = response.data;
 

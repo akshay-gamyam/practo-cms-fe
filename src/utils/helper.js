@@ -36,7 +36,8 @@ import { FaUserDoctor } from "react-icons/fa6";
 // Google OAuth Client ID
 export const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
-export const MENU_ITEMS = [
+// export const MENU_ITEMS = [
+  export const MENU_ITEMS = (role) => [
   { label: "Dashboard", icon: <IoHome size={20} />, path: ROUTES.DASHBOARD },
   { label: "Users", icon: <PiUsers size={20} />, path: ROUTES.USERS },
   {
@@ -80,8 +81,13 @@ export const MENU_ITEMS = [
     icon: <CgTranscript size={20} />,
     path: ROUTES.CONTENT_APPROVER_SCRIPTS_NEW,
   },
+  // {
+  //   label: "Assigned Videos",
+  //   icon: <LiaFileVideoSolid size={20} />,
+  //   path: ROUTES.CONTENT_APPROVER_VIDEOS,
+  // },
   {
-    label: "Assigned Videos",
+    label: role === "SUPER_ADMIN" ? "Review Queue" : "Assigned Videos",
     icon: <LiaFileVideoSolid size={20} />,
     path: ROUTES.CONTENT_APPROVER_VIDEOS,
   },

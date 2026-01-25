@@ -19,6 +19,7 @@ import {
 } from "../../../../redux/action/contentApproverAction/ContentApproverAction";
 import { formatDate, getStatusBadge } from "../../../../utils/helper";
 import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
+import { fetchAssigneeList } from "../../../../redux/action/agencyPocAction/AgencyPocAction";
 
 const ContentApproverVideos = () => {
   const dispatch = useDispatch();
@@ -31,6 +32,12 @@ const ContentApproverVideos = () => {
     error,
   } = useSelector((state) => state.contentApprover);
 
+  const { assigneeList } = useSelector((state) => state.agencyPoc);
+
+  const assigneeOptions = Array.isArray(assigneeList?.assigneeReviewer)
+    ? assigneeList?.assigneeReviewer
+    : [];
+
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedVideo, setSelectedVideo] = useState(null);
@@ -38,6 +45,8 @@ const ContentApproverVideos = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [commentType, setCommentType] = useState("comment");
+
+  // const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     const params = {};
@@ -55,6 +64,12 @@ const ContentApproverVideos = () => {
     dispatch(fetchContentApproverVideos(params));
   }, [dispatch, filterStatus]);
 
+  useEffect(() => {
+    if (showCommentModal) {
+      dispatch(fetchAssigneeList(selectedVideo?.id));
+    }
+  }, [dispatch, showCommentModal]);
+
   const getCurrentTabData = () => {
     switch (filterStatus) {
       case "approved":
@@ -67,12 +82,35 @@ const ContentApproverVideos = () => {
     }
   };
 
-  const handleApprove = (id) => {
+  const handleApprove = (id, assignedReviewerId, comment) => {
     const currentData = getCurrentTabData();
     const video = currentData.find((v) => v.id === id);
     setSelectedVideo(video);
     setCommentType("approve");
     setShowCommentModal(true);
+
+    // if (user?.role === "SUPER_ADMIN") {
+    //   if (commentType === "approve") {
+    //     dispatch(
+    //       approveVideos(selectedVideo?.id, comment, assignedReviewerId)
+    //     ).then(() => {
+    //       dispatch(fetchContentApproverVideos());
+    //       setSelectedVideo(null);
+    //       setCommentType("comment");
+    //     });
+    //   } else if (commentType === "reject") {
+    //     dispatch(
+    //       rejectVideos(selectedVideo.id, comment, assignedReviewerId)
+    //     ).then(() => {
+    //       dispatch(fetchContentApproverVideos());
+    //       setSelectedVideo(null);
+    //       setCommentType("comment");
+    //     });
+    //     dispatch(fetchContentApproverVideos());
+    //   }
+    // } else {
+    //   setShowCommentModal(true);
+    // }
   };
 
   const handleReject = (id) => {
@@ -83,13 +121,13 @@ const ContentApproverVideos = () => {
     setShowCommentModal(true);
   };
 
-  const handleAddComment = (comment) => {
+  const handleAddComment = (comment, assignedReviewerId) => {
     if (selectedVideo && comment.trim()) {
       if (commentType === "approve") {
-        dispatch(approveVideos(selectedVideo?.id, comment))
+        dispatch(approveVideos(selectedVideo?.id, comment, assignedReviewerId))
           .then(() => {
             setShowCommentModal(false);
-            dispatch(fetchContentApproverVideos())
+            dispatch(fetchContentApproverVideos());
             setSelectedVideo(null);
             setCommentType("comment");
           })
@@ -97,10 +135,10 @@ const ContentApproverVideos = () => {
             console.error("Failed to approve video:", error);
           });
       } else if (commentType === "reject") {
-        dispatch(rejectVideos(selectedVideo.id, comment))
+        dispatch(rejectVideos(selectedVideo.id, comment, assignedReviewerId))
           .then(() => {
             setShowCommentModal(false);
-            dispatch(fetchContentApproverVideos())
+            dispatch(fetchContentApproverVideos());
             setSelectedVideo(null);
             setCommentType("comment");
           })
@@ -220,11 +258,11 @@ const ContentApproverVideos = () => {
           <div className="space-y-6">
             {filteredVideos.map((video) => {
               const statusBadge = getStatusBadge(video.status);
-              
-              const isFinalStatus = 
-                video.decision?.toUpperCase() === "APPROVED" || 
+
+              const isFinalStatus =
+                video.decision?.toUpperCase() === "APPROVED" ||
                 video.decision?.toUpperCase() === "REJECTED";
-              
+
               const canInteract = !isFinalStatus;
 
               const authorName = video.uploadedBy
@@ -248,7 +286,7 @@ const ContentApproverVideos = () => {
                   className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
                 >
                   <div className="flex flex-col lg:flex-row">
-                    <div 
+                    <div
                       className="lg:w-2/5 relative bg-gradient-to-br from-blue-100 to-cyan-100 h-64 lg:h-auto group cursor-pointer"
                       onClick={() => handleThumbnailClick(video)}
                     >
@@ -266,13 +304,13 @@ const ContentApproverVideos = () => {
                           <FiPlay className="w-8 h-8 text-gray-900 group-hover:text-white ml-1" />
                         </div>
                       </div>
-                      
+
                       <div className="absolute bottom-4 right-4 bg-gray-900/80 backdrop-blur-sm text-white text-sm font-bold px-3 py-1.5 rounded-lg z-10">
                         {formatDuration(video.duration)}
                       </div>
 
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
-                      
+
                       {video.thumbnailUrl ? (
                         <img
                           src={video.thumbnailUrl}
@@ -411,6 +449,7 @@ const ContentApproverVideos = () => {
         video={selectedVideo}
         onSubmit={handleAddComment}
         commentType={commentType}
+        assigneeOptions={assigneeOptions}
       />
     </div>
   );

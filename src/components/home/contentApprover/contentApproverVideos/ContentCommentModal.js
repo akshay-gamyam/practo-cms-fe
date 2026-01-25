@@ -7,39 +7,53 @@ const ContentCommentModal = ({
   video,
   onSubmit,
   commentType = "comment",
+  assigneeOptions = [],
 }) => {
   const [comment, setComment] = useState("");
+  const [assignedReviewerId, setAssignedReviewerId] = useState("");
 
   if (!isOpen || !video) return null;
 
-    const handleSubmit = () => {
-    if (comment.trim()) {
-      onSubmit(comment);
-      setComment("");
-    }
+  // const handleSubmit = () => {
+  //   if (comment.trim()) {
+  //     onSubmit(comment, assignedReviewerId || undefined);
+  //     setComment("");
+  //     setAssignedReviewerId("");
+  //   }
+  // };
+
+   const handleSubmit = () => {
+    if (!comment.trim()) return;
+    onSubmit(
+      comment,
+      assignedReviewerId || undefined
+    );
+
+    setComment("");
+    setAssignedReviewerId("");
   };
 
   if (!isOpen || !video) return null;
 
   const getModalTitle = () => {
     switch (commentType) {
-      case 'approve':
-        return 'Approve Comment';
-      case 'reject':
-        return 'Reject Comment';
+      case "approve":
+        return "Approve Comment";
+      case "reject":
+        return "Reject Comment";
       default:
-        return 'Add Comment';
+        return "Add Comment";
     }
   };
 
   const getSubmitButtonText = () => {
     switch (commentType) {
-      case 'approve':
-        return 'Approve Comment';
-      case 'reject':
-        return 'Reject Comment';
+      case "approve":
+        return "Approve Comment";
+      case "reject":
+        return "Reject Comment";
       default:
-        return 'Submit Comment';
+        return "Submit Comment";
     }
   };
 
@@ -51,6 +65,27 @@ const ContentCommentModal = ({
             Comment for:{" "}
             <span className="font-semibold text-gray-900">{video.title}</span>
           </label>
+
+          {assigneeOptions.length > 0 && (
+            <div className="space-y-2 mb-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Assignee To
+              </label>
+              <select
+                value={assignedReviewerId}
+                onChange={(e) => setAssignedReviewerId(e.target.value)} // ✅ fixed
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg"
+              >
+                <option value="">Select Assignee</option>
+                {assigneeOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}

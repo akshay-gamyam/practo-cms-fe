@@ -13,6 +13,10 @@ const initialState = {
   selectedScript: null,
   selectedVideo: null,
 
+  assigneeList: {
+    assigneeReviewer: [],
+  },
+
   selectedVideoIdData: null,
   // Upload state
   videoUploadUrl: null,
@@ -371,6 +375,26 @@ const agencyPocSlice = createSlice({
       state.error = null;
     },
 
+    // ................. fetch Content Library Speciality list ........................
+    fetchAssigneeListStart(state) {
+      state.isContentLibrarySpecialtyLoading = true;
+      state.error = null;
+    },
+    fetchAssigneeListSuccess(state, action) {
+      state.isContentLibrarySpecialtyLoading = false;
+      state.assigneeList = {
+        assigneeReviewer: action.payload.reviewers || [],
+      };
+      state.error = null;
+    },
+    fetchAssigneeListFailure(state, action) {
+      state.isContentLibrarySpecialtyLoading = false;
+      state.error = action.payload;
+      state.assigneeList = {
+        assigneeReviewer: [],
+      };
+    },
+
     // ................. clear selected POC ........................
     clearSelectedPoc(state) {
       state.selectedAgencyPoc = null;
@@ -437,6 +461,10 @@ export const {
   submitVideoStart,
   submitVideoSuccess,
   submitVideoFailure,
+
+  fetchAssigneeListStart,
+  fetchAssigneeListSuccess,
+  fetchAssigneeListFailure,
 
   clearSelectedPoc,
   clearSelectedScript,

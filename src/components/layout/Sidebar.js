@@ -18,7 +18,9 @@ const Sidebar = () => {
 
   const allowedRoutes = ROLE_ACCESS[user?.role] || [];
 
-  const filteredMenuItems = MENU_ITEMS.filter((item) =>
+  const MENU_ITEM = MENU_ITEMS(user?.role);
+
+  const filteredMenuItems = MENU_ITEM.filter((item) =>
     allowedRoutes.includes(item.path)
   );
 

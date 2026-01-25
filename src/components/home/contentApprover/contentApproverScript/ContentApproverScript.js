@@ -355,8 +355,7 @@ const ContentApproverScript = () => {
                           Preview
                         </button>
 
-                         {/* {canInteract && (
-                          <></> */}.  (previously it is not)
+                         {/* {canInteract && (<></> */}
                         {canInteract && (
                           <>
                             <button

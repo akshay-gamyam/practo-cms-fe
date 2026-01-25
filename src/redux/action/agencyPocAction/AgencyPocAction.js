@@ -3,6 +3,7 @@ import {
   AGENCY_POC_SCRIPTS,
   AGENCY_POC_VIDEOS,
   GET_ALL_UPLOADED_VIDEOS_ID,
+  GET_ASSIGNEE_LIST,
   GET_SELECTED_VIDEO_DATA_BY_ID,
   GET_TOPICS_LIST,
   SUBMIT_AGENCY_VIDEO,
@@ -31,9 +32,9 @@ import {
   fetchScriptsStart,
   fetchScriptsSuccess,
   fetchScriptsFailure,
-  deleteScriptStart,
-  deleteScriptSuccess,
-  deleteScriptFailure,
+  // deleteScriptStart,
+  // deleteScriptSuccess,
+  // deleteScriptFailure,
   submitVideoStart,
   submitVideoSuccess,
   submitVideoFailure,
@@ -58,11 +59,15 @@ import {
   fetchVideoSelectedIdDataStart,
   fetchVideoSelectedIdDataSuccess,
   fetchVideoSelectedIdDataFailure,
+  fetchAssigneeListStart,
+  fetchAssigneeListSuccess,
+  fetchAssigneeListFailure,
 } from "../../reducer/agencyPocReducer/AgencyPocReducer";
 
 let isFetchingAgencyPoc = false;
 let isViewFetchingAgencyPocInDetailed = false;
 let isFetchingScript = false;
+let isFetchAssigneeList = false;
 let isFetchingAllScripts = false;
 let isFetchingAllVideos = false;
 let isSubmittingVideo = false;
@@ -235,13 +240,17 @@ export const submitScriptForReview = (scriptId) => async (dispatch) => {
 };
 
 // .................... fetch all scripts ...............
-export const fetchAllScripts =({ page, size } = {}) => async (dispatch) => {
+export const fetchAllScripts =
+  ({ page, size } = {}) =>
+  async (dispatch) => {
     if (isFetchingAllScripts) return;
     isFetchingAllScripts = true;
     dispatch(fetchScriptsStart());
 
     try {
-      const response = await api.get(AGENCY_POC_SCRIPTS, { params: { page, size }});
+      const response = await api.get(AGENCY_POC_SCRIPTS, {
+        params: { page, size },
+      });
 
       dispatch(
         fetchScriptsSuccess({
@@ -436,7 +445,6 @@ export const getThumbnailUploadUrl =
     }
   };
 
-
 export const uploadVideoComplete =
   (videoFile, thumbnailFile, formData, onProgress) => async (dispatch) => {
     try {
@@ -551,8 +559,8 @@ export const uploadVideoComplete =
         doctorName: formData.doctorName,
         specialty: formData.specialty,
         language: formData.language,
-        city: formData.city,
         ctaType: formData.ctaType,
+        tags: formData.tags,
       };
 
       if (videoFileUrl) {
@@ -561,6 +569,9 @@ export const uploadVideoComplete =
       if (thumbnailFileUrl) {
         videoData.thumbnailUrl = thumbnailFileUrl;
       }
+      // if (formData.assignedReviewerId) {
+      //   videoData.assignedReviewerId = formData.assignedReviewerId;
+      // }
 
       let result;
       if (isEditMode) {
@@ -592,7 +603,7 @@ export const uploadVideoComplete =
 export const updateVideoRecord = (videoId, videoData) => async (dispatch) => {
   dispatch(uploadVideoStart());
 
- try {
+  try {
     const { status, ...dataWithoutStatus } = videoData;
     const response = await api.patch(
       `${AGENCY_POC_VIDEOS}/${videoId}`,
@@ -655,14 +666,23 @@ export const fetchVideoById = (videoId) => async (dispatch) => {
 
 // ...................... Submit the video ................
 
-export const submitVideo = (videoId) => async (dispatch) => {
+export const submitVideo = (videoId, assignedReviewerId = null) => async (dispatch) => {
   if (isSubmittingVideo) return;
   isSubmittingVideo = true;
 
   dispatch(submitVideoStart());
 
   try {
-    const response = await api.post(SUBMIT_AGENCY_VIDEO(videoId));
+
+     const requestBody = assignedReviewerId 
+      ? { assignedReviewerId } 
+      : {};
+
+    const response = await api.post(
+      SUBMIT_AGENCY_VIDEO(videoId),
+      requestBody
+    );
+    // const response = await api.post(SUBMIT_AGENCY_VIDEO(videoId));
     const { video } = response.data;
 
     dispatch(submitVideoSuccess({ video }));
@@ -678,6 +698,32 @@ export const submitVideo = (videoId) => async (dispatch) => {
     return { success: false, error: errorMessage };
   } finally {
     isSubmittingVideo = false;
+  }
+};
+
+// ................. get all assignee list ................
+
+export const fetchAssigneeList = (video_id) => async (dispatch) => {
+  if (isFetchAssigneeList) return;
+  isFetchAssigneeList = true;
+  dispatch(fetchAssigneeListStart());
+
+  try {
+    const response = await api.get(GET_ASSIGNEE_LIST(video_id));
+    const { reviewers } = response.data;
+
+    dispatch(fetchAssigneeListSuccess({ reviewers }));
+
+    return { success: true, data: response.data };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to fetch scripts";
+    dispatch(fetchAssigneeListFailure(errorMessage));
+    return { success: false, error: errorMessage };
+  } finally {
+    isFetchAssigneeList = false;
   }
 };
 
