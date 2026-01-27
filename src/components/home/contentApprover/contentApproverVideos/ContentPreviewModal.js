@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import CustomModal from "../../../common/Modal/CustomModal";
 
-
 const ContentPreviewModal = ({ isOpen, onClose, video }) => {
   const videoRef = useRef(null);
 
@@ -34,9 +33,7 @@ const ContentPreviewModal = ({ isOpen, onClose, video }) => {
             <h3 className="text-lg font-bold text-gray-900">
               {video.title || video.topic?.title}
             </h3>
-            <p className="text-sm mt-1 text-gray-600">
-              {video.description}
-            </p>
+            <p className="text-sm mt-1 text-gray-600">{video.description}</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -70,6 +67,18 @@ const ContentPreviewModal = ({ isOpen, onClose, video }) => {
             )}
           </div>
 
+          {video.stage && (
+            <span
+              className={`px-3 py-1 text-xs rounded-full ${
+                video.stage === "LANGUAGE_ADAPTATION"
+                  ? "bg-orange-100 text-orange-700"
+                  : "bg-blue-100 text-blue-700"
+              }`}
+            >
+              {video.stage === "LANGUAGE_ADAPTATION" ? "Stage 2" : "Stage 1"}
+            </span>
+          )}
+
           <div className="border-t pt-4 grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-gray-400">Duration</p>
@@ -97,14 +106,23 @@ const ContentPreviewModal = ({ isOpen, onClose, video }) => {
             </div>
           </div>
 
+          {video.stage && (
+            <div>
+              <p className="text-gray-400">Stage</p>
+              <p className="font-medium">
+                {video.stage === "LANGUAGE_ADAPTATION" ? "Stage 2" : "Stage 1"}
+              </p>
+            </div>
+          )}
+
           <span
             className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold
               ${
                 video.status === "PUBLISHED"
                   ? "bg-green-100 text-green-700"
                   : video.status === "LOCKED"
-                  ? "bg-yellow-100 text-yellow-700"
-                  : "bg-gray-100 text-gray-600"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : "bg-gray-100 text-gray-600"
               }`}
           >
             {video.status}

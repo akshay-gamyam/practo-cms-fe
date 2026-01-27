@@ -10,24 +10,30 @@ import { FaCirclePlay } from "react-icons/fa6";
 import {
   fetchAllVideos,
   submitVideo,
+  fetchAssigneeList,
   // deleteVideo
 } from "../../../../redux/action/agencyPocAction/AgencyPocAction";
 import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
 import ContentPreviewModal from "../../contentApprover/contentApproverVideos/ContentPreviewModal";
+import { IoCreateOutline } from "react-icons/io5";
+import Stage2LanguageAdaptationModal from "./Stage2LanguageAdaptationModal";
 
 const AgencyPocVideos = () => {
   const dispatch = useDispatch();
-  const {
-    videos,
-    isVideoListLoading,
-    isDeleteVideoLoading,
-    isSubmitVideoLoading,
-  } = useSelector((state) => state.agencyPoc);
+  const { videos, isVideoListLoading, isSubmitVideoLoading, assigneeList } =
+    useSelector((state) => state.agencyPoc);
+
+  const assigneeOptions = Array.isArray(assigneeList?.assigneeReviewer)
+    ? assigneeList.assigneeReviewer
+    : [];
 
   const [activeTab, setActiveTab] = useState("all");
-  const [videoToDelete, setVideoToDelete] = useState(null);
+  const [activeStage, setActiveStage] = useState("stage1");
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [isStage2ModalOpen, setIsStage2ModalOpen] = useState(false);
+  const [selectedMasterVideo, setSelectedMasterVideo] = useState(null);
+  const [videoAssignees, setVideoAssignees] = useState({});
 
   const REVIEW_STATUSES = [
     "IN_REVIEW",
@@ -37,8 +43,15 @@ const AgencyPocVideos = () => {
   ];
 
   useEffect(() => {
-    dispatch(fetchAllVideos());
-  }, [dispatch]);
+    const filters = {};
+    if (activeStage === "stage1") {
+      filters.stage = "INITIAL_UPLOAD";
+    } else if (activeStage === "stage2") {
+      filters.stage = "LANGUAGE_ADAPTATION";
+    }
+    dispatch(fetchAllVideos(filters));
+    // dispatch(fetchAllVideos());
+  }, [dispatch, activeStage]);
 
   const getStatusBadge = (status) => {
     const badges = {
@@ -87,34 +100,64 @@ const AgencyPocVideos = () => {
         text: "PUBLISHED",
         color: "text-cyan-700 bg-cyan-50 border-cyan-200",
       },
-      SUPER_ADMIN_REVIEW:{
+      SUPER_ADMIN_REVIEW: {
         icon: <IoMdTime className="h-4 w-4" />,
         text: "SUPER_ADMIN_REVIEW",
         color: "text-rose-700 bg-rose-50 border-rose-200",
-      }
+      },
     };
     return badges[status];
   };
 
   const filteredVideos = videos.filter((video) => {
+    if (activeStage === "stage1" && video.stage !== "INITIAL_UPLOAD")
+      return false;
+    if (activeStage === "stage2" && video.stage !== "LANGUAGE_ADAPTATION")
+      return false;
     if (activeTab === "all") return true;
 
     if (activeTab === "IN_REVIEW") {
       return REVIEW_STATUSES.includes(video.status);
     }
+    if (activeTab === "PUBLISHED" && activeStage === "stage1") {
+      return video.status === "PUBLISHED" && video.stage === "INITIAL_UPLOAD";
+    }
 
     return video.status === activeTab;
   });
 
-  const tabCounts = {
-    all: videos.length,
-    IN_REVIEW: videos.filter((v) => REVIEW_STATUSES.includes(v.status)).length,
-    REJECTED: videos.filter((v) => v.status === "REJECTED").length,
-    PUBLISHED: videos.filter((v) => v.status === "PUBLISHED" && v?.stage === "INITIAL_UPLOAD").length,
-    // APPROVED: videos.filter((v) => v.status === "APPROVED").length,
-    LOCKED: videos.filter((v) => v.status === "LOCKED").length,
-    DRAFT: videos.filter((v) => v.status === "DRAFT").length,
+  // const tabCounts = {
+  //   all: videos.length,
+  //   IN_REVIEW: videos.filter((v) => REVIEW_STATUSES.includes(v.status)).length,
+  //   REJECTED: videos.filter((v) => v.status === "REJECTED").length,
+  //   PUBLISHED: videos.filter(
+  //     (v) => v.status === "PUBLISHED" && v?.stage === "INITIAL_UPLOAD",
+  //   ).length,
+  //   LOCKED: videos.filter((v) => v.status === "LOCKED").length,
+  //   DRAFT: videos.filter((v) => v.status === "DRAFT").length,
+  // };
+
+  const getTabCounts = () => {
+    const stageFilteredVideos = videos.filter((v) => {
+      if (activeStage === "stage1") return v.stage === "INITIAL_UPLOAD";
+      if (activeStage === "stage2") return v.stage === "LANGUAGE_ADAPTATION";
+      return true;
+    });
+
+    return {
+      all: stageFilteredVideos.length,
+      IN_REVIEW: stageFilteredVideos.filter((v) =>
+        REVIEW_STATUSES.includes(v.status),
+      ).length,
+      REJECTED: stageFilteredVideos.filter((v) => v.status === "REJECTED")
+        .length,
+      PUBLISHED: stageFilteredVideos.filter((v) => v.status === "PUBLISHED")
+        .length,
+      DRAFT: stageFilteredVideos.filter((v) => v.status === "DRAFT").length,
+    };
   };
+
+  const tabCounts = getTabCounts();
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -148,14 +191,53 @@ const AgencyPocVideos = () => {
     toast.info("Video upload coming soon!");
   };
 
-  const handleSubmitVideo = async (video) => {
-    const response = await dispatch(submitVideo(video.id));
+  // const handleSubmitVideo = async (video) => {
+  //   const response = await dispatch(submitVideo(video.id));
+
+  //   if (response?.success) {
+  //     toast.success("Video submitted for review");
+  //   } else {
+  //     toast.error(response?.error || "Failed to submit video");
+  //   }
+  // };
+
+  const handleSubmitVideo = async (video, reviewerId = null) => {
+    // For Stage 2 videos, we need assignedReviewerId
+    if (video.stage === "LANGUAGE_ADAPTATION" && !reviewerId) {
+      toast.error("Please select an assignee before submitting");
+      return;
+    }
+
+    const response = await dispatch(submitVideo(video.id, reviewerId || null));
 
     if (response?.success) {
       toast.success("Video submitted for review");
+      setVideoAssignees((prev) => {
+        const newState = { ...prev };
+        delete newState[video.id];
+        return newState;
+      });
+      const filters = {};
+      if (activeStage === "stage1") {
+        filters.stage = "INITIAL_UPLOAD";
+      } else if (activeStage === "stage2") {
+        filters.stage = "LANGUAGE_ADAPTATION";
+      }
+      dispatch(fetchAllVideos(filters));
     } else {
       toast.error(response?.error || "Failed to submit video");
     }
+  };
+
+  const handleCreateLanguageAdaptation = (masterVideo) => {
+    setSelectedMasterVideo(masterVideo);
+    setIsStage2ModalOpen(true);
+  };
+
+  const handleStage2Success = () => {
+    // Refresh Stage 2 videos
+    dispatch(fetchAllVideos({ stage: "LANGUAGE_ADAPTATION" }));
+    toast.success("Language adaptation created successfully!");
   };
 
   return (
@@ -187,6 +269,35 @@ const AgencyPocVideos = () => {
               upload your video for that specific script.
             </p>
           </div>
+        </div>
+
+        <div className="mb-6 flex gap-4">
+          <button
+            onClick={() => {
+              setActiveStage("stage1");
+              setActiveTab("all");
+            }}
+            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+              activeStage === "stage1"
+                ? "bg-cyan-600 text-white"
+                : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+            }`}
+          >
+            Stage 1 (Initial Upload)
+          </button>
+          <button
+            onClick={() => {
+              setActiveStage("stage2");
+              setActiveTab("all");
+            }}
+            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+              activeStage === "stage2"
+                ? "bg-cyan-600 text-white"
+                : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+            }`}
+          >
+            Stage 2 (Language Adaptation)
+          </button>
         </div>
 
         <div className="border-b border-gray-200 mb-8">
@@ -242,16 +353,6 @@ const AgencyPocVideos = () => {
             >
               Published ({tabCounts.PUBLISHED})
             </button>
-            {/* <button
-              onClick={() => setActiveTab("LOCKED")}
-              className={`pb-4 px-1 font-medium whitespace-nowrap transition-colors ${
-                activeTab === "APPROVED"
-                  ? "text-cyan-600 border-b-2 border-cyan-600"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              Locked ({tabCounts.LOCKED})
-            </button> */}
           </div>
         </div>
 
@@ -351,7 +452,18 @@ const AgencyPocVideos = () => {
                       </button>
                     </div>
                     <div>
-                      {video.status === "DRAFT" && (
+                      {/* {video.status === "DRAFT" && (
+                        <button
+                          disabled={isSubmitVideoLoading}
+                          onClick={() => handleSubmitVideo(video)}
+                          className="w-full mt-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                        >
+                          <FaCloudUploadAlt className="w-4 h-4" />
+                          {isSubmitVideoLoading ? "Submitting..." : "Submit"}
+                        </button>
+                      )} */}
+
+                      {activeStage === "stage1" && video.status === "DRAFT" && (
                         <button
                           disabled={isSubmitVideoLoading}
                           onClick={() => handleSubmitVideo(video)}
@@ -362,6 +474,63 @@ const AgencyPocVideos = () => {
                         </button>
                       )}
                     </div>
+
+                    {activeStage === "stage1" &&
+                      activeTab === "PUBLISHED" &&
+                      video.status === "PUBLISHED" &&
+                      video.stage === "INITIAL_UPLOAD" && (
+                        <button
+                          onClick={() => handleCreateLanguageAdaptation(video)}
+                          className="w-full mt-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                        >
+                          <FaCloudUploadAlt className="w-4 h-4" />
+                          Create Language Adaptation
+                        </button>
+                      )}
+
+                    {activeStage === "stage2" &&
+                      video.status === "DRAFT" &&
+                      video.stage === "LANGUAGE_ADAPTATION" && (
+                        <div className="mt-2 space-y-2">
+                          <select
+                            value={videoAssignees[video.id] || ""}
+                            onChange={(e) => {
+                              setVideoAssignees((prev) => ({
+                                ...prev,
+                                [video.id]: e.target.value,
+                              }));
+                            }}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                            onFocus={async () => {
+                              await dispatch(fetchAssigneeList(video.id));
+                            }}
+                          >
+                            <option value="">Select Assignee</option>
+                            {assigneeOptions.map((reviewer) => (
+                              <option key={reviewer.id} value={reviewer.id}>
+                                {reviewer.label}
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            disabled={
+                              isSubmitVideoLoading || !videoAssignees[video.id]
+                            }
+                            onClick={() => {
+                              handleSubmitVideo(
+                                video,
+                                videoAssignees[video.id],
+                              );
+                            }}
+                            className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <FaCloudUploadAlt className="w-4 h-4" />
+                            {isSubmitVideoLoading
+                              ? "Submitting..."
+                              : "Submit for Review"}
+                          </button>
+                        </div>
+                      )}
                   </div>
                 </div>
               );
@@ -385,6 +554,16 @@ const AgencyPocVideos = () => {
           setSelectedVideo(null);
         }}
         video={selectedVideo}
+      />
+
+      <Stage2LanguageAdaptationModal
+        open={isStage2ModalOpen}
+        onClose={() => {
+          setIsStage2ModalOpen(false);
+          setSelectedMasterVideo(null);
+        }}
+        masterVideo={selectedMasterVideo}
+        onSuccess={handleStage2Success}
       />
     </div>
   );

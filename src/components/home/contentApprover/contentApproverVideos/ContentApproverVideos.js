@@ -276,7 +276,7 @@ const ContentApproverVideos = () => {
               const badge = video.uploadedBy
                 ? getInitials(
                     video.uploadedBy.firstName,
-                    video.uploadedBy.lastName
+                    video.uploadedBy.lastName,
                   )
                 : "NA";
 
@@ -297,6 +297,20 @@ const ContentApproverVideos = () => {
                           {statusBadge.icon}
                           {statusBadge.text}
                         </span>
+
+                        {video.stage && (
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md ${
+                              video.stage === "LANGUAGE_ADAPTATION"
+                                ? "bg-orange-100 text-orange-700"
+                                : "bg-blue-100 text-blue-700"
+                            }`}
+                          >
+                            {video.stage === "LANGUAGE_ADAPTATION"
+                              ? "Stage 2"
+                              : "Stage 1"}
+                          </span>
+                        )}
                       </div>
 
                       <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
@@ -353,6 +367,20 @@ const ContentApproverVideos = () => {
                             <FiClock className="w-4 h-4" />
                             {formatDate(video.createdAt)}
                           </span>
+
+                          {video.stage && (
+                            <span
+                              className={`flex items-center gap-2 border px-2 py-1 rounded-xl ${
+                                video.stage === "LANGUAGE_ADAPTATION"
+                                  ? "border-orange-500 text-orange-700 bg-orange-50"
+                                  : "border-blue-500 text-blue-700 bg-blue-50"
+                              }`}
+                            >
+                              {video.stage === "LANGUAGE_ADAPTATION"
+                                ? "Stage 2"
+                                : "Stage 1"}
+                            </span>
+                          )}
                         </div>
 
                         {video.status?.toUpperCase() === "APPROVED" && (
