@@ -484,7 +484,7 @@ const AgencyPocVideos = () => {
                           className="w-full mt-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
                         >
                           <FaCloudUploadAlt className="w-4 h-4" />
-                          Create Language Adaptation
+                          Create Language
                         </button>
                       )}
 
