@@ -68,6 +68,17 @@ const ContentPreviewModal = ({ isOpen, onClose, video }) => {
                 {video.city}
               </span>
             )}
+            {video.stage && (
+              <span
+                className={`px-3 py-1 text-xs rounded-full ${
+                  video.stage === "LANGUAGE_ADAPTATION"
+                    ? "bg-orange-100 text-orange-700"
+                    : "bg-blue-100 text-blue-700"
+                }`}
+              >
+                {video.stage === "LANGUAGE_ADAPTATION" ? "Stage 2" : "Stage 1"}
+              </span>
+            )}
           </div>
 
           <div className="border-t pt-4 grid grid-cols-2 gap-4 text-sm">
@@ -95,6 +106,15 @@ const ContentPreviewModal = ({ isOpen, onClose, video }) => {
                 {new Date(video.createdAt).toLocaleDateString()}
               </p>
             </div>
+
+            {video.stage && (
+              <div>
+                <p className="text-gray-400">Stage</p>
+                <p className="font-medium">
+                  {video.stage === "LANGUAGE_ADAPTATION" ? "Stage 2" : "Stage 1"}
+                </p>
+              </div>
+            )}
           </div>
 
           <span

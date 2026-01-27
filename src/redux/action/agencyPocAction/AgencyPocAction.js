@@ -7,6 +7,7 @@ import {
   GET_SELECTED_VIDEO_DATA_BY_ID,
   GET_TOPICS_LIST,
   SUBMIT_AGENCY_VIDEO,
+  CREATE_STAGE2_VIDEO,
 } from "../../../api/apiEndPoints";
 import api from "../../../api/interceptor";
 import { LIMIT } from "../../../utils/constants";
@@ -327,13 +328,17 @@ export const fetchVideoDataByID = (videoId) => async (dispatch) => {
 
 // .................... fetch all videos ...............
 
-export const fetchAllVideos = () => async (dispatch) => {
+export const fetchAllVideos = (filters = {}) => async (dispatch) => {
   if (isFetchingAllVideos) return;
   isFetchingAllVideos = true;
   dispatch(fetchVideosStart());
 
   try {
-    const response = await api.get(AGENCY_POC_VIDEOS);
+    const params = {};
+    if (filters.stage) params.stage = filters.stage;
+    if (filters.status) params.status = filters.status;
+
+    const response = await api.get(AGENCY_POC_VIDEOS, { params });
     const { videos } = response.data;
 
     dispatch(fetchVideosSuccess({ videos }));
@@ -724,6 +729,137 @@ export const fetchAssigneeList = (video_id) => async (dispatch) => {
     return { success: false, error: errorMessage };
   } finally {
     isFetchAssigneeList = false;
+  }
+};
+
+// .................... create Stage 2 video (Language Adaptation) ...............
+
+export const createStage2Video = (masterVideoId, videoData, onProgress) => async (dispatch) => {
+  dispatch(uploadVideoStart());
+
+  try {
+    let videoFileUrl = null;
+    let thumbnailFileUrl = null;
+
+    // Upload video if provided
+    if (videoData.videoFile) {
+      if (onProgress) {
+        onProgress({
+          video: 0,
+          thumbnail: 0,
+          status: "Getting upload URL for video...",
+        });
+      }
+
+      const videoUrlResult = await dispatch(
+        getVideoUploadUrl(videoData.videoFile.name, videoData.videoFile.type)
+      );
+
+      if (!videoUrlResult.success) {
+        throw new Error(videoUrlResult.error);
+      }
+
+      const { uploadUrl: videoUploadUrl, fileUrl } = videoUrlResult.data;
+      videoFileUrl = fileUrl;
+
+      if (onProgress) {
+        onProgress({
+          video: 0,
+          thumbnail: 0,
+          status: "Uploading video...",
+        });
+      }
+
+      await uploadFileToS3(videoUploadUrl, videoData.videoFile, (percent) => {
+        if (onProgress) {
+          onProgress({
+            video: percent,
+            thumbnail: 0,
+            status: "Uploading video...",
+          });
+        }
+      });
+    }
+
+    // Upload thumbnail if provided
+    if (videoData.thumbnailFile) {
+      if (onProgress) {
+        onProgress({
+          video: videoData.videoFile ? 100 : 0,
+          thumbnail: 0,
+          status: "Getting upload URL for thumbnail...",
+        });
+      }
+
+      const thumbnailUrlResult = await dispatch(
+        getThumbnailUploadUrl(videoData.thumbnailFile.name, videoData.thumbnailFile.type)
+      );
+
+      if (!thumbnailUrlResult.success) {
+        throw new Error(thumbnailUrlResult.error);
+      }
+
+      const { uploadUrl: thumbnailUploadUrl, fileUrl } = thumbnailUrlResult.data;
+      thumbnailFileUrl = fileUrl;
+
+      if (onProgress) {
+        onProgress({
+          video: videoData.videoFile ? 100 : 0,
+          thumbnail: 0,
+          status: "Uploading thumbnail...",
+        });
+      }
+
+      await uploadFileToS3(thumbnailUploadUrl, videoData.thumbnailFile, (percent) => {
+        if (onProgress) {
+          onProgress({
+            video: videoData.videoFile ? 100 : 0,
+            thumbnail: percent,
+            status: "Uploading thumbnail...",
+          });
+        }
+      });
+    }
+
+    // Create Stage 2 video record
+    if (onProgress) {
+      onProgress({
+        video: 100,
+        thumbnail: 100,
+        status: "Creating language adaptation...",
+      });
+    }
+
+    const requestBody = {
+      videoUrl: videoFileUrl,
+      language: videoData.language,
+    };
+
+    if (thumbnailFileUrl) {
+      requestBody.thumbnailUrl = thumbnailFileUrl;
+    }
+
+    const response = await api.post(CREATE_STAGE2_VIDEO(masterVideoId), requestBody);
+    const { video } = response.data;
+
+    dispatch(uploadVideoSuccess({ video }));
+
+    if (onProgress) {
+      onProgress({
+        video: 100,
+        thumbnail: 100,
+        status: "Language adaptation created successfully!",
+      });
+    }
+
+    return { success: true, data: response.data };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to create Stage 2 video";
+    dispatch(uploadVideoFailure(errorMessage));
+    return { success: false, error: errorMessage };
   }
 };
 

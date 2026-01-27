@@ -64,3 +64,4 @@ export const GET_ALL_UPLOADED_VIDEOS_ID = "/api/videos/uploadedVideoIds";
 export const GET_SELECTED_VIDEO_DATA_BY_ID = (video_id) => `/api/videos/${video_id}`
 
 export const GET_ASSIGNEE_LIST = (video_id) => `/api/videos/${video_id}/available-reviewers`
+export const CREATE_STAGE2_VIDEO = (masterVideoId) => `/api/videos/${masterVideoId}/stage2`
