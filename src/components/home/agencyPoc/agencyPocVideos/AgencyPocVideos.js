@@ -40,6 +40,7 @@ const AgencyPocVideos = () => {
     "MEDICAL_REVIEW",
     "BRAND_REVIEW",
     "DOCTOR_REVIEW",
+    "SUPER_ADMIN_REVIEW",
   ];
 
   useEffect(() => {
@@ -351,7 +352,7 @@ const AgencyPocVideos = () => {
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              Published ({tabCounts.PUBLISHED})
+              {activeStage === "stage1" ? "Master Videos" : "Published" } ({tabCounts.PUBLISHED})
             </button>
           </div>
         </div>
@@ -361,7 +362,13 @@ const AgencyPocVideos = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredVideos.map((video) => {
-              console.log("video", video);
+              const shouldShowAssignBlock =
+                video.status === "DRAFT" &&
+                ((activeStage === "stage2" &&
+                  video.stage === "LANGUAGE_ADAPTATION") ||
+                  (activeStage === "stage1" &&
+                    video.stage === "INITIAL_UPLOAD"));
+
               const badge = getStatusBadge(video?.status);
               return (
                 <div
@@ -463,7 +470,7 @@ const AgencyPocVideos = () => {
                         </button>
                       )} */}
 
-                      {activeStage === "stage1" && video.status === "DRAFT" && (
+                      {/* {activeStage === "stage1" && video.status === "DRAFT" && (
                         <button
                           disabled={isSubmitVideoLoading}
                           onClick={() => handleSubmitVideo(video)}
@@ -472,7 +479,7 @@ const AgencyPocVideos = () => {
                           <FaCloudUploadAlt className="w-4 h-4" />
                           {isSubmitVideoLoading ? "Submitting..." : "Submit"}
                         </button>
-                      )}
+                      )} */}
                     </div>
 
                     {activeStage === "stage1" &&
@@ -488,7 +495,47 @@ const AgencyPocVideos = () => {
                         </button>
                       )}
 
-                    {activeStage === "stage2" &&
+                    {shouldShowAssignBlock && (
+                      <div className="mt-2 space-y-2">
+                        <select
+                          value={videoAssignees[video.id] || ""}
+                          onChange={(e) => {
+                            setVideoAssignees((prev) => ({
+                              ...prev,
+                              [video.id]: e.target.value,
+                            }));
+                          }}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                          onFocus={async () => {
+                            await dispatch(fetchAssigneeList(video.id));
+                          }}
+                        >
+                          <option value="">Select Assignee</option>
+                          {assigneeOptions.map((reviewer) => (
+                            <option key={reviewer.id} value={reviewer.id}>
+                              {reviewer.label}
+                            </option>
+                          ))}
+                        </select>
+
+                        <button
+                          disabled={
+                            isSubmitVideoLoading || !videoAssignees[video.id]
+                          }
+                          onClick={() => {
+                            handleSubmitVideo(video, videoAssignees[video.id]);
+                          }}
+                          className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <FaCloudUploadAlt className="w-4 h-4" />
+                          {isSubmitVideoLoading
+                            ? "Submitting..."
+                            : "Submit for Review"}
+                        </button>
+                      </div>
+                    )}
+
+                    {/* {activeStage === "stage2" &&
                       video.status === "DRAFT" &&
                       video.stage === "LANGUAGE_ADAPTATION" && (
                         <div className="mt-2 space-y-2">
@@ -531,6 +578,50 @@ const AgencyPocVideos = () => {
                           </button>
                         </div>
                       )}
+
+                    {activeStage === "stage1" &&
+                      video.status === "DRAFT" &&
+                      video.stage === "INITIAL_UPLOAD" && (
+                        <div className="mt-2 space-y-2">
+                          <select
+                            value={videoAssignees[video.id] || ""}
+                            onChange={(e) => {
+                              setVideoAssignees((prev) => ({
+                                ...prev,
+                                [video.id]: e.target.value,
+                              }));
+                            }}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                            onFocus={async () => {
+                              await dispatch(fetchAssigneeList(video.id));
+                            }}
+                          >
+                            <option value="">Select Assignee</option>
+                            {assigneeOptions.map((reviewer) => (
+                              <option key={reviewer.id} value={reviewer.id}>
+                                {reviewer.label}
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            disabled={
+                              isSubmitVideoLoading || !videoAssignees[video.id]
+                            }
+                            onClick={() => {
+                              handleSubmitVideo(
+                                video,
+                                videoAssignees[video.id],
+                              );
+                            }}
+                            className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <FaCloudUploadAlt className="w-4 h-4" />
+                            {isSubmitVideoLoading
+                              ? "Submitting..."
+                              : "Submit for Review"}
+                          </button>
+                        </div>
+                      )} */}
                   </div>
                 </div>
               );

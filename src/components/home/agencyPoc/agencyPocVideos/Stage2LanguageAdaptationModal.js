@@ -129,8 +129,8 @@ const Stage2LanguageAdaptationModal = ({
           },
           (progress) => {
             setUploadProgress(progress);
-          }
-        )
+          },
+        ),
       );
 
       if (result.success) {
@@ -191,11 +191,6 @@ const Stage2LanguageAdaptationModal = ({
       maxWidth="max-w-4xl"
     >
       <div className="space-y-6">
-        <p className="text-sm text-gray-500 -mt-2">
-          {masterVideo?.title ||
-            "Create Stage 2 video from published Stage 1 video"}
-        </p>
-
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
             <FiAlertCircle
@@ -247,7 +242,6 @@ const Stage2LanguageAdaptationModal = ({
           </div>
         )}
 
-        {/* Video File Upload */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">
             Video File <span className="text-red-500">*</span>
@@ -334,7 +328,7 @@ const Stage2LanguageAdaptationModal = ({
 
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">
-              Thumbnail <span className="text-gray-500 text-xs">(Optional)</span>
+            Thumbnail <span className="text-gray-500 text-xs">(Optional)</span>
           </label>
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
             {thumbnailPreview ? (
@@ -381,9 +375,7 @@ const Stage2LanguageAdaptationModal = ({
                   <p className="text-sm font-medium text-gray-700">
                     Click to upload thumbnail
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    or drag and drop
-                  </p>
+                  <p className="text-xs text-gray-500 mt-1">or drag and drop</p>
                 </div>
 
                 <button
@@ -424,7 +416,7 @@ const Stage2LanguageAdaptationModal = ({
               />
             </div>
 
-             <div className="space-y-2">
+            <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 CTA Type
               </label>
@@ -495,6 +487,19 @@ const Stage2LanguageAdaptationModal = ({
           </div>
         </div>
 
+        <div className="md:col-span-2 space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Description <span className="text-red-500">*</span>
+          </label>
+          <textarea
+            type="text"
+            value={masterVideo?.description || "N/A"}
+            disabled
+            rows={4}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+          />
+        </div>
+
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
           <button
             type="button"
@@ -507,9 +512,7 @@ const Stage2LanguageAdaptationModal = ({
           <button
             type="button"
             onClick={handleSaveAsDraft}
-              disabled={
-                uploading || !videoFile || !formData.language
-              }
+            disabled={uploading || !videoFile || !formData.language}
             className="flex items-center text-white gap-2 bg-teal-500 px-6 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-teal-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {uploading ? (
