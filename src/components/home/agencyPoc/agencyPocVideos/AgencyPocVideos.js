@@ -28,7 +28,6 @@ const AgencyPocVideos = () => {
   const [videoToDelete, setVideoToDelete] = useState(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  console.log("selectedVideo", selectedVideo);
 
   const REVIEW_STATUSES = [
     "IN_REVIEW",
@@ -111,6 +110,7 @@ const AgencyPocVideos = () => {
     all: videos.length,
     IN_REVIEW: videos.filter((v) => REVIEW_STATUSES.includes(v.status)).length,
     REJECTED: videos.filter((v) => v.status === "REJECTED").length,
+    PUBLISHED: videos.filter((v) => v.status === "PUBLISHED" && v?.stage === "INITIAL_UPLOAD").length,
     // APPROVED: videos.filter((v) => v.status === "APPROVED").length,
     LOCKED: videos.filter((v) => v.status === "LOCKED").length,
     DRAFT: videos.filter((v) => v.status === "DRAFT").length,
@@ -126,39 +126,12 @@ const AgencyPocVideos = () => {
     });
   };
 
-  // const formatFileSize = (bytes) => {
-  //   if (!bytes) return 'N/A';
-  //   const mb = bytes / (1024 * 1024);
-  //   return `${mb.toFixed(2)} MB`;
-  // };
-
   const formatDuration = (seconds) => {
     if (!seconds) return "0:00";
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
-
-  // const handleDeleteVideo = async (videoId) => {
-  //   if (!window.confirm('Are you sure you want to delete this video?')) {
-  //     return;
-  //   }
-
-  //   setVideoToDelete(videoId);
-  //   const response = await dispatch(deleteVideo(videoId));
-
-  //   if (response?.success) {
-  //     toast.success('Video deleted successfully');
-  //   } else {
-  //     toast.error(response?.error || 'Failed to delete video');
-  //   }
-  //   setVideoToDelete(null);
-  // };
-
-  // const handleViewVideo = (video) => {
-  //   console.log("View video:", video);
-  //   toast.info("Video player coming soon!");
-  // };
 
   const handleViewVideo = (video) => {
     if (!video?.videoUrl) {
@@ -251,14 +224,25 @@ const AgencyPocVideos = () => {
             <button
               onClick={() => setActiveTab("DRAFT")}
               className={`pb-4 px-1 font-medium whitespace-nowrap transition-colors ${
-                activeTab === "APPROVED"
+                activeTab === "DRAFT"
                   ? "text-cyan-600 border-b-2 border-cyan-600"
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
               Draft ({tabCounts.DRAFT})
             </button>
+
             <button
+              onClick={() => setActiveTab("PUBLISHED")}
+              className={`pb-4 px-1 font-medium whitespace-nowrap transition-colors ${
+                activeTab === "PUBLISHED"
+                  ? "text-cyan-600 border-b-2 border-cyan-600"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Published ({tabCounts.PUBLISHED})
+            </button>
+            {/* <button
               onClick={() => setActiveTab("LOCKED")}
               className={`pb-4 px-1 font-medium whitespace-nowrap transition-colors ${
                 activeTab === "APPROVED"
@@ -267,7 +251,7 @@ const AgencyPocVideos = () => {
               }`}
             >
               Locked ({tabCounts.LOCKED})
-            </button>
+            </button> */}
           </div>
         </div>
 

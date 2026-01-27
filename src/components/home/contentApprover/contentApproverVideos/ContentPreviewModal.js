@@ -3,7 +3,6 @@ import CustomModal from "../../../common/Modal/CustomModal";
 
 
 const ContentPreviewModal = ({ isOpen, onClose, video }) => {
-    console.log("video", video)
   const videoRef = useRef(null);
 
   useEffect(() => {
