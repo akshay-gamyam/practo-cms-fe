@@ -88,6 +88,11 @@ const AgencyPocVideos = () => {
         text: "PUBLISHED",
         color: "text-cyan-700 bg-cyan-50 border-cyan-200",
       },
+      SUPER_ADMIN_REVIEW:{
+        icon: <IoMdTime className="h-4 w-4" />,
+        text: "SUPER_ADMIN_REVIEW",
+        color: "text-rose-700 bg-rose-50 border-rose-200",
+      }
     };
     return badges[status];
   };
