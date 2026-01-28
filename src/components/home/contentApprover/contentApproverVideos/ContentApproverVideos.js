@@ -417,7 +417,11 @@ const ContentApproverVideos = () => {
                             className="flex-1 px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <FiCheckCircle className="w-5 h-5" />
-                            Approve
+                            {(() => {
+                              if (video.stage === "LANGUAGE_ADAPTATION") return <span>Publish Final Video</span>
+                              if (video.stage === "INITIAL_VIDEO") return <span>Publish master</span>
+                              else return <p>Approve</p>
+                            })()}
                           </button>
                           <button
                             onClick={() => handleReject(video.id)}

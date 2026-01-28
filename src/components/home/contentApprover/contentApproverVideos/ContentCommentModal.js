@@ -66,7 +66,7 @@ const ContentCommentModal = ({
             <span className="font-semibold text-gray-900">{video.title}</span>
           </label>
 
-          {assigneeOptions.length > 0 && (
+          {assigneeOptions.length > 0 && commentType !== "reject" && (
             <div className="space-y-2 mb-3">
               <label className="block text-sm font-medium text-gray-700">
                 Assignee To

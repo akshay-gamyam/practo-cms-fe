@@ -15,7 +15,6 @@ import {
 } from "../../../../redux/action/agencyPocAction/AgencyPocAction";
 import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
 import ContentPreviewModal from "../../contentApprover/contentApproverVideos/ContentPreviewModal";
-import { IoCreateOutline } from "react-icons/io5";
 import Stage2LanguageAdaptationModal from "./Stage2LanguageAdaptationModal";
 
 const AgencyPocVideos = () => {
@@ -120,6 +119,12 @@ const AgencyPocVideos = () => {
     if (activeTab === "IN_REVIEW") {
       return REVIEW_STATUSES.includes(video.status);
     }
+
+    if (activeTab === "REJECTED") {
+      return (
+        video?.latestRejection !== null || (video.status === "REJECTED").length
+      );
+    }
     if (activeTab === "PUBLISHED" && activeStage === "stage1") {
       return video.status === "PUBLISHED" && video.stage === "INITIAL_UPLOAD";
     }
@@ -150,8 +155,9 @@ const AgencyPocVideos = () => {
       IN_REVIEW: stageFilteredVideos.filter((v) =>
         REVIEW_STATUSES.includes(v.status),
       ).length,
-      REJECTED: stageFilteredVideos.filter((v) => v.status === "REJECTED")
-        .length,
+      REJECTED: stageFilteredVideos.filter(
+        (v) => v.status === "REJECTED" || v.latestRejection !== null,
+      ).length,
       PUBLISHED: stageFilteredVideos.filter((v) => v.status === "PUBLISHED")
         .length,
       DRAFT: stageFilteredVideos.filter((v) => v.status === "DRAFT").length,
@@ -188,7 +194,6 @@ const AgencyPocVideos = () => {
   };
 
   const handleReuploadVideo = (video) => {
-    console.log("Reupload video:", video);
     toast.info("Video upload coming soon!");
   };
 
@@ -362,6 +367,7 @@ const AgencyPocVideos = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredVideos.map((video) => {
+              const rejection = video?.latestRejection;
               const shouldShowAssignBlock =
                 video.status === "DRAFT" &&
                 ((activeStage === "stage2" &&
@@ -402,30 +408,77 @@ const AgencyPocVideos = () => {
                   </div>
 
                   <div className="p-5">
-                    <div
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border mb-3 ${badge.color}`}
-                    >
-                      <span>{badge.icon}</span>
-                      {badge.text}
+                    <div className="flex items-center justify-between mb-3">
+                      <div
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${badge.color}`}
+                      >
+                        <span>{badge.icon}</span>
+                        {badge.text}
+                      </div>
+
+                      <div className="text-sm bg-gray-200 px-2 py-0.5 rounded-full border border text-gray-500">
+                        Uploaded: {formatDate(video.createdAt)}
+                      </div>
                     </div>
 
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">
-                      {video?.title || "Untitled Video"}
-                    </h3>
+                    <div className="relative group mb-3">
+                      <h3 className="text-xl font-bold text-gray-900 truncate">
+                        {video?.title || "Untitled Video"}
+                      </h3>
+                      {video?.title && video.title.length > 30 && (
+                        <div className="absolute left-0 top-full mt-1 w-full bg-gray-900 text-white text-sm px-3 py-2 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 pointer-events-none">
+                          {video.title}
+                        </div>
+                      )}
+                    </div>
 
-                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-4 border border-gray-300 rounded-lg bg-gray-50 p-2">
-                      <span className="text-md font-semibold">
-                        Description:{" "}
-                        <span className="text-sm font-normal">
-                          {video?.description}
+                    <div className="relative group mb-4">
+                      <div className="flex items-center gap-2 text-sm text-gray-600 border border-gray-300 rounded-lg bg-gray-50 p-2">
+                        <span className="text-md font-semibold">
+                          Description:{" "}
+                          <span
+                            className={`text-sm font-normal inline-block align-bottom ${
+                              !shouldShowAssignBlock
+                                ? "line-clamp-4 max-w-full"
+                                : "truncate max-w-[200px]"
+                            }`}
+                          >
+                            {video.description}
+                          </span>
                         </span>
-                      </span>
+                      </div>
+                      {video.description.length >
+                        (!shouldShowAssignBlock ? 150 : 30) && (
+                        <div
+                          className="absolute left-0 top-full mt-1 w-full bg-gray-900 text-white text-sm px-3 py-2 rounded-lg shadow-lg
+                   opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                   transition-all duration-200 z-10 pointer-events-none"
+                        >
+                          {video.description}
+                        </div>
+                      )}
                     </div>
 
-                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                      <span>Uploaded: {formatDate(video.createdAt)}</span>
-                      {/* <span className="font-medium">{formatFileSize(video.fileSize)}</span> */}
-                    </div>
+                    {rejection?.comments && (
+                      <div className="relative group mb-4">
+                        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-1">
+                          <p className="flex items-start gap-2 text-sm text-red-700 leading-relaxed">
+                            <RxCrossCircled
+                              size={14}
+                              className="mt-[5px] flex-shrink-0"
+                            />
+                            <span className="truncate block overflow-hidden whitespace-nowrap text-ellipsis min-w-0 flex-1">
+                              {rejection.comments}
+                            </span>
+                          </p>
+                        </div>
+                        {rejection.comments.length > 30 && (
+                          <div className="absolute left-0 top-full mt-1 w-full bg-gray-900 text-white text-sm px-3 py-2 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 pointer-events-none max-h-32 overflow-y-auto">
+                            {rejection.comments}
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {video.status === "REJECTED" && video.rejectionReason && (
                       <div className="bg-red-50 border border-red-100 rounded-lg p-3 mb-4">
@@ -458,29 +511,7 @@ const AgencyPocVideos = () => {
                         View
                       </button>
                     </div>
-                    <div>
-                      {/* {video.status === "DRAFT" && (
-                        <button
-                          disabled={isSubmitVideoLoading}
-                          onClick={() => handleSubmitVideo(video)}
-                          className="w-full mt-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-                        >
-                          <FaCloudUploadAlt className="w-4 h-4" />
-                          {isSubmitVideoLoading ? "Submitting..." : "Submit"}
-                        </button>
-                      )} */}
-
-                      {/* {activeStage === "stage1" && video.status === "DRAFT" && (
-                        <button
-                          disabled={isSubmitVideoLoading}
-                          onClick={() => handleSubmitVideo(video)}
-                          className="w-full mt-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-                        >
-                          <FaCloudUploadAlt className="w-4 h-4" />
-                          {isSubmitVideoLoading ? "Submitting..." : "Submit"}
-                        </button>
-                      )} */}
-                    </div>
+                    <div></div>
 
                     {activeStage === "stage1" &&
                       activeTab === "PUBLISHED" &&
@@ -534,94 +565,6 @@ const AgencyPocVideos = () => {
                         </button>
                       </div>
                     )}
-
-                    {/* {activeStage === "stage2" &&
-                      video.status === "DRAFT" &&
-                      video.stage === "LANGUAGE_ADAPTATION" && (
-                        <div className="mt-2 space-y-2">
-                          <select
-                            value={videoAssignees[video.id] || ""}
-                            onChange={(e) => {
-                              setVideoAssignees((prev) => ({
-                                ...prev,
-                                [video.id]: e.target.value,
-                              }));
-                            }}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                            onFocus={async () => {
-                              await dispatch(fetchAssigneeList(video.id));
-                            }}
-                          >
-                            <option value="">Select Assignee</option>
-                            {assigneeOptions.map((reviewer) => (
-                              <option key={reviewer.id} value={reviewer.id}>
-                                {reviewer.label}
-                              </option>
-                            ))}
-                          </select>
-                          <button
-                            disabled={
-                              isSubmitVideoLoading || !videoAssignees[video.id]
-                            }
-                            onClick={() => {
-                              handleSubmitVideo(
-                                video,
-                                videoAssignees[video.id],
-                              );
-                            }}
-                            className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <FaCloudUploadAlt className="w-4 h-4" />
-                            {isSubmitVideoLoading
-                              ? "Submitting..."
-                              : "Submit for Review"}
-                          </button>
-                        </div>
-                      )}
-
-                    {activeStage === "stage1" &&
-                      video.status === "DRAFT" &&
-                      video.stage === "INITIAL_UPLOAD" && (
-                        <div className="mt-2 space-y-2">
-                          <select
-                            value={videoAssignees[video.id] || ""}
-                            onChange={(e) => {
-                              setVideoAssignees((prev) => ({
-                                ...prev,
-                                [video.id]: e.target.value,
-                              }));
-                            }}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                            onFocus={async () => {
-                              await dispatch(fetchAssigneeList(video.id));
-                            }}
-                          >
-                            <option value="">Select Assignee</option>
-                            {assigneeOptions.map((reviewer) => (
-                              <option key={reviewer.id} value={reviewer.id}>
-                                {reviewer.label}
-                              </option>
-                            ))}
-                          </select>
-                          <button
-                            disabled={
-                              isSubmitVideoLoading || !videoAssignees[video.id]
-                            }
-                            onClick={() => {
-                              handleSubmitVideo(
-                                video,
-                                videoAssignees[video.id],
-                              );
-                            }}
-                            className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <FaCloudUploadAlt className="w-4 h-4" />
-                            {isSubmitVideoLoading
-                              ? "Submitting..."
-                              : "Submit for Review"}
-                          </button>
-                        </div>
-                      )} */}
                   </div>
                 </div>
               );
