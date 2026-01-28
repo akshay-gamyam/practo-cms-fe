@@ -48,17 +48,18 @@ const Stage2LanguageAdaptationModal = ({
       return;
     }
 
-    // Reset form when modal opens
+    // Reset form and prefill from masterVideo (same as VideoUploadModal edit mode)
     setFormData({
       language: "",
     });
     setVideoFile(null);
     setThumbnailFile(null);
-    setVideoPreview(null);
-    setThumbnailPreview(null);
+    setVideoPreview(masterVideo?.videoUrl || null);
+    setThumbnailPreview(masterVideo?.thumbnailUrl || null);
+    
     setError(null);
     setUploadProgress({ video: 0, thumbnail: 0, status: "" });
-  }, [open]);
+  }, [open, masterVideo]);
 
   const openFilePicker = () => {
     if (!uploading) {
@@ -108,10 +109,6 @@ const Stage2LanguageAdaptationModal = ({
 
   const handleSaveAsDraft = async () => {
     // Validation
-    if (!videoFile) {
-      setError("Please select a video file");
-      return;
-    }
     if (!formData.language) {
       setError("Please select a language");
       return;
@@ -123,9 +120,9 @@ const Stage2LanguageAdaptationModal = ({
         createStage2Video(
           masterVideo.id,
           {
-            videoFile,
-            thumbnailFile,
-            language: formData.language,
+          videoFile: videoFile || null,
+          thumbnailFile: thumbnailFile || null,
+          language: formData.language,
           },
           (progress) => {
             setUploadProgress(progress);
@@ -244,7 +241,13 @@ const Stage2LanguageAdaptationModal = ({
 
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">
-            Video File <span className="text-red-500">*</span>
+            Video File{" "}
+            {masterVideo && (
+              <span className="text-sm text-gray-500 ml-2">
+                (Optional - upload to replace)
+              </span>
+            )}
+            {!masterVideo && <span className="text-red-500">*</span>}
           </label>
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
             {videoPreview ? (
@@ -328,7 +331,13 @@ const Stage2LanguageAdaptationModal = ({
 
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">
-            Thumbnail <span className="text-gray-500 text-xs">(Optional)</span>
+            Thumbnail{" "}
+            <span className="text-gray-500 text-xs">(Optional)</span>
+            {masterVideo && (
+              <span className="text-sm text-gray-500 ml-2">
+                (Optional - upload to replace)
+              </span>
+            )}
           </label>
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
             {thumbnailPreview ? (
@@ -489,7 +498,7 @@ const Stage2LanguageAdaptationModal = ({
 
         <div className="md:col-span-2 space-y-2">
           <label className="block text-sm font-medium text-gray-700">
-            Description <span className="text-red-500">*</span>
+            Description
           </label>
           <textarea
             type="text"
@@ -512,12 +521,12 @@ const Stage2LanguageAdaptationModal = ({
           <button
             type="button"
             onClick={handleSaveAsDraft}
-            disabled={uploading || !videoFile || !formData.language}
-            className="flex items-center text-white gap-2 bg-teal-500 px-6 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-teal-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={uploading || !formData.language}
+            className="flex items-center text-white gap-2 bg-teal-500 px-6 py-2 text-sm font-medium rounded-lg hover:bg-teal-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {uploading ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-600 border-t-transparent" />
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
                 Saving...
               </>
             ) : (
