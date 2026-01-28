@@ -836,8 +836,10 @@ export const createStage2Video = (masterVideoId, videoData, onProgress) => async
     }
 
     const requestBody = {
-      videoUrl: videoFileUrl,
+      // videoUrl: videoFileUrl,
       language: videoData.language,
+      videoUrl: videoFileUrl || videoData.videoUrl,
+      thumbnailUrl: thumbnailFileUrl || videoData.thumbnailUrl,
     };
 
     if (thumbnailFileUrl) {

@@ -241,7 +241,6 @@ const AgencyPocVideos = () => {
   };
 
   const handleStage2Success = () => {
-    // Refresh Stage 2 videos
     dispatch(fetchAllVideos({ stage: "LANGUAGE_ADAPTATION" }));
     toast.success("Language adaptation created successfully!");
   };
@@ -598,6 +597,7 @@ const AgencyPocVideos = () => {
         }}
         masterVideo={selectedMasterVideo}
         onSuccess={handleStage2Success}
+        activeStage = {activeStage}
       />
     </div>
   );

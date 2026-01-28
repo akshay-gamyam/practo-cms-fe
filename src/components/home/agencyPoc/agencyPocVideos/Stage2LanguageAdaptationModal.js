@@ -2,7 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FiImage, FiAlertCircle, FiSave } from "react-icons/fi";
 import { BsUpload } from "react-icons/bs";
-import { createStage2Video } from "../../../../redux/action/agencyPocAction/AgencyPocAction";
+import {
+  createStage2Video,
+  fetchAllVideos,
+} from "../../../../redux/action/agencyPocAction/AgencyPocAction";
 import CustomModal from "../../../common/Modal/CustomModal";
 
 const Stage2LanguageAdaptationModal = ({
@@ -10,6 +13,7 @@ const Stage2LanguageAdaptationModal = ({
   onClose,
   masterVideo,
   onSuccess,
+  activeStage,
 }) => {
   const dispatch = useDispatch();
 
@@ -56,7 +60,7 @@ const Stage2LanguageAdaptationModal = ({
     setThumbnailFile(null);
     setVideoPreview(masterVideo?.videoUrl || null);
     setThumbnailPreview(masterVideo?.thumbnailUrl || null);
-    
+
     setError(null);
     setUploadProgress({ video: 0, thumbnail: 0, status: "" });
   }, [open, masterVideo]);
@@ -120,9 +124,13 @@ const Stage2LanguageAdaptationModal = ({
         createStage2Video(
           masterVideo.id,
           {
-          videoFile: videoFile || null,
-          thumbnailFile: thumbnailFile || null,
-          language: formData.language,
+            // videoFile: videoFile || null,
+            // thumbnailFile: thumbnailFile || null,
+            videoFile: videoFile,
+            videoUrl: videoFile ? null : masterVideo?.videoUrl,
+            thumbnailFile: thumbnailFile,
+            thumbnailUrl: thumbnailFile ? null : masterVideo?.thumbnailUrl,
+            language: formData.language,
           },
           (progress) => {
             setUploadProgress(progress);
@@ -136,6 +144,14 @@ const Stage2LanguageAdaptationModal = ({
         }
         setTimeout(() => {
           handleClose();
+          dispatch(
+            fetchAllVideos({
+              stage:
+                activeStage === "stage2"
+                  ? "LANGUAGE_ADAPTATION"
+                  : "INITIAL_UPLOAD",
+            }),
+          );
         }, 1500);
       } else {
         setError(result.error);
@@ -331,8 +347,7 @@ const Stage2LanguageAdaptationModal = ({
 
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">
-            Thumbnail{" "}
-            <span className="text-gray-500 text-xs">(Optional)</span>
+            Thumbnail <span className="text-gray-500 text-xs">(Optional)</span>
             {masterVideo && (
               <span className="text-sm text-gray-500 ml-2">
                 (Optional - upload to replace)
