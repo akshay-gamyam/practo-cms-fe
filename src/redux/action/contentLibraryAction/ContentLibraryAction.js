@@ -30,7 +30,7 @@ export const fetchContentLibraryList =
     dispatch(fetchContentLibraryListStart());
 
     try {
-      const queryParams = {};
+      const queryParams = { allStages: true};
 
       if (params.page !== undefined && params.page !== null) {
         queryParams.page = params.page;

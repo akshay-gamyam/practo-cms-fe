@@ -522,7 +522,7 @@ export const getContentPreview = (htmlContent, maxLength = 500) => {
 
 export const getStatusColor = (statusValue) => {
   const statusColorMap = {
-    DRAFT: "bg-gray-100 text-gray-600",
+    DRAFT: "bg-teal-100 text-teal-600",
     BRAND_REVIEW: "bg-purple-100 text-purple-600",
     MEDICAL_REVIEW: "bg-orange-100 text-orange-600",
     DOCTOR_REVIEW: "bg-yellow-100 text-yellow-600",

@@ -198,7 +198,13 @@ const ContentLibrary = () => {
                       Status
                     </th>
                     <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                      Language
+                    </th>
+                    <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
                       Duration
+                    </th>
+                    <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                      Stage
                     </th>
                     <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
                       Uploaded
@@ -234,7 +240,7 @@ const ContentLibrary = () => {
                       <td className="px-6 py-4">
                         <span
                           className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                            item.status
+                            item.status,
                           )}`}
                         >
                           {item.status?.replace(/_/g, " ") || "N/A"}
@@ -242,7 +248,27 @@ const ContentLibrary = () => {
                       </td>
 
                       <td className="px-6 py-4 text-gray-700 whitespace-nowrap">
+                        {item.language || "N/A"}
+                      </td>
+
+                      <td className="px-6 py-4 text-gray-700 whitespace-nowrap">
                         {formatDuration(item.duration)}
+                      </td>
+
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex px-3 py-1 rounded-full text-[13px] font-medium
+                          ${
+                            item.stage === "INITIAL_UPLOAD" ? "bg-rose-100" : item.stage === "LANGUAGE_ADAPTATION" ? "bg-sky-100" : "bg-gray-100"
+                          }
+                        `}
+                        >
+                          {item.stage === "INITIAL_UPLOAD"
+                            ? "Stage 1"
+                            : item.stage === "LANGUAGE_ADAPTATION"
+                              ? "Stage 2"
+                              : "N/A"}
+                        </span>
                       </td>
 
                       <td className="px-6 py-4 text-gray-700 whitespace-nowrap">
