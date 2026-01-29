@@ -46,7 +46,7 @@ const ContentApproverVideos = () => {
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [commentType, setCommentType] = useState("comment");
 
-  // const user = useSelector((state) => state.auth.user);
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     const params = {};
@@ -417,9 +417,9 @@ const ContentApproverVideos = () => {
                             className="flex-1 px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <FiCheckCircle className="w-5 h-5" />
-                            {video.stage === "LANGUAGE_ADAPTATION" ? (
+                            {user?.role === "SUPER_ADMIN" && video.stage === "LANGUAGE_ADAPTATION" ? (
                               <span>Publish Final Video</span>
-                            ) : video.stage === "INITIAL_UPLOAD" ? (
+                            ) : user?.role === "SUPER_ADMIN" &&  video.stage === "INITIAL_UPLOAD" ? (
                               <span>Publish Master</span>
                             ) : (
                               <span>Approve</span>
