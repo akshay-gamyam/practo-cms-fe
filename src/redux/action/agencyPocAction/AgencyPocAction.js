@@ -738,6 +738,169 @@ export const fetchAssigneeList = (video_id) => async (dispatch) => {
 
 
 
+// Add this updated createStage2Video function to replace the existing one in your AgencyPocAction.js file
+
+// ............. For working complete good  in without  editable............
+
+// export const createStage2Video = (masterVideoId, videoData, onProgress) => async (dispatch) => {
+//   dispatch(uploadVideoStart());
+
+//   try {
+//     let videoFileUrl = null;
+//     let thumbnailFileUrl = null;
+
+//     // Check if this is an update (resubmit mode) - videoData will have videoId
+//     const isUpdateMode = !!videoData.videoId;
+
+//     // Upload video if new file is provided
+//     if (videoData.videoFile) {
+//       if (onProgress) {
+//         onProgress({
+//           video: 0,
+//           thumbnail: 0,
+//           status: "Getting upload URL for video...",
+//         });
+//       }
+
+//       const videoUrlResult = await dispatch(
+//         getVideoUploadUrl(videoData.videoFile.name, videoData.videoFile.type)
+//       );
+
+//       if (!videoUrlResult.success) {
+//         throw new Error(videoUrlResult.error);
+//       }
+
+//       const { uploadUrl: videoUploadUrl, fileUrl } = videoUrlResult.data;
+//       videoFileUrl = fileUrl;
+
+//       if (onProgress) {
+//         onProgress({
+//           video: 0,
+//           thumbnail: 0,
+//           status: "Uploading video...",
+//         });
+//       }
+
+//       await uploadFileToS3(videoUploadUrl, videoData.videoFile, (percent) => {
+//         if (onProgress) {
+//           onProgress({
+//             video: percent,
+//             thumbnail: 0,
+//             status: "Uploading video...",
+//           });
+//         }
+//       });
+//     }
+
+//     // Upload thumbnail if new file is provided
+//     if (videoData.thumbnailFile) {
+//       if (onProgress) {
+//         onProgress({
+//           video: videoData.videoFile ? 100 : 0,
+//           thumbnail: 0,
+//           status: "Getting upload URL for thumbnail...",
+//         });
+//       }
+
+//       const thumbnailUrlResult = await dispatch(
+//         getThumbnailUploadUrl(videoData.thumbnailFile.name, videoData.thumbnailFile.type)
+//       );
+
+//       if (!thumbnailUrlResult.success) {
+//         throw new Error(thumbnailUrlResult.error);
+//       }
+
+//       const { uploadUrl: thumbnailUploadUrl, fileUrl } = thumbnailUrlResult.data;
+//       thumbnailFileUrl = fileUrl;
+
+//       if (onProgress) {
+//         onProgress({
+//           video: videoData.videoFile ? 100 : 0,
+//           thumbnail: 0,
+//           status: "Uploading thumbnail...",
+//         });
+//       }
+
+//       await uploadFileToS3(thumbnailUploadUrl, videoData.thumbnailFile, (percent) => {
+//         if (onProgress) {
+//           onProgress({
+//             video: videoData.videoFile ? 100 : 0,
+//             thumbnail: percent,
+//             status: "Uploading thumbnail...",
+//           });
+//         }
+//       });
+//     }
+
+//     // Create or update Stage 2 video record
+//     if (onProgress) {
+//       onProgress({
+//         video: 100,
+//         thumbnail: 100,
+//         status: isUpdateMode 
+//           ? "Updating video information..." 
+//           : "Creating language adaptation...",
+//       });
+//     }
+
+//     const requestBody = {
+//       language: videoData.language,
+//       // Use new uploaded URLs if available, otherwise use existing URLs from videoData
+//       videoUrl: videoFileUrl || videoData.videoUrl,
+//       thumbnailUrl: thumbnailFileUrl || videoData.thumbnailUrl,
+//     };
+
+//     let response;
+//     let video;
+
+//     if (isUpdateMode) {
+//       // Update existing video using PATCH
+//       const { videoId, videoFile, thumbnailFile, ...updateData } = videoData;
+//       const finalUpdateData = {
+//         ...updateData,
+//         videoUrl: videoFileUrl || videoData.videoUrl,
+//         thumbnailUrl: thumbnailFileUrl || videoData.thumbnailUrl,
+//       };
+
+//       response = await api.patch(
+//         `${AGENCY_POC_VIDEOS}/${videoId}`,
+//         finalUpdateData
+//       );
+//       video = response.data.video;
+//     } else {
+//       // Create new Stage 2 video using POST
+//       response = await api.post(CREATE_STAGE2_VIDEO(masterVideoId), requestBody);
+//       video = response.data.video;
+//     }
+
+//     dispatch(uploadVideoSuccess({ video }));
+
+//     if (onProgress) {
+//       onProgress({
+//         video: 100,
+//         thumbnail: 100,
+//         status: isUpdateMode 
+//           ? "Video updated successfully!" 
+//           : "Language adaptation created successfully!",
+//       });
+//     }
+
+//     return { success: true, data: response.data };
+//   } catch (error) {
+//     const errorMessage =
+//       error.response?.data?.message ||
+//       error.message ||
+//       "Failed to create/update Stage 2 video";
+//     dispatch(uploadVideoFailure(errorMessage));
+//     return { success: false, error: errorMessage };
+//   }
+// };
+
+
+
+
+// Note: Only showing the updated createStage2Video function
+// The rest of the file remains the same as in the original document
 
 export const createStage2Video = (masterVideoId, videoData, onProgress) => async (dispatch) => {
   dispatch(uploadVideoStart());
@@ -746,7 +909,10 @@ export const createStage2Video = (masterVideoId, videoData, onProgress) => async
     let videoFileUrl = null;
     let thumbnailFileUrl = null;
 
-    // Upload video if provided
+    // Check if this is an update (resubmit mode) - videoData will have videoId
+    const isUpdateMode = !!videoData.videoId;
+
+    // Upload video if new file is provided
     if (videoData.videoFile) {
       if (onProgress) {
         onProgress({
@@ -786,7 +952,7 @@ export const createStage2Video = (masterVideoId, videoData, onProgress) => async
       });
     }
 
-    // Upload thumbnail if provided
+    // Upload thumbnail if new file is provided
     if (videoData.thumbnailFile) {
       if (onProgress) {
         onProgress({
@@ -826,28 +992,63 @@ export const createStage2Video = (masterVideoId, videoData, onProgress) => async
       });
     }
 
-    // Create Stage 2 video record
+    // Create or update Stage 2 video record
     if (onProgress) {
       onProgress({
         video: 100,
         thumbnail: 100,
-        status: "Creating language adaptation...",
+        status: isUpdateMode 
+          ? "Updating video information..." 
+          : "Creating language adaptation...",
       });
     }
 
     const requestBody = {
-      // videoUrl: videoFileUrl,
       language: videoData.language,
+      // Use new uploaded URLs if available, otherwise use existing URLs from videoData
       videoUrl: videoFileUrl || videoData.videoUrl,
       thumbnailUrl: thumbnailFileUrl || videoData.thumbnailUrl,
     };
 
-    if (thumbnailFileUrl) {
-      requestBody.thumbnailUrl = thumbnailFileUrl;
+    // Include additional fields if provided (for stage1 editable mode)
+    if (videoData.title) {
+      requestBody.title = videoData.title;
+    }
+    if (videoData.ctaType) {
+      requestBody.ctaType = videoData.ctaType;
+    }
+    if (videoData.doctorName) {
+      requestBody.doctorName = videoData.doctorName;
+    }
+    if (videoData.specialty) {
+      requestBody.specialty = videoData.specialty;
+    }
+    if (videoData.description) {
+      requestBody.description = videoData.description;
     }
 
-    const response = await api.post(CREATE_STAGE2_VIDEO(masterVideoId), requestBody);
-    const { video } = response.data;
+    let response;
+    let video;
+
+    if (isUpdateMode) {
+      // Update existing video using PATCH
+      const { videoId, videoFile, thumbnailFile, ...updateData } = videoData;
+      const finalUpdateData = {
+        ...updateData,
+        videoUrl: videoFileUrl || videoData.videoUrl,
+        thumbnailUrl: thumbnailFileUrl || videoData.thumbnailUrl,
+      };
+
+      response = await api.patch(
+        `${AGENCY_POC_VIDEOS}/${videoId}`,
+        finalUpdateData
+      );
+      video = response.data.video;
+    } else {
+      // Create new Stage 2 video using POST
+      response = await api.post(CREATE_STAGE2_VIDEO(masterVideoId), requestBody);
+      video = response.data.video;
+    }
 
     dispatch(uploadVideoSuccess({ video }));
 
@@ -855,7 +1056,9 @@ export const createStage2Video = (masterVideoId, videoData, onProgress) => async
       onProgress({
         video: 100,
         thumbnail: 100,
-        status: "Language adaptation created successfully!",
+        status: isUpdateMode 
+          ? "Video updated successfully!" 
+          : "Language adaptation created successfully!",
       });
     }
 
@@ -864,29 +1067,8 @@ export const createStage2Video = (masterVideoId, videoData, onProgress) => async
     const errorMessage =
       error.response?.data?.message ||
       error.message ||
-      "Failed to create Stage 2 video";
+      "Failed to create/update Stage 2 video";
     dispatch(uploadVideoFailure(errorMessage));
     return { success: false, error: errorMessage };
   }
 };
-
-
-// // .................... delete script ...............
-// export const deleteScript = (scriptId) => async (dispatch) => {
-//   dispatch(deleteScriptStart());
-
-//   try {
-//     await api.delete(`${AGENCY_POC_SCRIPTS}/${scriptId}`);
-
-//     dispatch(deleteScriptSuccess({ scriptId }));
-
-//     return { success: true };
-//   } catch (error) {
-//     const errorMessage =
-//       error.response?.data?.message ||
-//       error.message ||
-//       "Failed to delete script";
-//     dispatch(deleteScriptFailure(errorMessage));
-//     return { success: false, error: errorMessage };
-//   }
-// };

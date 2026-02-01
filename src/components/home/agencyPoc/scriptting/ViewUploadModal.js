@@ -71,6 +71,7 @@ const VideoUploadModal = ({
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [videoPreview, setVideoPreview] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
+  const [isDraftSaved, setIsDraftSaved] = useState(false);
 
   const [uploadProgress, setUploadProgress] = useState({
     video: 0,
@@ -107,6 +108,7 @@ const VideoUploadModal = ({
       setThumbnailFile(null);
       setVideoPreview(null);
       setThumbnailPreview(null);
+      setIsDraftSaved(false);
       setError(null);
       return;
     }
@@ -128,6 +130,7 @@ const VideoUploadModal = ({
       setThumbnailFile(null);
       setVideoPreview(existingVideoData.videoUrl || null);
       setThumbnailPreview(existingVideoData.thumbnailUrl || null);
+      setIsDraftSaved(false); 
     } catch (err) {
       console.error("Error prefilling form:", err);
       setError("Failed to load video data");
@@ -248,6 +251,7 @@ const VideoUploadModal = ({
           )
         );
         if (result.success) {
+           setIsDraftSaved(true);
           if (onUploadSuccess) {
             onUploadSuccess(result.data);
           }
@@ -284,8 +288,8 @@ const VideoUploadModal = ({
         // const submitResult = await dispatch(submitVideo(updatedVideoId));
 
         const submitResult = await dispatch(
-        submitVideo(updatedVideoId, formData.assignedReviewerId)
-      );
+          submitVideo(updatedVideoId, formData.assignedReviewerId)
+        );
         if (submitResult.success) {
           if (onUploadSuccess) {
             onUploadSuccess(submitResult.data);
@@ -311,9 +315,9 @@ const VideoUploadModal = ({
           return;
         }
         // const submitResult = await dispatch(submitVideo(videoId));
-          const submitResult = await dispatch(
+        const submitResult = await dispatch(
         submitVideo(videoId, formData.assignedReviewerId)
-      );
+        );
         if (submitResult.success) {
           if (onUploadSuccess) {
             onUploadSuccess(submitResult.data);
@@ -345,9 +349,9 @@ const VideoUploadModal = ({
           return;
         }
         // const submitResult = await dispatch(submitVideo(newVideoId));
-         const submitResult = await dispatch(
-        submitVideo(newVideoId, formData.assignedReviewerId)
-      );
+        const submitResult = await dispatch(
+          submitVideo(newVideoId, formData.assignedReviewerId)
+        );
         if (submitResult.success) {
           if (onUploadSuccess) {
             onUploadSuccess(submitResult.data);
@@ -410,6 +414,7 @@ const VideoUploadModal = ({
     setThumbnailPreview(null);
     setUploadProgress({ video: 0, thumbnail: 0, status: "" });
     setError(null);
+    setIsDraftSaved(false);
 
     onClose();
   };
@@ -523,31 +528,31 @@ const VideoUploadModal = ({
                     className="w-full max-h-64 rounded-lg mx-auto"
                   />
                   {/* {!isEditMode && ( */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (
-                          videoFile &&
-                          videoPreview &&
-                          videoFile instanceof File
-                        ) {
-                          URL.revokeObjectURL(videoPreview);
-                        }
-                        setVideoFile(null);
-                        // setVideoPreview(
-                        //   isEditMode && existingVideoData?.videoUrl
-                        //     ? existingVideoData.videoUrl
-                        //     : null
-                        // );
-                        setVideoPreview(null);
-                      }}
-                      disabled={uploading}
-                      className="text-sm hover:shadow-lg text-black bg-red-100 hover:text-red-800 disabled:opacity-50 border hover:border-red-800 border-red-300 p-2 rounded-xl"
-                    >
-                      {/* {isEditMode ? "Cancel Replace" : "Remove Video"}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (
+                        videoFile &&
+                        videoPreview &&
+                        videoFile instanceof File
+                      ) {
+                        URL.revokeObjectURL(videoPreview);
+                      }
+                      setVideoFile(null);
+                      // setVideoPreview(
+                      //   isEditMode && existingVideoData?.videoUrl
+                      //     ? existingVideoData.videoUrl
+                      //     : null
+                      // );
+                      setVideoPreview(null);
+                    }}
+                    disabled={uploading}
+                    className="text-sm hover:shadow-lg text-black bg-red-100 hover:text-red-800 disabled:opacity-50 border hover:border-red-800 border-red-300 p-2 rounded-xl"
+                  >
+                    {/* {isEditMode ? "Cancel Replace" : "Remove Video"}
                     </button> */}
-                      Remove Video
-                    </button>
+                    Remove Video
+                  </button>
                 </div>
               ) : (
                 <div
@@ -620,30 +625,30 @@ const VideoUploadModal = ({
                     className="w-full max-h-48 object-contain rounded-lg mx-auto"
                   />
                   {/* {!isEditMode && ( */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (
-                          thumbnailFile &&
-                          thumbnailPreview &&
-                          thumbnailFile instanceof File
-                        ) {
-                          URL.revokeObjectURL(thumbnailPreview);
-                        }
-                        setThumbnailFile(null);
-                        setThumbnailPreview(null);
-                        // setThumbnailPreview(
-                        //   isEditMode && existingVideoData?.thumbnailUrl
-                        //     ? existingVideoData.thumbnailUrl
-                        //     : null
-                        // );
-                      }}
-                      disabled={uploading}
-                      className="text-sm hover:shadow-lg text-black bg-red-100 hover:text-red-800 disabled:opacity-50 border hover:border-red-800 border-red-300 p-2 rounded-xl"
-                    >
-                       Remove Thumbnail
-                      {/* {isEditMode ? "Cancel Replace" : "Remove Thumbnail"} */}
-                    </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (
+                        thumbnailFile &&
+                        thumbnailPreview &&
+                        thumbnailFile instanceof File
+                      ) {
+                        URL.revokeObjectURL(thumbnailPreview);
+                      }
+                      setThumbnailFile(null);
+                      setThumbnailPreview(null);
+                      // setThumbnailPreview(
+                      //   isEditMode && existingVideoData?.thumbnailUrl
+                      //     ? existingVideoData.thumbnailUrl
+                      //     : null
+                      // );
+                    }}
+                    disabled={uploading}
+                    className="text-sm hover:shadow-lg text-black bg-red-100 hover:text-red-800 disabled:opacity-50 border hover:border-red-800 border-red-300 p-2 rounded-xl"
+                  >
+                    Remove Thumbnail
+                    {/* {isEditMode ? "Cancel Replace" : "Remove Thumbnail"} */}
+                  </button>
                   {/* )} */}
                 </div>
               ) : (
@@ -881,12 +886,12 @@ const VideoUploadModal = ({
                     </>
                   )}
                 </button>
-
+                
                 <button
                   type="button"
                   onClick={() => handleSubmit(false)}
                   disabled={
-                    uploading || !videoFile || !thumbnailFile || !formData.title
+                    uploading || !videoFile || !thumbnailFile || !formData.title || !isDraftSaved
                   }
                   className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white rounded-lg bg-gradient-to-r from-blue-600 to-teal-400 transition-all hover:brightness-110 active:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >

@@ -554,7 +554,7 @@ export const getVideoButtonState = (script) => {
     };
   }
   
-  const hasDraftVideo = script.videos.some(video => video.status === "DRAFT");
+  const hasDraftVideo = script.videos.some(video => video.status === "DRAFT" && video?.stage === "INITIAL_UPLOAD");
   
   if (hasDraftVideo) {
     return {

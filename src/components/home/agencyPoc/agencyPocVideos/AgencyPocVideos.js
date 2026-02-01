@@ -16,15 +16,16 @@ import {
 import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
 import ContentPreviewModal from "../../contentApprover/contentApproverVideos/ContentPreviewModal";
 import Stage2LanguageAdaptationModal from "./Stage2LanguageAdaptationModal";
-
+import TextViewModal from "../../../common/Modal/TextViewModal";
 const AgencyPocVideos = () => {
   const dispatch = useDispatch();
-  const { videos, isVideoListLoading, isSubmitVideoLoading, assigneeList } =
-    useSelector((state) => state.agencyPoc);
+  const { videos, isVideoListLoading, assigneeList } = useSelector(
+    (state) => state.agencyPoc,
+  );
 
-  const assigneeOptions = Array.isArray(assigneeList?.assigneeReviewer)
-    ? assigneeList.assigneeReviewer
-    : [];
+  // const assigneeOptions = Array.isArray(assigneeList?.assigneeReviewer)
+  //   ? assigneeList.assigneeReviewer
+  //   : [];
 
   const [activeTab, setActiveTab] = useState("all");
   const [activeStage, setActiveStage] = useState("stage1");
@@ -33,6 +34,14 @@ const AgencyPocVideos = () => {
   const [isStage2ModalOpen, setIsStage2ModalOpen] = useState(false);
   const [selectedMasterVideo, setSelectedMasterVideo] = useState(null);
   const [videoAssignees, setVideoAssignees] = useState({});
+  const [isResubmitModalOpen, setIsResubmitModalOpen] = useState(false);
+  const [videoForResubmit, setVideoForResubmit] = useState(null);
+  const [isTextViewModalOpen, setIsTextViewModalOpen] = useState(false);
+  const [textViewData, setTextViewData] = useState({
+    title: "",
+    content: "",
+    type: "default",
+  });
 
   const REVIEW_STATUSES = [
     "IN_REVIEW",
@@ -119,11 +128,12 @@ const AgencyPocVideos = () => {
     if (activeTab === "IN_REVIEW") {
       return REVIEW_STATUSES.includes(video.status);
     }
+    if (activeTab === "DRAFT") {
+      return video.status === "DRAFT" && video?.latestRejection === null;
+    }
 
     if (activeTab === "REJECTED") {
-      return (
-        video?.latestRejection !== null || (video.status === "REJECTED").length
-      );
+      return video?.latestRejection !== null || video.status === "REJECTED";
     }
     if (activeTab === "PUBLISHED" && activeStage === "stage1") {
       return video.status === "PUBLISHED" && video.stage === "INITIAL_UPLOAD";
@@ -131,17 +141,6 @@ const AgencyPocVideos = () => {
 
     return video.status === activeTab;
   });
-
-  // const tabCounts = {
-  //   all: videos.length,
-  //   IN_REVIEW: videos.filter((v) => REVIEW_STATUSES.includes(v.status)).length,
-  //   REJECTED: videos.filter((v) => v.status === "REJECTED").length,
-  //   PUBLISHED: videos.filter(
-  //     (v) => v.status === "PUBLISHED" && v?.stage === "INITIAL_UPLOAD",
-  //   ).length,
-  //   LOCKED: videos.filter((v) => v.status === "LOCKED").length,
-  //   DRAFT: videos.filter((v) => v.status === "DRAFT").length,
-  // };
 
   const getTabCounts = () => {
     const stageFilteredVideos = videos.filter((v) => {
@@ -160,7 +159,9 @@ const AgencyPocVideos = () => {
       ).length,
       PUBLISHED: stageFilteredVideos.filter((v) => v.status === "PUBLISHED")
         .length,
-      DRAFT: stageFilteredVideos.filter((v) => v.status === "DRAFT").length,
+      DRAFT: stageFilteredVideos.filter(
+        (v) => v.status === "DRAFT" && v.latestRejection === null,
+      ).length,
     };
   };
 
@@ -194,46 +195,36 @@ const AgencyPocVideos = () => {
   };
 
   const handleReuploadVideo = (video) => {
-    toast.info("Video upload coming soon!");
+    setVideoForResubmit(video);
+    setIsResubmitModalOpen(true);
   };
 
-  // const handleSubmitVideo = async (video) => {
-  //   const response = await dispatch(submitVideo(video.id));
+  // const handleSubmitVideo = async (video, reviewerId = null) => {
+  //   if (video.stage === "LANGUAGE_ADAPTATION" && !reviewerId) {
+  //     toast.error("Please select an assignee before submitting");
+  //     return;
+  //   }
+
+  //   const response = await dispatch(submitVideo(video.id, reviewerId || null));
 
   //   if (response?.success) {
   //     toast.success("Video submitted for review");
+  //     setVideoAssignees((prev) => {
+  //       const newState = { ...prev };
+  //       delete newState[video.id];
+  //       return newState;
+  //     });
+  //     const filters = {};
+  //     if (activeStage === "stage1") {
+  //       filters.stage = "INITIAL_UPLOAD";
+  //     } else if (activeStage === "stage2") {
+  //       filters.stage = "LANGUAGE_ADAPTATION";
+  //     }
+  //     dispatch(fetchAllVideos(filters));
   //   } else {
   //     toast.error(response?.error || "Failed to submit video");
   //   }
   // };
-
-  const handleSubmitVideo = async (video, reviewerId = null) => {
-    // For Stage 2 videos, we need assignedReviewerId
-    if (video.stage === "LANGUAGE_ADAPTATION" && !reviewerId) {
-      toast.error("Please select an assignee before submitting");
-      return;
-    }
-
-    const response = await dispatch(submitVideo(video.id, reviewerId || null));
-
-    if (response?.success) {
-      toast.success("Video submitted for review");
-      setVideoAssignees((prev) => {
-        const newState = { ...prev };
-        delete newState[video.id];
-        return newState;
-      });
-      const filters = {};
-      if (activeStage === "stage1") {
-        filters.stage = "INITIAL_UPLOAD";
-      } else if (activeStage === "stage2") {
-        filters.stage = "LANGUAGE_ADAPTATION";
-      }
-      dispatch(fetchAllVideos(filters));
-    } else {
-      toast.error(response?.error || "Failed to submit video");
-    }
-  };
 
   const handleCreateLanguageAdaptation = (masterVideo) => {
     setSelectedMasterVideo(masterVideo);
@@ -243,6 +234,30 @@ const AgencyPocVideos = () => {
   const handleStage2Success = () => {
     dispatch(fetchAllVideos({ stage: "LANGUAGE_ADAPTATION" }));
     toast.success("Language adaptation created successfully!");
+  };
+
+  const handleResubmitSuccess = () => {
+    const filters = {};
+    if (activeStage === "stage1") {
+      filters.stage = "INITIAL_UPLOAD";
+      dispatch(fetchAllVideos(filters));
+    } else if (activeStage === "stage2") {
+      filters.stage = "LANGUAGE_ADAPTATION";
+      dispatch(fetchAllVideos(filters));
+    }
+  };
+
+  const handleShowMore = (title, content, type = "default") => {
+    setTextViewData({ title, content, type });
+    setIsTextViewModalOpen(true);
+  };
+
+  const shouldShowMore = (text, maxLines = 4) => {
+    if (!text) return false;
+    const lines = text.split("\n").length;
+    if (lines > maxLines) return true;
+    const estimatedLines = Math.ceil(text.length / 40);
+    return estimatedLines > maxLines;
   };
 
   return (
@@ -356,7 +371,8 @@ const AgencyPocVideos = () => {
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              {activeStage === "stage1" ? "Master Videos" : "Published" } ({tabCounts.PUBLISHED})
+              {activeStage === "stage1" ? "Master Videos" : "Published"} (
+              {tabCounts.PUBLISHED})
             </button>
           </div>
         </div>
@@ -367,12 +383,12 @@ const AgencyPocVideos = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredVideos.map((video) => {
               const rejection = video?.latestRejection;
-              const shouldShowAssignBlock =
-                video.status === "DRAFT" &&
-                ((activeStage === "stage2" &&
-                  video.stage === "LANGUAGE_ADAPTATION") ||
-                  (activeStage === "stage1" &&
-                    video.stage === "INITIAL_UPLOAD"));
+              // const shouldShowAssignBlock =
+              //   video.status === "DRAFT" &&
+              //   ((activeStage === "stage2" &&
+              //     video.stage === "LANGUAGE_ADAPTATION") ||
+              //     (activeStage === "stage1" &&
+              //       video.stage === "INITIAL_UPLOAD"));
 
               const badge = getStatusBadge(video?.status);
               return (
@@ -395,6 +411,10 @@ const AgencyPocVideos = () => {
                       <FaVideo className="w-16 h-16 text-gray-400" />
                     )}
 
+                    <div className="absolute bottom-3 left-3 bg-gray-800 bg-opacity-90 text-white text-sm px-2 py-1 rounded font-medium">
+                      {video?.language}
+                    </div>
+
                     <div className="absolute justify-center">
                       <FaCirclePlay
                         onClick={() => handleViewVideo(video)}
@@ -416,7 +436,7 @@ const AgencyPocVideos = () => {
                       </div>
 
                       <div className="text-sm bg-gray-200 px-2 py-0.5 rounded-full border border text-gray-500">
-                        Uploaded: {formatDate(video.createdAt)}
+                        {formatDate(video.createdAt)}
                       </div>
                     </div>
 
@@ -431,31 +451,26 @@ const AgencyPocVideos = () => {
                       )}
                     </div>
 
-                    <div className="relative group mb-4">
-                      <div className="flex items-center gap-2 text-sm text-gray-600 border border-gray-300 rounded-lg bg-gray-50 p-2">
-                        <span className="text-md font-semibold">
-                          Description:{" "}
-                          <span
-                            className={`text-sm font-normal inline-block align-bottom ${
-                              !shouldShowAssignBlock
-                                ? "line-clamp-4 max-w-full"
-                                : "truncate max-w-[200px]"
-                            }`}
-                          >
-                            {video.description}
-                          </span>
+                    <div className="relative mb-4">
+                      <div className="flex flex-col gap-2 text-sm text-gray-600 border border-gray-300 rounded-lg bg-gray-50 p-2">
+                        <span className="text-sm  font-normal line-clamp-3 overflow-hidden">
+                          Description: {video.description}
                         </span>
+                        {shouldShowMore(video.description) && (
+                          <button
+                            onClick={() =>
+                              handleShowMore(
+                                "Description",
+                                video.description,
+                                "description",
+                              )
+                            }
+                            className="text-blue-600 hover:text-blue-800 hover:underline text-sm font-semibold self-start bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-md transition-colors"
+                          >
+                            Show more →
+                          </button>
+                        )}
                       </div>
-                      {video.description.length >
-                        (!shouldShowAssignBlock ? 150 : 30) && (
-                        <div
-                          className="absolute left-0 top-full mt-1 w-full bg-gray-900 text-white text-sm px-3 py-2 rounded-lg shadow-lg
-                   opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                   transition-all duration-200 z-10 pointer-events-none"
-                        >
-                          {video.description}
-                        </div>
-                      )}
                     </div>
 
                     {rejection?.comments && (
@@ -471,10 +486,19 @@ const AgencyPocVideos = () => {
                             </span>
                           </p>
                         </div>
-                        {rejection.comments.length > 30 && (
-                          <div className="absolute left-0 top-full mt-1 w-full bg-gray-900 text-white text-sm px-3 py-2 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 pointer-events-none max-h-32 overflow-y-auto">
-                            {rejection.comments}
-                          </div>
+                        {shouldShowMore(rejection.comments) && (
+                          <button
+                            onClick={() =>
+                              handleShowMore(
+                                "Rejection Feedback",
+                                rejection.comments,
+                                "rejection",
+                              )
+                            }
+                            className="text-red-600 hover:text-red-800 hover:underline text-sm font-semibold mt-2 ml-6 bg-red-100 hover:bg-red-200 px-3 py-1 rounded-md transition-colors"
+                          >
+                            Show more →
+                          </button>
                         )}
                       </div>
                     )}
@@ -491,7 +515,7 @@ const AgencyPocVideos = () => {
                     )}
 
                     <div className="flex gap-2">
-                      {video.status === "REJECTED" && (
+                      {video.status === "DRAFT" && rejection && (
                         <button
                           onClick={() => handleReuploadVideo(video)}
                           className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
@@ -503,14 +527,26 @@ const AgencyPocVideos = () => {
                       <button
                         onClick={() => handleViewVideo(video)}
                         className={`${
-                          video.status === "REJECTED" ? "flex-1" : "w-full"
-                        } hover:bg-gradient-to-r from-[#518dcd] to-[#7ac0ca] hover:text-white text-black px-4 py-2.5 rounded-lg font-medium transition-colors border border-cyan-300 flex items-center justify-center gap-2`}
+                          video.status === "DRAFT" ? "flex-1" : "w-full"
+                        } hover:bg-gradient-to-r from-[#518dcd] to-[#7ac0ca] hover:text-white text-black px-4 py-1.5 rounded-lg font-medium transition-colors border border-cyan-300 flex items-center justify-center gap-2`}
                       >
                         <FaEye className="w-4 h-4" />
                         View
                       </button>
                     </div>
-                    <div></div>
+
+                    {video.status === "DRAFT" &&
+                      video.stage === "LANGUAGE_ADAPTATION" &&
+                      video?.latestRejection === null && (
+                        <button
+                          // onClick={() => handleCreateLanguageAdaptation(video)}
+                          onClick={() => handleReuploadVideo(video)}
+                          className="w-full mt-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                        >
+                          <FaCloudUploadAlt className="w-4 h-4" />
+                          Continue to Draft
+                        </button>
+                      )}
 
                     {activeStage === "stage1" &&
                       activeTab === "PUBLISHED" &&
@@ -525,7 +561,7 @@ const AgencyPocVideos = () => {
                         </button>
                       )}
 
-                    {shouldShowAssignBlock && (
+                    {/* {shouldShowAssignBlock && (
                       <div className="mt-2 space-y-2">
                         <select
                           value={videoAssignees[video.id] || ""}
@@ -563,7 +599,7 @@ const AgencyPocVideos = () => {
                             : "Submit for Review"}
                         </button>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </div>
               );
@@ -597,7 +633,29 @@ const AgencyPocVideos = () => {
         }}
         masterVideo={selectedMasterVideo}
         onSuccess={handleStage2Success}
-        activeStage = {activeStage}
+        activeStage={activeStage}
+      />
+
+      {videoForResubmit && (
+        <Stage2LanguageAdaptationModal
+          open={isResubmitModalOpen}
+          onClose={() => {
+            setIsResubmitModalOpen(false);
+            setVideoForResubmit(null);
+          }}
+          masterVideo={videoForResubmit}
+          onSuccess={handleResubmitSuccess}
+          activeStage={activeStage}
+          isResubmit={true}
+        />
+      )}
+
+      <TextViewModal
+        isOpen={isTextViewModalOpen}
+        onClose={() => setIsTextViewModalOpen(false)}
+        title={textViewData.title}
+        content={textViewData.content}
+        contentType={textViewData.type}
       />
     </div>
   );
