@@ -26,6 +26,7 @@ import { getVideoButtonState, getWordCount } from "../../../../utils/helper";
 import { LIMIT } from "../../../../utils/constants";
 import Pagination from "../../../common/pagination/Pagination";
 import { clearSelectedVideoData } from "../../../../redux/reducer/agencyPocReducer/AgencyPocReducer";
+import { CiFilter, CiSearch } from "react-icons/ci";
 
 const Scriptting = () => {
   const dispatch = useDispatch();
@@ -117,7 +118,7 @@ const Scriptting = () => {
 
     // If allVideosId is available, check if any video is in the uploaded list
     if (allVideosId && allVideosId.length > 0) {
-      return script.videos.some(video => allVideosId.includes(video.id));
+      return script.videos.some((video) => allVideosId.includes(video.id));
     }
 
     // Fallback: if videos array exists and has items, consider it as having video
@@ -127,8 +128,8 @@ const Scriptting = () => {
   // Helper function to get video ID for script
   const getScriptVideoId = (script) => {
     if (!script.videos || script.videos.length === 0) return null;
-    const uploadedVideo = script.videos.find(video => 
-      allVideosId && allVideosId.includes(video.id)
+    const uploadedVideo = script.videos.find(
+      (video) => allVideosId && allVideosId.includes(video.id),
     );
     return uploadedVideo ? uploadedVideo.id : null;
   };
@@ -270,7 +271,7 @@ const Scriptting = () => {
       dispatch(fetchAllScripts({ page, size: LIMIT }));
       dispatch(fetchAllVideosID());
     },
-    [dispatch, page]
+    [dispatch, page],
   );
 
   const formatDate = (dateString) => {
@@ -301,6 +302,26 @@ const Scriptting = () => {
             </p>
           </div>
 
+          <div className="bg-white rounded-lg shadow-md p-4 mb-6 mt-4">
+            <div className="flex flex-col lg:flex-row gap-4">
+              <div className="flex-1 relative">
+                <CiSearch
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={20}
+                />
+                <input
+                  type="text"
+                  placeholder="Search Script..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <button className="flex items-center justify-center gap-2 px-4 py-2 hover:bg-teal-500 hover:text-white border border-gray-300 rounded-xl text-gray-700 font-medium transition-colors whitespace-nowrap">
+                <CiFilter size={20} />
+                Filter
+              </button>
+            </div>
+          </div>
+
           <div className="max-w-7xl mx-auto border-b border-gray-300">
             <div className="flex gap-2 sm:gap-6 overflow-x-auto scrollbar-hide">
               {tabs.map((tab) => (
@@ -329,7 +350,7 @@ const Scriptting = () => {
             <div className="space-y-4">
               {filteredScripts.map((script) => {
                 const hasVideo = hasUploadedVideo(script);
-                 const buttonState = getVideoButtonState(script);
+                const buttonState = getVideoButtonState(script);
                 return (
                   <div
                     key={script.id}
@@ -377,7 +398,7 @@ const Scriptting = () => {
                         </div>
 
                         <div className="flex items-center gap-2 flex-shrink-0">
-                           {script.status === "LOCKED" && (
+                          {script.status === "LOCKED" && (
                             <>
                               {buttonState.buttonType === "upload" && (
                                 <button

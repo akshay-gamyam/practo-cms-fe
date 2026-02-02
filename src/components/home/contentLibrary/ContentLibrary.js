@@ -237,7 +237,7 @@ const ContentLibrary = () => {
                         {item.specialty || "N/A"}
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
                             item.status,

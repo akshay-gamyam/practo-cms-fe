@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt, FaEye, FaVideo } from "react-icons/fa";
 import { RxCrossCircled } from "react-icons/rx";
-import { HiOutlineVideoCamera } from "react-icons/hi";
+import {HiOutlineInformationCircle } from "react-icons/hi";
 import { SiTicktick } from "react-icons/si";
 import { IoMdTime } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,6 +17,7 @@ import SkeletonBlock from "../../../common/skeletonBlock/SkeletonBlock";
 import ContentPreviewModal from "../../contentApprover/contentApproverVideos/ContentPreviewModal";
 import Stage2LanguageAdaptationModal from "./Stage2LanguageAdaptationModal";
 import TextViewModal from "../../../common/Modal/TextViewModal";
+import { CiFilter, CiSearch } from "react-icons/ci";
 const AgencyPocVideos = () => {
   const dispatch = useDispatch();
   const { videos, isVideoListLoading, assigneeList } = useSelector(
@@ -270,24 +271,57 @@ const AgencyPocVideos = () => {
           <p className="text-gray-600">Videos uploaded for locked scripts</p>
         </div>
 
-        <div className="bg-gradient-to-r from-cyan-50 to-blue-50 border border-cyan-200 rounded-xl p-6 mb-8 flex gap-4">
-          <div className="flex-shrink-0">
-            <div className="w-12 h-12 rounded-full bg-cyan-500 flex items-center justify-center text-white flex-shrink-0">
-              <HiOutlineVideoCamera className="w-6 h-6 text-white" />
+        <div className="bg-white rounded-lg shadow-md p-4 mb-6 mt-4">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1 relative">
+              <CiSearch
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <input
+                type="text"
+                placeholder="Search Videos..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
             </div>
+            <button className="flex items-center justify-center gap-2 px-4 py-2 hover:bg-teal-500 hover:text-white border border-gray-300 rounded-xl text-gray-700 font-medium transition-colors whitespace-nowrap">
+              <CiFilter size={20} />
+              Filter
+            </button>
           </div>
-          <div>
-            <h3 className="text-lg font-semibold text-cyan-900 mb-2">
+        </div>
+
+        <div className="fixed top-8 right-4 z-50 cursor-pointer">
+          <div className="relative group flex items-center gap-2 border border-gray-300 rounded-full bg-white/70 px-4 py-2 shadow-md backdrop-blur-md transition hover:shadow-lg">
+            <span className="text-sm font-semibold text-cyan-900">
               How to Upload Videos
-            </h3>
-            <p className="text-cyan-700">
-              Videos can only be uploaded for scripts that have been{" "}
-              <span className="font-semibold">approved and locked</span>. Go to{" "}
-              <span className="font-semibold">"Scripts"</span> page, find locked
-              scripts, and click the{" "}
-              <span className="font-semibold">"Upload Video"</span> button to
-              upload your video for that specific script.
-            </p>
+            </span>
+
+            <HiOutlineInformationCircle className="w-6 h-6 text-cyan-600 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" />
+
+            <div className="pointer-events-none absolute right-0 top-full mt-3 w-80 origin-top-right scale-95 rounded-xl border border-white/20 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-5 py-4 text-sm text-gray-100 opacity-0 shadow-2xl backdrop-blur-xl transition-all duration-300 group-hover:scale-100 group-hover:opacity-100">
+              <div className="absolute -top-2 right-6 h-4 w-4 rotate-45 bg-gray-900"></div>
+
+              <p className="leading-relaxed">
+                Videos can only be uploaded for scripts that have
+                <span className="ml-1 font-semibold text-cyan-400">
+                  approved and locked
+                </span>
+                .
+              </p>
+
+              <p className="mt-2 leading-relaxed">
+                Go to the
+                <span className="mx-1 font-semibold text-blue-400">
+                  "Scripts"
+                </span>
+                page, find locked scripts, and click
+                <span className="ml-1 font-semibold text-green-400">
+                  "Upload Video"
+                </span>
+                .
+              </p>
+            </div>
           </div>
         </div>
 

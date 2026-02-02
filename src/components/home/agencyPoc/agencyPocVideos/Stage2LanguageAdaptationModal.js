@@ -908,7 +908,7 @@ const Stage2LanguageAdaptationModal = ({
             ) : (
               <>
                 {isResubmit ? <FiSend size={16} /> : null}
-                {isResubmit ? "Resubmit for Review" : null}
+                {isResubmit ? "Submit" : null}
               </>
             )}
           </button>
