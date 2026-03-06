@@ -126,8 +126,8 @@ const Sidebar = () => {
                 item.label === "My Topics"
                   ? "Doctor Notes"
                   : item.label}
-                {/* {item.label} */}
               </span>
+              {item?.label === "Notifications" && (<spam className="bg-red-400 font-bold px-1 py-0.5 text-xs text-black rounded-full">{user?.notifications?.unreadCount }</spam> )}
             </button>
           );
         })}

@@ -45,6 +45,11 @@ export const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
     icon: <IoDocumentTextOutline size={20} />,
     path: ROUTES.CONTENT_LIBRARY,
   },
+  {
+    label: role === "SUPER_ADMIN" ? "Review Queue" : "Assigned Videos",
+    icon: <LiaFileVideoSolid size={20} />,
+    path: ROUTES.CONTENT_APPROVER_VIDEOS,
+  },
   { label: "Upload", icon: <FiUpload size={20} />, path: ROUTES.UPLOAD },
   {
     label: "Assigned Topics",
@@ -86,11 +91,7 @@ export const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
   //   icon: <LiaFileVideoSolid size={20} />,
   //   path: ROUTES.CONTENT_APPROVER_VIDEOS,
   // },
-  {
-    label: role === "SUPER_ADMIN" ? "Review Queue" : "Assigned Videos",
-    icon: <LiaFileVideoSolid size={20} />,
-    path: ROUTES.CONTENT_APPROVER_VIDEOS,
-  },
+  
   { label: "Videos", icon: <IoVideocam size={20} />, path: ROUTES.VIDEOS },
   {
     label: "Review Queue",
