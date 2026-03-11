@@ -518,6 +518,25 @@ const Scriptting = () => {
                         </div>
                       </div>
 
+                       {script.latestRejection && (
+                          <div className="mt-4 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
+                            <div className="flex items-start gap-2">
+                              <div className="mt-0.5 flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                                <FiXCircle size={16} className="text-red-600" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-md font-medium text-red-900 mb-1">
+                                  Rejection Reason:
+                                </p>
+                                <p className="text-sm text-red-800 break-words">
+                                  {script.latestRejection.comments}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+
                       {script.rejectionReason &&
                         script.status === "REJECTED" && (
                           <div className="mt-4 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
